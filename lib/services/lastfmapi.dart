@@ -39,10 +39,10 @@ class RateLimitException implements Exception {
   }
 }
 
-class SearchResult<T> {
-  SearchResult(this.musicInfoList, this.totalItems, this.currentPage);
+class LastFMSearchResult<T> {
+  LastFMSearchResult(this.items, this.totalItems, this.currentPage);
 
-  final List<T> musicInfoList;
+  final List<T> items;
   final int totalItems;
   //final int totalPages;
   final int currentPage;
@@ -66,7 +66,7 @@ class LastfmAPI<T> {
 
   ///this is the only method that should be called.
   ///Other public methods are for inheritance purposes.
-  Future<SearchResult> search(String searchString,
+  Future<LastFMSearchResult> search(String searchString,
       {required MusicInfoType searchType,
       int page = 1,
       int itemCount = 50}) async {
@@ -75,7 +75,7 @@ class LastfmAPI<T> {
     final data = decode(response);
     checkForServiceErrors(data);
     items = jsonToOjects(data, searchType);
-    return SearchResult(items, _totalItems, page);
+    return LastFMSearchResult(items, _totalItems, page);
   }
 
   List<T> jsonToOjects(MapStringDynamic data, MusicInfoType searchType) {

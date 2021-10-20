@@ -13,12 +13,17 @@ const Int64maxValue = 0x7FFFFFFFFFFFFFFF;
 const Int64minValue = -0x8000000000000000;
 */
 Widget loadingIndicator({String semantics = 'waiting'}) {
-  return Center(
-    child: Container(
-      height: 50,
-      width: 50,
-      child: CircularProgressIndicator.adaptive(
-        semanticsLabel: semantics,
+  return Container(
+    color: Colors.red,
+    alignment: Alignment.center,
+    child: Center(
+      child: Container(
+        color: Colors.blue,
+        height: 30,
+        width: 30,
+        child: CircularProgressIndicator.adaptive(
+          semanticsLabel: semantics,
+        ),
       ),
     ),
   );

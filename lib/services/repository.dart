@@ -8,48 +8,65 @@ import 'package:jobtest_lastfm/app/models/musicinfoview.dart';
 import 'devapi.dart';
 import 'lastfmapi.dart';
 
+enum RepoStatus { none, init, loading }
+
 const Map<MusicInfoType, String> musicInfoTypeStrings = {
   MusicInfoType.albums: 'albums',
   MusicInfoType.tracks: 'tracks',
   MusicInfoType.artists: 'artists',
 };
 
+class RepoFetchResult<T> {
+  RepoFetchResult(
+    this.infoType,
+    this.items,
+    this.totalItems,
+    this.isFirst,
+    this.page,
+  );
+
+  final MusicInfoType infoType;
+  final List<T> items;
+  final int totalItems;
+  final int page;
+  final bool isFirst;
+  bool get isLast {
+    return items.length == totalItems;
+  }
+}
+
 class Repository<T> {
   Repository({required LastfmAPI lastFMapi}) : _lastFMapi = lastFMapi {
-    _streamController =
-        StreamController<List<T>?>(onListen: () => print('listening'));
-    _streamPageController =
-        StreamController<List<T>?>(onListen: () => print('pager listening'));
-    init();
+    _streamController = StreamController<RepoFetchResult<T>?>(
+        onListen: () => print('listening'));
+    _streamPageController = StreamController<RepoFetchResult<T>?>(
+        onListen: () => print('pager listening'));
   }
 
   final LastfmAPI _lastFMapi;
-  late final StreamController<List<T>?> _streamController;
-  late final StreamController<List<T>?> _streamPageController;
+  late final StreamController<RepoFetchResult<T>?> _streamController;
+  late final StreamController<RepoFetchResult<T>?> _streamPageController;
   String _searchString = '';
   MusicInfoType _searchType = MusicInfoType.albums;
   final List<T> _items = [];
   int _page = -1;
   int _totalItems = -1;
+  RepoStatus _status = RepoStatus.none;
 
-  void init() {
-    reset();
-  }
+  //gets
+
+  RepoStatus get status => _status;
 
   ///stream that is the main source of fetched data. (The next() call
   ///does not return data.) The data added is all items from all pages
   ///that have so far been fetched on a single search string.
   ///Suitable for endless scrolling listviews.
-  Stream<List<T>?> get stream => _streamController.stream;
+  Stream<RepoFetchResult<T>?> get stream => _streamController.stream;
   //stream that is the main source for fetched data. (The next() call
   //does not return data.) The data added is a single page of items
   //that have been fetched on the last next() call.
   //Suitable for paged views with next button.
-  Stream<List<T>?> get streamPage => _streamPageController.stream;
-
-  ///totalItems property is the total number of possible items matched
-  ///and that would be fetched if all pages are fetched.
-  int get totalItems => _totalItems;
+  Stream<RepoFetchResult<T>?> get streamPage => _streamPageController.stream;
 
   //events/callback
 
@@ -72,54 +89,77 @@ class Repository<T> {
   ///rawData is the source data from the json for any other
   ///info that could be extrated or further processed to add to a MusicInfo with
   ///more fields etc.
-  static Modelizer modelize = (
-    String name,
-    String imageLinkSmall,
-    String imageLinkMedium,
-    Map<String, String> otherData,
-    MapStringDynamic rawData,
-  ) {
-    return MusicInfo(name, imageLinkSmall, imageLinkMedium, otherData);
+  // ignore: prefer_function_declarations_over_variables
+  static Modelizer modelize =
+      (name, imageLinkSmall, imageLinkMedium, otherData, rawData) {
+    return MusicInfo(
+      name,
+      imageLinkSmall,
+      imageLinkMedium,
+      otherData,
+    );
   };
 
   void reset() {
     _searchString = '';
     _items.clear();
-    _page = 1;
+    _page = -1;
     _totalItems = -1;
     _streamController.add(null);
     _streamPageController.add(null);
+    _status = RepoStatus.none;
   }
 
   //initialise a search, ready for calling next()
   void searchInit(String searchStr) {
     final str = searchStr.trim();
-    if (searchStr != _searchString) {
-      reset();
-    }
+    if (str.isEmpty) reset();
+    if (str.length > 2) _status = RepoStatus.init;
+    //preserve whitespace for UI
     _searchString = searchStr;
   }
 
   ///next page of data added to previously fetched items and
   ///added to the stream.
   ///returns true on no new data
-  Future<bool> next({int UIdelayMillisecs = 0}) async {
+  Future<void> next({int UIdelayMillisecs = 0}) async {
     final stopWatch = Stopwatch();
     stopWatch.start();
-    beforeFetch(_items);
-    final results = await _lastFMapi.search(_searchString,
-        searchType: _searchType, page: _page);
-    _totalItems = results.totalItems;
-    afterFetch(results.musicInfoList as List<T>);
-    _page++;
-    _items.addAll(results.musicInfoList as List<T>);
-    final delay = UIdelayMillisecs - stopWatch.elapsed.inMilliseconds;
-    await Future.delayed(Duration(milliseconds: delay));
-    _streamPageController.add(results.musicInfoList as List<T>);
-    _streamController.add(_items);
-    finalizedFetch(_items);
-    final completed = _items.length == _totalItems;
-    return completed;
+    _status = RepoStatus.loading;
+    try {
+      beforeFetch(_items);
+      final results = await _lastFMapi.search(_searchString,
+          searchType: _searchType, page: _page);
+      _totalItems = results.totalItems;
+      afterFetch(results.items as List<T>);
+      _page++;
+      final fetchResultPage = RepoFetchResult<T>(
+          _searchType,
+          results.items as List<T>,
+          results.totalItems,
+          _items.length == 0,
+          _page);
+      _streamPageController.add(fetchResultPage);
+      _items.addAll(results.items as List<T>);
+      final fetchResultAll = RepoFetchResult<T>(
+        _searchType,
+        _items,
+        results.totalItems,
+        _items.length == 0,
+        _page,
+      );
+      _status = RepoStatus.none;
+      print('before stream add');
+      _streamController.add(fetchResultAll);
+      print('after stream add');
+      finalizedFetch(_items);
+      //completed = _items.length == _totalItems;
+      _status = RepoStatus.none;
+      final delay = UIdelayMillisecs - stopWatch.elapsed.inMilliseconds;
+      await Future.delayed(Duration(milliseconds: delay));
+    } finally {
+      _status = RepoStatus.none;
+    }
   }
 
   void dispose() {

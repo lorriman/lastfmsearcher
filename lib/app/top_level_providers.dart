@@ -50,17 +50,14 @@ final repositoryProvider = StateProvider<Repository<MusicInfo>>((ref) {
   return Repository<MusicInfo>(lastFMapi: database);
 });
 
-final viewModelProvider = Provider<MusicViewModel>((ref) {
+final viewModelProvider = ChangeNotifierProvider<MusicViewModel>((ref) {
   return MusicViewModel(ref.watch(repositoryProvider).state);
 });
 
-final musicInfoProvider = StreamProvider.autoDispose<List<MusicInfo>?>((ref) {
+final musicInfoProvider = StreamProvider<RepoFetchResult<MusicInfo>?>((ref) {
   print('######## musicInfoProvider build ########');
   final repo = ref.watch(repositoryProvider).state;
-  ref.onDispose(() {
-    print('%%%%%% musicInfoProvider dispose %%%%');
-    repo.dispose();
-  });
+
   return repo.stream;
 });
 

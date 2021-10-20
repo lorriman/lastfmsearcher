@@ -29,10 +29,10 @@ class _HomePageState extends State<HomePage> {
   //LastfmDatabase(apiKey: '5b162553274ad0ff3d5a71d798de3f2c'));
 
   void _onRadioChanged(dynamic value) {
-    setState(() {
+    /*setState(() {
       return;
       _radioGroupValue = value as String;
-    });
+    });*/
   }
 
   @override
@@ -78,18 +78,33 @@ class _HomePageState extends State<HomePage> {
               Consumer(
                 builder: (context, watch, _) {
                   final modelsAsyncValue = watch(musicInfoProvider);
+                  print('consumer builder');
+
+                  if (viewModel.isLoading && viewModel.isFirst) {
+                    return loadingIndicator(semantics: 'waiting for LastFM');
+                  }
+                  if (modelsAsyncValue.data == null && !viewModel.isLoading)
+                    return textPressSearchIcon();
+
+                  print(modelsAsyncValue.runtimeType);
                   return modelsAsyncValue.when(
-                    loading: () => Center(
-                      child: loadingIndicator(semantics: 'waiting for LastFM'),
-                    ),
+                    loading: () {
+                      return Center(
+                        child:
+                            loadingIndicator(semantics: 'waiting for LastFM'),
+                      );
+                    },
                     error: (e, st) => Text(
                       'Error $e ${kDebugMode ? st.toString() : ''}',
                     ),
-                    data: (data) => Expanded(
-                        child: ListViewMusicInfo(
-                      musicInfoItems: data,
-                      viewModel: viewModel,
-                    )),
+                    data: (data) {
+                      return Expanded(
+                          child: ListViewMusicInfo(
+                        musicInfoItems: data?.items ?? [],
+                        viewModel: viewModel,
+                        results: data,
+                      ));
+                    },
                   );
                 },
               )
@@ -133,9 +148,9 @@ class _HomePageState extends State<HomePage> {
         cursorColor: Colors.black,
         showCursor: true,
         onChanged: (value) {
-          setState(() {
-            viewModel.searchString = value;
-          });
+          //setState(() {
+          viewModel.searchString = value;
+          //});
         },
       ),
     );
@@ -167,6 +182,16 @@ class _HomePageState extends State<HomePage> {
   //Add an extra element for a loadingIndicator when the user
   // scrolls down to the last element, but not if there are no more items
 
+  Widget textPressSearchIcon() {
+    return Center(
+        heightFactor: 2,
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
+          Text('Press search icon'),
+          Icon(Icons.search),
+          Text('to search'),
+        ]));
+  }
 }
 
 class ListViewCard extends StatelessWidget {
@@ -192,12 +217,16 @@ class ListViewCard extends StatelessWidget {
 }
 
 class ListViewMusicInfo extends StatelessWidget {
-  const ListViewMusicInfo(
-      {Key? key, this.musicInfoItems, required this.viewModel})
-      : super(key: key);
+  const ListViewMusicInfo({
+    Key? key,
+    required this.musicInfoItems,
+    required this.viewModel,
+    required this.results,
+  }) : super(key: key);
 
-  final List<MusicInfo>? musicInfoItems;
+  final List<MusicInfo> musicInfoItems;
   final MusicViewModel viewModel;
+  final RepoFetchResult? results;
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +234,7 @@ class ListViewMusicInfo extends StatelessWidget {
     return ListView.builder(
       itemCount: computeElementCount(),
       itemBuilder: (context, idx) {
-        if (items == null) return textPressSearchIcon();
+        if (results == null) return textPressSearchIcon();
         if (items.isEmpty) return textNoItemsFound();
         //if this element is > items then it's a fetch and circular indicator
         if (idx == items.length) return fetchAndIndicate();
@@ -217,9 +246,9 @@ class ListViewMusicInfo extends StatelessWidget {
   //some inline convenience functions
   int computeElementCount() {
     final items = musicInfoItems;
-    if (items == null) return 1; //element for a message
+    if (results == null) return 1; //element for a message
     if (items.isEmpty) return 1; //ditto
-    if (viewModel.status == FetchType.complete) return items.length;
+    if (results!.isLast) return items.length;
     return items.length + 1;
   }
 

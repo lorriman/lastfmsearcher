@@ -5,7 +5,7 @@ import 'package:jobtest_lastfm/services/repository.dart';
 import 'lastfmapi.dart';
 
 class DevDatabase<T> implements LastfmAPI {
-  Future<SearchResult> search(String searchString,
+  Future<LastFMSearchResult> search(String searchString,
       {required MusicInfoType searchType,
       int page = 1,
       int itemCount = 20}) async {
@@ -14,11 +14,11 @@ class DevDatabase<T> implements LastfmAPI {
       items.add(
           MusicInfo('$searchString${i.toString()}', '', '', {'test': 'test'}));
     }
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(Duration(milliseconds: 2000));
     if (page > 3) {
-      return SearchResult(<T>[], 3 * itemCount, page);
+      return LastFMSearchResult(<T>[], 3 * itemCount, page);
     }
-    return SearchResult(items, 3 * itemCount, page);
+    return LastFMSearchResult(items, 3 * itemCount, page);
   }
 
   @override

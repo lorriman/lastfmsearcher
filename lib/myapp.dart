@@ -14,7 +14,8 @@ class _MyAppState extends State<MyApp> {
       onPointerDown: (_) {
         FocusScopeNode currentFocus = FocusScope.of(context);
         if (!currentFocus.hasPrimaryFocus) {
-          SystemChannels.textInput.invokeMethod('TextInput.hide');
+          //ignore analysis rule doesn't work here. Ignsore the 'error'
+          SystemChannels.textInput.invokeMethod<dynamic>('TextInput.hide');
           // currentFocus.focusedChild?.unfocus();
         }
       },

@@ -1,40 +1,40 @@
+import 'package:flutter/foundation.dart';
+import 'package:jobtest_lastfm/app/models/item.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:state_notifier/state_notifier.dart';
 
-enum FetchType { none, first, subsequent, complete }
-
-class MusicViewModel {
+class MusicViewModel extends ChangeNotifier {
   MusicViewModel(this._repository);
 
   //private
 
   String _searchString = '';
+  bool? _isFirst;
   final Repository _repository;
-  FetchType _status = FetchType.none;
-  int _totalResults = -1;
+  //FetchType _status = FetchType.none;
+  //int _totalResults = -1;
 
   //getters
 
   String get searchString => _searchString;
-  FetchType get status => _status;
-  int get totalResults => _totalResults;
-  bool get hasMoreData {
-    return status == FetchType.first || status == FetchType.subsequent;
-  }
+  //FetchType get status => _status;
+  //int get totalResults => _totalResults;
+
+  bool get isLoading => _repository.status == RepoStatus.loading;
+
+  bool get isFirst => _isFirst ?? false;
 
   //setters
 
   set searchString(String str) {
-    if (str != _searchString) {
-      _status = FetchType.none;
-      _totalResults = -1;
-    }
+    if (str != _searchString) _isFirst = null;
     _searchString = str;
     _repository.searchInit(searchString);
+    notifyListeners();
   }
 
   bool get notReady {
-    return _searchString.length < 3;
+    return _searchString.trim().length < 3;
   }
 
   ///fetches data
@@ -42,16 +42,15 @@ class MusicViewModel {
   ///Eg, to guarantee a progress indicator gets a chance to display.
   ///If the fetch is less than 350 milliseconds the repository method
   ///will delay the return of data through the stream by the difference.
-  Future<void> fetch() async {
-    switch (status) {
-      case FetchType.none:
-        _status = FetchType.first;
-        break;
-      case FetchType.first:
-        _status = FetchType.subsequent;
-        break;
+  void fetch() {
+    if (_isFirst == null) {
+      _isFirst = true;
+      notifyListeners();
+    } else {
+      _isFirst = false;
     }
-    final completed = await _repository.next(UIdelayMillisecs: 350);
-    _status = completed ? FetchType.complete : status;
+    _repository.next(UIdelayMillisecs: 350);
   }
 }
+
+//debuggin async code
