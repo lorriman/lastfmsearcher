@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/material.dart';
 
 const uInt32maxValue = 0xFFFFFFFF;
@@ -64,6 +66,11 @@ extension DateHelpers on DateTime {
   DateTime dayAfter() {
     return add(Duration(days: 1));
   }
+}
+
+Future<Map<String, dynamic>> parseJsonFromAssets(String assetsPath) async {
+  final str = await rootBundle.loadString(assetsPath);
+  return jsonDecode(str) as Map<String, dynamic>;
 }
 
 //todo: over-complicated rate limiter converting from python

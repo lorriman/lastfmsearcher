@@ -4,7 +4,7 @@ import 'package:jobtest_lastfm/services/repository.dart';
 
 import 'lastfmapi.dart';
 
-class DevDatabase<T> implements LastfmAPI {
+class DevAPI<T> implements LastfmAPI {
   Future<LastFMSearchResult> search(String searchString,
       {required String searchType, int page = 1, int itemCount = 20}) async {
     final List<MusicInfo> items = [];

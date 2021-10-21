@@ -60,6 +60,7 @@ class LastfmAPI<T> {
   ///Other public methods are for inheritance purposes.
   Future<LastFMSearchResult> search(String searchString,
       {required String searchType, int page = 1, int itemCount = 50}) async {
+    print('Api search');
     late final List<T> items;
     final response = await networkFetch(searchType, searchString, page);
     final data = decode(response);

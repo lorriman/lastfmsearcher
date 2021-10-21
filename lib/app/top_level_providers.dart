@@ -37,7 +37,11 @@ import 'models/viewmodel.dart';
 /// transforms its contents in to model-view objects.
 
 final databaseProvider = Provider((ref) {
-  return DevDatabase<MusicInfo>();
+  return LastfmAPI<MusicInfo>(
+    apiKey: global_apiKey,
+    modelize: Repository.modelize,
+    rateLimit: Duration(milliseconds: 500),
+  );
 });
 
 final repositoryProvider = StateProvider<Repository<MusicInfo>>((ref) {

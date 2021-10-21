@@ -128,6 +128,7 @@ class Repository<T> {
     //preserve whitespace for UI
     _searchString = searchStr;
     _musicInfoType = searchType;
+    _page = 1;
   }
 
   ///next page of data added to previously fetched items and
