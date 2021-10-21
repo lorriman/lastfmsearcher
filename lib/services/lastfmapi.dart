@@ -5,14 +5,6 @@ import 'globals.dart';
 
 typedef MapStringDynamic = Map<String, dynamic>;
 
-typedef LastFmModelizer<T> = T Function(
-  String name,
-  String imageLinkSmall,
-  String imageLinkMedium,
-  Map<String, String> otherData,
-  MapStringDynamic rawData,
-);
-
 class LastFmServerException implements Exception {
   final String cause;
   LastFmServerException(this.cause);
@@ -40,12 +32,20 @@ class LastFMSearchResult<T> {
   final int currentPage;
 }
 
+typedef LastFmModelizer<T> = T Function(
+  String name,
+  String imageLinkSmall,
+  String imageLinkMedium,
+  Map<String, String> otherData,
+  MapStringDynamic rawData,
+);
+
 class LastfmAPI<T> {
+// The API avoids data state, which should be managed by objects using the API.
   final _client = http.Client();
   final String _apiKey;
-  int _totalItems = -1;
-  DateTime? _fetchTime;
   Duration rateLimit;
+  DateTime? _fetchTime;
   final LastFmModelizer modelize;
 
   //todo: remove my apikey
@@ -61,33 +61,12 @@ class LastfmAPI<T> {
   Future<LastFMSearchResult> search(String searchString,
       {required String searchType, int page = 1, int itemCount = 50}) async {
     print('Api search');
-    late final List<T> items;
     final response = await networkFetch(searchType, searchString, page);
     final data = decode(response);
     checkForServiceErrors(data);
-    items = jsonToOjects(data, searchType);
-    return LastFMSearchResult(items, _totalItems, page);
-  }
-
-  List<T> jsonToOjects(MapStringDynamic data, String searchType) {
     final items = <T>[];
-    try {
-      final info = data['results'] as MapStringDynamic;
-      final List<dynamic> itemsMatches =
-          info['${searchType}matches'][searchType] as List<dynamic>;
-
-      _totalItems = int.parse(info['opensearch:totalResults']);
-
-      for (int idx = 0; idx < itemsMatches.length; idx++) {
-        final T item = itemJsonToModel(itemsMatches[idx]);
-        items.add(item);
-      }
-    } catch (e, st) {
-      logger.e(e, '', st);
-      throw LastFmApiException(
-          'App: problem with the data from lastFM - $data');
-    }
-    return items;
+    final totalItems = jsonToOjects(data, items, searchType);
+    return LastFMSearchResult(items, totalItems, page);
   }
 
   Future<http.Response> networkFetch(
@@ -129,6 +108,27 @@ class LastfmAPI<T> {
       logger.e(data['message']);
       throw LastFmApiException('Api: $msg');
     }
+  }
+
+  int jsonToOjects(MapStringDynamic data, List<T> items, String searchType) {
+    late final int totalItems;
+    try {
+      final info = data['results'] as MapStringDynamic;
+      final List<dynamic> itemsMatches =
+          info['${searchType}matches'][searchType] as List<dynamic>;
+
+      totalItems = int.parse(info['opensearch:totalResults']);
+
+      for (int idx = 0; idx < itemsMatches.length; idx++) {
+        final T item = itemJsonToModel(itemsMatches[idx]);
+        items.add(item);
+      }
+    } catch (e, st) {
+      logger.e(e, '', st);
+      throw LastFmApiException(
+          'App: problem with the data from lastFM - $data');
+    }
+    return totalItems;
   }
 
   T itemJsonToModel(MapStringDynamic itemData) {

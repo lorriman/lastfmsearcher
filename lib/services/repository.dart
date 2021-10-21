@@ -111,7 +111,6 @@ class Repository<T> {
   };
 
   void reset() {
-    _searchString = '';
     _items.clear();
     _page = -1;
     _totalItems = -1;
@@ -124,9 +123,9 @@ class Repository<T> {
   void searchInit(String searchStr, MusicInfoType searchType) {
     final str = searchStr.trim();
     if (str.isEmpty) reset();
+    if (str != _searchString) reset();
     if (str.length > 2) _status = RepoStatus.init;
-    //preserve whitespace for UI
-    _searchString = searchStr;
+    _searchString = str;
     _musicInfoType = searchType;
     _page = 1;
   }
@@ -134,23 +133,18 @@ class Repository<T> {
   ///next page of data added to previously fetched items and
   ///added to the stream.
   Future<void> next({int UIdelayMillisecs = 0}) async {
-    final stopWatch = Stopwatch();
-    stopWatch.start();
+    final stopWatch = Stopwatch()..start();
     _status = RepoStatus.loading;
     try {
       beforeFetch(_items);
       final results = await _lastFMapi.search(_searchString,
           searchType: searchTypeApiStrings[_musicInfoType]!, page: _page);
+      _page++;
       _totalItems = results.totalItems;
       afterFetch(results.items as List<T>);
-      _page++;
       //page of results
-      final fetchResultPage = RepoFetchResult<T>(
-          _musicInfoType,
-          results.items as List<T>,
-          results.totalItems,
-          _items.length == 0,
-          _page);
+      final fetchResultPage = RepoFetchResult<T>(_musicInfoType,
+          results.items as List<T>, results.totalItems, _items.isEmpty, _page);
       _streamPageController.add(fetchResultPage);
       _items.addAll(results.items as List<T>);
       //all results, for infinite scrolling
@@ -158,18 +152,15 @@ class Repository<T> {
         _musicInfoType,
         _items,
         results.totalItems,
-        _items.length == 0,
+        _items.isEmpty,
         _page,
       );
       _status = RepoStatus.none;
-      print('before stream add');
       _streamController.add(fetchResultAll);
-      print('after stream add');
       finalizedFetch(_items);
-      //completed = _items.length == _totalItems;
       _status = RepoStatus.none;
       final delay = UIdelayMillisecs - stopWatch.elapsed.inMilliseconds;
-      await Future.delayed(Duration(milliseconds: delay));
+      if (delay > 0) await Future.delayed(Duration(milliseconds: delay));
     } finally {
       _status = RepoStatus.none;
     }

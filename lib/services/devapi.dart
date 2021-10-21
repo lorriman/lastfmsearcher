@@ -45,7 +45,7 @@ class DevAPI<T> implements LastfmAPI {
   }
 
   @override
-  List<T> jsonToOjects(MapStringDynamic data, String searchType) {
+  int jsonToOjects(MapStringDynamic data, List items, String searchType) {
     // TODO: implement jsonToOjects
     throw UnimplementedError();
   }

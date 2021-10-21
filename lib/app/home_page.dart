@@ -2,11 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:jobtest_lastfm/app/top_level_providers.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
 
 import 'package:jobtest_lastfm/services/repository.dart';
-
 import 'models/item.dart';
 import 'models/viewmodel.dart';
 
@@ -53,7 +53,14 @@ class _HomePageState extends State<HomePage> {
               ),
               IconButton(
                 icon: Icon(Icons.search, semanticLabel: 'search button'),
-                onPressed: viewModel.notReady ? null : () => viewModel.fetch(),
+                onPressed: viewModel.notReady
+                    ? null
+                    : () {
+                        if (!viewModel.isLoading) {
+                          viewModel.searchString = _textController.value.text;
+                          viewModel.fetch();
+                        }
+                      },
               ),
             ],
           ),
@@ -198,7 +205,12 @@ class ListViewCard extends StatelessWidget {
         elevation: 10.0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text('$index ${item.name}'),
+          child: Text(
+            '${index + 1} - ${item.name}',
+            textScaleFactor: 1.5,
+            maxLines: 3,
+            softWrap: true,
+          ),
         ));
   }
 }

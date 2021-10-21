@@ -1,5 +1,3 @@
-//import 'dart:ui';
-
 class MusicInfo {
   MusicInfo(
       this.name, this.imageLinkSmall, this.imageLinkMedium, this.otherData);

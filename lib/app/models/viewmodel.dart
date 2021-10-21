@@ -18,9 +18,13 @@ class MusicViewModel extends ChangeNotifier {
 
   String get searchString => _searchString;
   MusicInfoType get searchType => _searchType;
+  //various useful to make UI more readable
   bool get isLoading => _repository.status == RepoStatus.loading;
   bool get isFirst => _isFirst ?? false;
-  bool get notReady => _searchString.trim().length < 3;
+  bool get notReady => !isReady;
+  bool get isReady =>
+      (_searchString.trim().length > 2) &&
+      (_repository.status != RepoStatus.loading);
 
   //setters
 
@@ -58,6 +62,6 @@ class MusicViewModel extends ChangeNotifier {
     } else {
       _isFirst = false;
     }
-    _repository.next(UIdelayMillisecs: 350);
+    _repository.next(UIdelayMillisecs: 0);
   }
 }
