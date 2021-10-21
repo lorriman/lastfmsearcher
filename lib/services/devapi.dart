@@ -54,7 +54,7 @@ class DevDatabase<T> implements LastfmAPI {
 
   @override
   // TODO: implement modelize
-  Modelizer get modelize => throw UnimplementedError();
+  LastFmModelizer get modelize => throw UnimplementedError();
 
   @override
   Future<Response> networkFetch(

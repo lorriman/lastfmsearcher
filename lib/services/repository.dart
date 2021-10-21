@@ -43,6 +43,8 @@ class Repository<T> {
         onListen: () => print('pager listening'));
   }
 
+  //private
+
   final LastfmAPI _lastFMapi;
   late final StreamController<RepoFetchResult<T>?> _streamController;
   late final StreamController<RepoFetchResult<T>?> _streamPageController;
@@ -90,7 +92,7 @@ class Repository<T> {
   ///info that could be extrated or further processed to add to a MusicInfo with
   ///more fields etc.
   // ignore: prefer_function_declarations_over_variables
-  static Modelizer modelize =
+  static LastFmModelizer modelize =
       (name, imageLinkSmall, imageLinkMedium, otherData, rawData) {
     return MusicInfo(
       name,
@@ -133,6 +135,7 @@ class Repository<T> {
       _totalItems = results.totalItems;
       afterFetch(results.items as List<T>);
       _page++;
+      //page of results
       final fetchResultPage = RepoFetchResult<T>(
           _musicInfoType,
           results.items as List<T>,
@@ -141,6 +144,7 @@ class Repository<T> {
           _page);
       _streamPageController.add(fetchResultPage);
       _items.addAll(results.items as List<T>);
+      //all results, for infinite scrolling
       final fetchResultAll = RepoFetchResult<T>(
         _musicInfoType,
         _items,

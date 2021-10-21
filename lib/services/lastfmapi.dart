@@ -12,7 +12,8 @@ const Map<MusicInfoType, String> searchTypeApiKeys = {
 };
 
 typedef MapStringDynamic = Map<String, dynamic>;
-typedef Modelizer<T> = T Function(
+
+typedef LastFmModelizer<T> = T Function(
   String name,
   String imageLinkSmall,
   String imageLinkMedium,
@@ -20,19 +21,19 @@ typedef Modelizer<T> = T Function(
   MapStringDynamic rawData,
 );
 
-class ServerException implements Exception {
+class LastFmServerException implements Exception {
   final String cause;
-  ServerException(this.cause);
+  LastFmServerException(this.cause);
 }
 
-class ApiException implements Exception {
+class LastFmApiException implements Exception {
   final String cause;
-  ApiException(this.cause);
+  LastFmApiException(this.cause);
 }
 
-class RateLimitException implements Exception {
+class LastFmRateLimitException implements Exception {
   final Duration millisecondsLimit;
-  RateLimitException(this.millisecondsLimit);
+  LastFmRateLimitException(this.millisecondsLimit);
   @override
   String toString() {
     return 'Rate limit of ${millisecondsLimit.inMilliseconds} exceeded';
@@ -44,7 +45,6 @@ class LastFMSearchResult<T> {
 
   final List<T> items;
   final int totalItems;
-  //final int totalPages;
   final int currentPage;
 }
 
@@ -54,7 +54,7 @@ class LastfmAPI<T> {
   int _totalItems = -1;
   DateTime? _fetchTime;
   Duration rateLimit;
-  final Modelizer modelize;
+  final LastFmModelizer modelize;
 
   //todo: remove my apikey
   LastfmAPI({
@@ -94,7 +94,8 @@ class LastfmAPI<T> {
       }
     } catch (e, st) {
       logger.e(e, '', st);
-      throw ApiException('App: problem with the data from lastFM - $data');
+      throw LastFmApiException(
+          'App: problem with the data from lastFM - $data');
     }
     return items;
   }
@@ -108,7 +109,7 @@ class LastfmAPI<T> {
     final response = await _client
         .get(url, headers: {'Accept': 'application/json; charset=UTF-8'});
     if (response.statusCode != 200) {
-      throw ServerException('Server: ${response.reasonPhrase}');
+      throw LastFmServerException('Server: ${response.reasonPhrase}');
     }
     return response;
   }
@@ -136,7 +137,7 @@ class LastfmAPI<T> {
           break;
       }
       logger.e(data['message']);
-      throw ApiException('Api: $msg');
+      throw LastFmApiException('Api: $msg');
     }
   }
 
@@ -144,9 +145,12 @@ class LastfmAPI<T> {
     final name = itemData['name'] as String;
     final imageSmall = (itemData['image']?[0]?['#text'] ?? '') as String;
     final imageMedium = (itemData['image']?[1]?['#text'] ?? '') as String;
-    itemData.removeWhere((key, dynamic value) => value is! String);
-    final other = itemData
-        .map<String, String>((k, dynamic v) => MapEntry(k, v as String));
+    final strData = Map.from(itemData);
+    //remove non-strings
+    strData.removeWhere((dynamic key, dynamic value) => value is! String);
+    //make a Map(String,String)
+    final other = strData.map<String, String>(
+        (dynamic k, dynamic v) => MapEntry(k, v as String));
     other.remove('name');
     //callback, note the cast at the end
     final item = modelize(name, imageSmall, imageMedium, other, itemData) as T;
@@ -163,7 +167,7 @@ class LastfmAPI<T> {
         if (limit) {
           await Future.delayed(diff);
         } else {
-          throw RateLimitException(rateLimit);
+          throw LastFmRateLimitException(rateLimit);
         }
       }
     }

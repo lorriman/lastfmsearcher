@@ -11,12 +11,11 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Listener(
+      //keyboard popdown
       onPointerDown: (_) {
         FocusScopeNode currentFocus = FocusScope.of(context);
         if (!currentFocus.hasPrimaryFocus) {
-          //ignore analysis rule doesn't work here. Ignsore the 'error'
           SystemChannels.textInput.invokeMethod<dynamic>('TextInput.hide');
-          // currentFocus.focusedChild?.unfocus();
         }
       },
       child: MaterialApp(
@@ -30,7 +29,6 @@ class _MyAppState extends State<MyApp> {
           primarySwatch: Colors.lightGreen,
           brightness: Brightness.dark,
         ),
-//      debugShowCheckedModeBanner: false,
         home: HomePage(),
       ),
     );

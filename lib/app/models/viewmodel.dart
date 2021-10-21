@@ -44,6 +44,8 @@ class MusicViewModel extends ChangeNotifier {
     if (value != null) searchType = value;
   }
 
+  //methods
+
   ///fetches data
   ///With a calculated delay for UI purposes.
   ///Eg, to guarantee a progress indicator gets a chance to display.
@@ -59,5 +61,3 @@ class MusicViewModel extends ChangeNotifier {
     _repository.next(UIdelayMillisecs: 350);
   }
 }
-
-//debuggin async code

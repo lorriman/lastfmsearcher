@@ -19,14 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //MusicInfoType _radioGroupValue = MusicInfoType.albums;
   late final TextEditingController _textController;
-
-//  final _repository = TestRepository(); //Repository(database: TestDatabase());
-
-  //LastfmDatabase(apiKey: '5b162553274ad0ff3d5a71d798de3f2c'));
-
-  //LastfmDatabase(apiKey: '5b162553274ad0ff3d5a71d798de3f2c'));
 
   @override
   void initState() {
@@ -39,8 +32,8 @@ class _HomePageState extends State<HomePage> {
     return Consumer(builder: (context, watch, _) {
       final viewModel = watch(viewModelProvider);
       return GestureDetector(
-        //keyboard pop-down, lots of confusion out there on this works
-        //onTapDown: (_) =>SystemChannels.textInput.invokeMethod('TextInput.hide'),
+        //legacy keyboard pop-down. We might have to resort to this
+        //if the other one doesn't work out. See [MyApp.build]->Listener
 
         //FocusManager.instance.primaryFocus?.unfocus(),
         //FocusScope.of(context).requestFocus(new FocusNode()),
