@@ -6,9 +6,7 @@ import 'lastfmapi.dart';
 
 class DevDatabase<T> implements LastfmAPI {
   Future<LastFMSearchResult> search(String searchString,
-      {required MusicInfoType searchType,
-      int page = 1,
-      int itemCount = 20}) async {
+      {required String searchType, int page = 1, int itemCount = 20}) async {
     final List<MusicInfo> items = [];
     for (var i = 0; i < itemCount; i++) {
       items.add(
@@ -47,7 +45,7 @@ class DevDatabase<T> implements LastfmAPI {
   }
 
   @override
-  List<T> jsonToOjects(MapStringDynamic data, MusicInfoType searchType) {
+  List<T> jsonToOjects(MapStringDynamic data, String searchType) {
     // TODO: implement jsonToOjects
     throw UnimplementedError();
   }
@@ -58,7 +56,7 @@ class DevDatabase<T> implements LastfmAPI {
 
   @override
   Future<Response> networkFetch(
-      MusicInfoType searchType, String searchString, int page) {
+      String searchType, String searchString, int page) {
     // TODO: implement networkFetch
     throw UnimplementedError();
   }

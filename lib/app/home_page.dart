@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jobtest_lastfm/app/top_level_providers.dart';
-import 'package:jobtest_lastfm/services/lastfmapi.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
 
 import 'package:jobtest_lastfm/services/repository.dart';
@@ -78,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                     return textPressSearchIcon();
 
                   return modelsAsyncValue.when(
-                    //data isn't livestreamed so this is null
+                    //data isn't livestreamed (unlike firestore) so this is null
                     //see fetchAndIndicate() in [ListViewMusicInfo.build]
                     loading: () => Center(child: Placeholder()),
                     error: (e, st) => SelectableText(

@@ -3,14 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'globals.dart';
 
-enum MusicInfoType { albums, tracks, artists }
-
-const Map<MusicInfoType, String> searchTypeApiKeys = {
-  MusicInfoType.albums: 'album',
-  MusicInfoType.tracks: 'track',
-  MusicInfoType.artists: 'artist',
-};
-
 typedef MapStringDynamic = Map<String, dynamic>;
 
 typedef LastFmModelizer<T> = T Function(
@@ -67,9 +59,7 @@ class LastfmAPI<T> {
   ///this is the only method that should be called.
   ///Other public methods are for inheritance purposes.
   Future<LastFMSearchResult> search(String searchString,
-      {required MusicInfoType searchType,
-      int page = 1,
-      int itemCount = 50}) async {
+      {required String searchType, int page = 1, int itemCount = 50}) async {
     late final List<T> items;
     final response = await networkFetch(searchType, searchString, page);
     final data = decode(response);
@@ -78,13 +68,12 @@ class LastfmAPI<T> {
     return LastFMSearchResult(items, _totalItems, page);
   }
 
-  List<T> jsonToOjects(MapStringDynamic data, MusicInfoType searchType) {
+  List<T> jsonToOjects(MapStringDynamic data, String searchType) {
     final items = <T>[];
     try {
       final info = data['results'] as MapStringDynamic;
       final List<dynamic> itemsMatches =
-          info['${searchTypeApiKeys[searchType]}matches']
-              [searchTypeApiKeys[searchType]] as List<dynamic>;
+          info['${searchType}matches'][searchType] as List<dynamic>;
 
       _totalItems = int.parse(info['opensearch:totalResults']);
 
@@ -101,9 +90,9 @@ class LastfmAPI<T> {
   }
 
   Future<http.Response> networkFetch(
-      MusicInfoType searchType, String searchString, int page) async {
+      String searchType, String searchString, int page) async {
     final link =
-        'https://ws.audioscrobbler.com/2.0/?method=${searchTypeApiKeys[searchType]}.search&${searchTypeApiKeys[searchType]}=$searchString&page=${page.toString()}&api_key=$_apiKey&format=json';
+        'https://ws.audioscrobbler.com/2.0/?method=${searchType}.search&${searchType}=$searchString&page=${page.toString()}&api_key=$_apiKey&format=json';
     final url = Uri.parse(link);
     await _checkRateOrLimit(limit: kReleaseMode);
     final response = await _client

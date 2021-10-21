@@ -10,7 +10,15 @@ import 'lastfmapi.dart';
 
 enum RepoStatus { none, init, loading }
 
-const Map<MusicInfoType, String> musicInfoTypeStrings = {
+enum MusicInfoType { albums, tracks, artists }
+
+const Map<MusicInfoType, String> searchTypeApiStrings = <MusicInfoType, String>{
+  MusicInfoType.albums: 'album',
+  MusicInfoType.tracks: 'track',
+  MusicInfoType.artists: 'artist',
+};
+
+const Map<MusicInfoType, String> musicInfoTypeUIStrings = {
   MusicInfoType.albums: 'albums',
   MusicInfoType.tracks: 'tracks',
   MusicInfoType.artists: 'artists',
@@ -131,7 +139,7 @@ class Repository<T> {
     try {
       beforeFetch(_items);
       final results = await _lastFMapi.search(_searchString,
-          searchType: _musicInfoType, page: _page);
+          searchType: searchTypeApiStrings[_musicInfoType]!, page: _page);
       _totalItems = results.totalItems;
       afterFetch(results.items as List<T>);
       _page++;
