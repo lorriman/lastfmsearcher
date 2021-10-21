@@ -1,6 +1,5 @@
 import 'package:http/src/response.dart';
 import 'package:jobtest_lastfm/app/models/item.dart';
-import 'package:jobtest_lastfm/services/repository.dart';
 
 import 'lastfmapi.dart';
 
@@ -23,7 +22,7 @@ class DevAPI<T> implements LastfmAPI {
   Duration rateLimit = Duration.zero;
 
   @override
-  void checkForServiceErrors(MapStringDynamic data) {
+  void checkForServiceErrors(MapSD data) {
     // TODO: implement checkForServiceErrors
   }
 
@@ -33,26 +32,26 @@ class DevAPI<T> implements LastfmAPI {
   }
 
   @override
-  MapStringDynamic decode(Response response) {
+  MapSD decode(Response response) {
     // TODO: implement decode
     throw UnimplementedError();
   }
 
   @override
-  T itemJsonToModel(MapStringDynamic itemData) {
+  T itemJsonToModel(MapSD itemData) {
     // TODO: implement itemJsonToModel
     throw UnimplementedError();
   }
 
   @override
-  int jsonToOjects(MapStringDynamic data, List items, String searchType) {
+  int jsonToOjects(MapSD data, List items, String searchType) {
     // TODO: implement jsonToOjects
     throw UnimplementedError();
   }
 
   @override
   // TODO: implement modelize
-  LastFmModelizer get modelize => throw UnimplementedError();
+  LastFmModelizer get modelizer => throw UnimplementedError();
 
   @override
   Future<Response> networkFetch(

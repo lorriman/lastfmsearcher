@@ -1,12 +1,9 @@
-//import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:math';
 
 import 'package:jobtest_lastfm/app/models/item.dart';
-import 'package:jobtest_lastfm/app/models/musicinfoview.dart';
-
-import 'devapi.dart';
 import 'lastfmapi.dart';
+
+// ignore_for_file: prefer_function_declarations_over_variables
 
 enum RepoStatus { none, init, loading }
 
@@ -54,6 +51,7 @@ class Repository<T> {
   //private
 
   final LastfmAPI _lastFMapi;
+  //stream are expected to be used by StreamProviders, see getters
   late final StreamController<RepoFetchResult<T>?> _streamController;
   late final StreamController<RepoFetchResult<T>?> _streamPageController;
   String _searchString = '';
@@ -66,10 +64,11 @@ class Repository<T> {
   //gets
 
   RepoStatus get status => _status;
+  int get totalItems => _totalItems;
 
   ///stream that is the main source of fetched data. (The next() call
   ///does not return data.) The data added is all items from all pages
-  ///that have so far been fetched on a single search string.
+  ///that have so far been fetched for the current search string.
   ///Suitable for endless scrolling listviews.
   Stream<RepoFetchResult<T>?> get stream => _streamController.stream;
   //stream that is the main source for fetched data. (The next() call
@@ -81,7 +80,7 @@ class Repository<T> {
   //events/callback
 
   ///callback for immediately prior to fetching data in next()
-  ///cancel. data is existing fetched items. totalItems is -1
+  ///data is existing fetched items. totalItems is -1
   ///on the first fetch, and valid after that.
   void Function(List<T> data) beforeFetch = (_) {};
 
@@ -97,9 +96,8 @@ class Repository<T> {
 
   ///callback for use in the API, passed in the apiProvider to the api constructor
   ///rawData is the source data from the json for any other
-  ///info that could be extrated or further processed to add to a MusicInfo with
+  ///info that could be extracted or further processed to add to a MusicInfo with
   ///more fields etc.
-  // ignore: prefer_function_declarations_over_variables
   static LastFmModelizer modelize =
       (name, imageLinkSmall, imageLinkMedium, otherData, rawData) {
     return MusicInfo(
@@ -132,7 +130,9 @@ class Repository<T> {
 
   ///next page of data added to previously fetched items and
   ///added to the stream.
-  Future<void> next({int UIdelayMillisecs = 0}) async {
+  ///The uiDelayMillisecs is to guarantee a progress indicator
+  ///gets to be seen in case fetching is near instantaneous.
+  Future<void> next({int uiDelayMillisecs = 0}) async {
     final stopWatch = Stopwatch()..start();
     _status = RepoStatus.loading;
     try {
@@ -159,7 +159,7 @@ class Repository<T> {
       _streamController.add(fetchResultAll);
       finalizedFetch(_items);
       _status = RepoStatus.none;
-      final delay = UIdelayMillisecs - stopWatch.elapsed.inMilliseconds;
+      final delay = uiDelayMillisecs - stopWatch.elapsed.inMilliseconds;
       if (delay > 0) await Future.delayed(Duration(milliseconds: delay));
     } finally {
       _status = RepoStatus.none;

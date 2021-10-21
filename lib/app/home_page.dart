@@ -18,6 +18,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  //todo: shoft the controller in to the ViewModel
   late final TextEditingController _textController;
 
   @override
@@ -36,9 +37,7 @@ class _HomePageState extends State<HomePage> {
 
         //FocusManager.instance.primaryFocus?.unfocus(),
         //FocusScope.of(context).requestFocus(new FocusNode()),
-
         behavior: HitTestBehavior.translucent,
-
         child: Scaffold(
           appBar: AppBar(
             title: Text(
@@ -49,14 +48,16 @@ class _HomePageState extends State<HomePage> {
             actions: [
               Container(
                 width: 150,
-                child: _searchField(viewModel),
+                child: _searchTextField(viewModel),
               ),
               IconButton(
                 icon: Icon(Icons.search, semanticLabel: 'search button'),
                 onPressed: viewModel.notReady
                     ? null
                     : () {
-                        if (!viewModel.isLoading) {
+                        //notLoading absorbs an accidental double-tap without
+                        //disabling the button
+                        if (viewModel.notLoading) {
                           viewModel.searchString = _textController.value.text;
                           viewModel.fetch();
                         }
@@ -66,7 +67,14 @@ class _HomePageState extends State<HomePage> {
           ),
           body: Column(
             children: [
-              Container(height: 40, child: _radioButtons(viewModel)),
+              Row(children: [
+                _radioButtons(viewModel),
+                if (viewModel.hasItems)
+                  Text(
+                    'found: ${thousandsFormatter.format(viewModel.totalItems)} ',
+                    maxLines: 2,
+                  ),
+              ]),
               Consumer(
                 builder: (context, watch, _) {
                   final modelsAsyncValue = watch(musicInfoProvider);
@@ -84,7 +92,8 @@ class _HomePageState extends State<HomePage> {
                     return textPressSearchIcon();
 
                   return modelsAsyncValue.when(
-                    //data isn't livestreamed (unlike firestore) so this is null
+                    //data isn't livestreamed (unlike firestore) so
+                    //loading is never called.
                     //see fetchAndIndicate() in [ListViewMusicInfo.build]
                     loading: () => Center(child: Placeholder()),
                     error: (e, st) => SelectableText(
@@ -108,7 +117,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Widget _searchField(MusicViewModel viewModel) {
+  Widget _searchTextField(MusicViewModel viewModel) {
     return Theme(
       data: ThemeData(
           textSelectionTheme: TextSelectionThemeData(
@@ -149,9 +158,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+//todo: turn this in to a loop
   Widget _radioButtons(MusicViewModel viewModel) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text('albums'),
         Radio<MusicInfoType>(

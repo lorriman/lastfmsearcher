@@ -1,11 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jobtest_lastfm/services/devapi.dart';
 import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/lastfmapi.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
-
 import 'models/item.dart';
-import 'models/musicinfoview.dart';
 import 'models/viewmodel.dart';
 
 /// # Top Level Providers
@@ -31,16 +28,13 @@ import 'models/viewmodel.dart';
 /// That stream is offered by musicInfoStreamProvider.
 /// The UI watches this stream.
 ///
-/// ## MvvM
-/// Alternatively in MvvM, and in this project, the UI watches the
-/// musicViewModelsStreamProvider which is watching the MusicInfo stream and
-/// transforms its contents in to model-view objects.
+//todo: writeup MvvM
 
 final databaseProvider = Provider((ref) {
   return LastfmAPI<MusicInfo>(
     apiKey: global_apiKey,
-    modelize: Repository.modelize,
-    rateLimit: Duration(milliseconds: 0),
+    modelizer: Repository.modelize,
+    rateLimit: Duration(milliseconds: 350),
   );
 });
 

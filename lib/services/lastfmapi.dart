@@ -3,7 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'globals.dart';
 
-typedef MapStringDynamic = Map<String, dynamic>;
+//shorthand as there's a lot of this
+typedef MapSD = Map<String, dynamic>;
+
+//todo: exceptions not working as expected
 
 class LastFmServerException implements Exception {
   final String cause;
@@ -32,12 +35,13 @@ class LastFMSearchResult<T> {
   final int currentPage;
 }
 
+///for a client to supply a callback to produce the T objects they want
 typedef LastFmModelizer<T> = T Function(
   String name,
   String imageLinkSmall,
   String imageLinkMedium,
   Map<String, String> otherData,
-  MapStringDynamic rawData,
+  MapSD rawData,
 );
 
 class LastfmAPI<T> {
@@ -46,18 +50,20 @@ class LastfmAPI<T> {
   final String _apiKey;
   Duration rateLimit;
   DateTime? _fetchTime;
-  final LastFmModelizer modelize;
+  final LastFmModelizer modelizer;
 
-  //todo: remove my apikey
   LastfmAPI({
     required this.rateLimit,
     required String apiKey,
-    required this.modelize,
+    required this.modelizer,
   })  : _apiKey = apiKey,
         assert(rateLimit.inMilliseconds > -1);
 
   ///this is the only method that should be called.
   ///Other public methods are for inheritance purposes.
+  ///searchType is either 'album', 'track' or 'artist'.
+  ///itemCount is number of items to fetch per page.
+  ///fetching beyond the end returns an empty result, not null.
   Future<LastFMSearchResult> search(String searchString,
       {required String searchType, int page = 1, int itemCount = 50}) async {
     print('Api search');
@@ -83,13 +89,12 @@ class LastfmAPI<T> {
     return response;
   }
 
-  MapStringDynamic decode(http.Response response) {
-    final MapStringDynamic data =
-        json.decode(response.body) as MapStringDynamic;
+  MapSD decode(http.Response response) {
+    final MapSD data = json.decode(response.body) as MapSD;
     return data;
   }
 
-  void checkForServiceErrors(MapStringDynamic data) {
+  void checkForServiceErrors(MapSD data) {
     if (data['error'] != null) {
       String msg = 'There was an error fetching the data from LastFM';
       switch (data['error']) {
@@ -110,10 +115,14 @@ class LastfmAPI<T> {
     }
   }
 
-  int jsonToOjects(MapStringDynamic data, List<T> items, String searchType) {
+  ///extracts meta data, like the total available number of
+  ///items if all pages were fetched (totalItems) and
+  ///then calls toitemJsonToModel to make ojects for
+  ///each item.
+  int jsonToOjects(MapSD data, List<T> items, String searchType) {
     late final int totalItems;
     try {
-      final info = data['results'] as MapStringDynamic;
+      final info = data['results'] as MapSD;
       final List<dynamic> itemsMatches =
           info['${searchType}matches'][searchType] as List<dynamic>;
 
@@ -131,7 +140,9 @@ class LastfmAPI<T> {
     return totalItems;
   }
 
-  T itemJsonToModel(MapStringDynamic itemData) {
+  ///produces a model object (with a callback, modelizer, provided by the
+  ///client object)
+  T itemJsonToModel(MapSD itemData) {
     final name = itemData['name'] as String;
     final imageSmall = (itemData['image']?[0]?['#text'] ?? '') as String;
     final imageMedium = (itemData['image']?[1]?['#text'] ?? '') as String;
@@ -143,7 +154,7 @@ class LastfmAPI<T> {
         (dynamic k, dynamic v) => MapEntry(k, v as String));
     other.remove('name');
     //callback, note the cast at the end
-    final item = modelize(name, imageSmall, imageMedium, other, itemData) as T;
+    final item = modelizer(name, imageSmall, imageMedium, other, itemData) as T;
     return item;
   }
 

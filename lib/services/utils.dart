@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,10 @@ const Uint64minValue = 0;
 const Int64maxValue = 0x7FFFFFFFFFFFFFFF;
 const Int64minValue = -0x8000000000000000;
 */
+
+final dynamic thousandsFormatter = NumberFormat.decimalPattern();
+//var thousandsFormatter = NumberFormat('#,##,000');
+
 Widget loadingIndicator({String semantics = 'waiting', double size = 50}) {
   return Container(
     //color: Colors.red,
@@ -121,10 +126,6 @@ def count(self):
 '''Give cumulative amount of limiting, which maybe zero if
         operations are slower than the rate limit'''
 return self.__counter
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
+
 
 */
