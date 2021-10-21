@@ -12,15 +12,15 @@ const Uint64minValue = 0;
 const Int64maxValue = 0x7FFFFFFFFFFFFFFF;
 const Int64minValue = -0x8000000000000000;
 */
-Widget loadingIndicator({String semantics = 'waiting'}) {
+Widget loadingIndicator({String semantics = 'waiting', double size = 50}) {
   return Container(
-    color: Colors.red,
+    //color: Colors.red,
     alignment: Alignment.center,
     child: Center(
       child: Container(
-        color: Colors.blue,
-        height: 30,
-        width: 30,
+        //color: Colors.blue,
+        height: size,
+        width: size,
         child: CircularProgressIndicator.adaptive(
           semanticsLabel: semantics,
         ),

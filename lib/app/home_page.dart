@@ -19,7 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String? _radioGroupValue = musicInfoTypeStrings[MusicInfoType.albums];
+  //MusicInfoType _radioGroupValue = MusicInfoType.albums;
   late final TextEditingController _textController;
 
 //  final _repository = TestRepository(); //Repository(database: TestDatabase());
@@ -27,13 +27,6 @@ class _HomePageState extends State<HomePage> {
   //LastfmDatabase(apiKey: '5b162553274ad0ff3d5a71d798de3f2c'));
 
   //LastfmDatabase(apiKey: '5b162553274ad0ff3d5a71d798de3f2c'));
-
-  void _onRadioChanged(dynamic value) {
-    /*setState(() {
-      return;
-      _radioGroupValue = value as String;
-    });*/
-  }
 
   @override
   void initState() {
@@ -74,27 +67,28 @@ class _HomePageState extends State<HomePage> {
           ),
           body: Column(
             children: [
-              Container(height: 40, child: _radioButtons()),
+              Container(height: 40, child: _radioButtons(viewModel)),
               Consumer(
                 builder: (context, watch, _) {
                   final modelsAsyncValue = watch(musicInfoProvider);
-                  print('consumer builder');
 
+                  //first loading indicator is done here. Subsequently,
+                  //to allow infinite scrolling, loading indicators
+                  //are done at final element of the listview on scrolling
+                  //to the end.
+                  //see fetchAndIndicate() in [ListViewMusicInfo.build]
                   if (viewModel.isLoading && viewModel.isFirst) {
-                    return loadingIndicator(semantics: 'waiting for LastFM');
+                    return loadingIndicator(
+                        semantics: 'waiting for LastFM', size: 100);
                   }
-                  if (modelsAsyncValue.data == null && !viewModel.isLoading)
+                  if (modelsAsyncValue.data == null)
                     return textPressSearchIcon();
 
-                  print(modelsAsyncValue.runtimeType);
                   return modelsAsyncValue.when(
-                    loading: () {
-                      return Center(
-                        child:
-                            loadingIndicator(semantics: 'waiting for LastFM'),
-                      );
-                    },
-                    error: (e, st) => Text(
+                    //data isn't livestreamed so this is null
+                    //see fetchAndIndicate() in [ListViewMusicInfo.build]
+                    loading: () => Center(child: Placeholder()),
+                    error: (e, st) => SelectableText(
                       'Error $e ${kDebugMode ? st.toString() : ''}',
                     ),
                     data: (data) {
@@ -156,25 +150,26 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _radioButtons() {
+  Widget _radioButtons(MusicViewModel viewModel) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Text('albums'),
-        Radio(
-            value: 'albums',
-            groupValue: _radioGroupValue,
-            onChanged: _onRadioChanged),
+        Radio<MusicInfoType>(
+          value: MusicInfoType.albums,
+          groupValue: viewModel.searchType,
+          onChanged: viewModel.onRadioChange,
+        ),
         Text('songs'),
-        Radio(
-            value: 'songs',
-            groupValue: _radioGroupValue,
-            onChanged: _onRadioChanged),
+        Radio<MusicInfoType>(
+            value: MusicInfoType.tracks,
+            groupValue: viewModel.searchType,
+            onChanged: viewModel.onRadioChange),
         Text('artists'),
-        Radio(
-            value: 'artists',
-            groupValue: _radioGroupValue,
-            onChanged: _onRadioChanged),
+        Radio<MusicInfoType>(
+            value: MusicInfoType.artists,
+            groupValue: viewModel.searchType,
+            onChanged: viewModel.onRadioChange),
       ],
     );
   }

@@ -47,7 +47,7 @@ class Repository<T> {
   late final StreamController<RepoFetchResult<T>?> _streamController;
   late final StreamController<RepoFetchResult<T>?> _streamPageController;
   String _searchString = '';
-  MusicInfoType _searchType = MusicInfoType.albums;
+  MusicInfoType _musicInfoType = MusicInfoType.albums;
   final List<T> _items = [];
   int _page = -1;
   int _totalItems = -1;
@@ -111,17 +111,17 @@ class Repository<T> {
   }
 
   //initialise a search, ready for calling next()
-  void searchInit(String searchStr) {
+  void searchInit(String searchStr, MusicInfoType searchType) {
     final str = searchStr.trim();
     if (str.isEmpty) reset();
     if (str.length > 2) _status = RepoStatus.init;
     //preserve whitespace for UI
     _searchString = searchStr;
+    _musicInfoType = searchType;
   }
 
   ///next page of data added to previously fetched items and
   ///added to the stream.
-  ///returns true on no new data
   Future<void> next({int UIdelayMillisecs = 0}) async {
     final stopWatch = Stopwatch();
     stopWatch.start();
@@ -129,12 +129,12 @@ class Repository<T> {
     try {
       beforeFetch(_items);
       final results = await _lastFMapi.search(_searchString,
-          searchType: _searchType, page: _page);
+          searchType: _musicInfoType, page: _page);
       _totalItems = results.totalItems;
       afterFetch(results.items as List<T>);
       _page++;
       final fetchResultPage = RepoFetchResult<T>(
-          _searchType,
+          _musicInfoType,
           results.items as List<T>,
           results.totalItems,
           _items.length == 0,
@@ -142,7 +142,7 @@ class Repository<T> {
       _streamPageController.add(fetchResultPage);
       _items.addAll(results.items as List<T>);
       final fetchResultAll = RepoFetchResult<T>(
-        _searchType,
+        _musicInfoType,
         _items,
         results.totalItems,
         _items.length == 0,
@@ -165,59 +165,5 @@ class Repository<T> {
   void dispose() {
     _streamController.close();
     _streamPageController.close();
-  }
-}
-
-//#######DevTest
-class TestRepository {
-  TestRepository() {
-    streamController = StreamController<List<String>?>(onListen: () {
-      print('listening');
-    });
-    init();
-  }
-
-  void init() {
-    reset();
-  }
-
-  late final StreamController<List<String>?> streamController;
-
-  final r = Random(3);
-
-  String _searchString = '';
-  final List<String> _items = [];
-  int _page = 1;
-
-  Stream<List<String>?> get stream => streamController.stream;
-
-  void reset() {
-    _searchString = '';
-    _items.clear();
-    _page = 1;
-    streamController.add(null);
-  }
-
-  void search(String searchStr) {
-    if (searchStr != _searchString) {
-      reset();
-    }
-    _searchString = searchStr;
-  }
-
-  void next({int UIdelayMillisecs = 0}) async {
-    final List<String> viewModels = [];
-    await Future.delayed(Duration(milliseconds: UIdelayMillisecs));
-    final ss = await Future.value([
-      for (var i = _items.length; i < _items.length + 30; i++)
-        'string  $i ' + r.nextDouble().toString()
-    ]);
-    _items.addAll(ss);
-    streamController.add(_items);
-    return;
-  }
-
-  void dispose() {
-    streamController.close();
   }
 }

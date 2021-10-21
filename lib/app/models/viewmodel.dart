@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:jobtest_lastfm/app/models/item.dart';
+import 'package:jobtest_lastfm/services/lastfmapi.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:state_notifier/state_notifier.dart';
 
@@ -10,31 +11,37 @@ class MusicViewModel extends ChangeNotifier {
 
   String _searchString = '';
   bool? _isFirst;
+  MusicInfoType _searchType = MusicInfoType.albums;
   final Repository _repository;
-  //FetchType _status = FetchType.none;
-  //int _totalResults = -1;
 
   //getters
 
   String get searchString => _searchString;
-  //FetchType get status => _status;
-  //int get totalResults => _totalResults;
-
+  MusicInfoType get searchType => _searchType;
   bool get isLoading => _repository.status == RepoStatus.loading;
-
   bool get isFirst => _isFirst ?? false;
+  bool get notReady => _searchString.trim().length < 3;
 
   //setters
 
   set searchString(String str) {
     if (str != _searchString) _isFirst = null;
     _searchString = str;
-    _repository.searchInit(searchString);
+    _repository.searchInit(searchString, _searchType);
     notifyListeners();
   }
 
-  bool get notReady {
-    return _searchString.trim().length < 3;
+  set searchType(MusicInfoType searchType) {
+    _searchType = searchType;
+    _repository.reset();
+    notifyListeners();
+  }
+
+  //events/callbacks
+
+  void onRadioChange(MusicInfoType? value) {
+    assert(value != null);
+    if (value != null) searchType = value;
   }
 
   ///fetches data
