@@ -1,4 +1,3 @@
-import 'package:http/src/response.dart';
 import 'package:jobtest_lastfm/app/models/item.dart';
 
 import 'lastfmapi.dart';

@@ -1,12 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:jobtest_lastfm/app/top_level_providers.dart';
+import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
 
-import 'package:jobtest_lastfm/services/repository.dart';
 import 'models/item.dart';
 import 'models/viewmodel.dart';
 

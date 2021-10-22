@@ -41,10 +41,7 @@ final databaseProvider = Provider((ref) {
 final repositoryProvider = StateProvider<Repository<MusicInfo>>((ref) {
   final database = ref.watch(databaseProvider);
 
-  print('######## repositoryProvider build ########');
-  ref.onDispose(() {
-    print('%%%%%% repositoryProvider dispose %%%%');
-  });
+  ref.onDispose(() {});
   return Repository<MusicInfo>(lastFMapi: database);
 });
 
@@ -53,29 +50,7 @@ final viewModelProvider = ChangeNotifierProvider<MusicViewModel>((ref) {
 });
 
 final musicInfoProvider = StreamProvider<RepoFetchResult<MusicInfo>?>((ref) {
-  print('######## musicInfoProvider build ########');
   final repo = ref.watch(repositoryProvider).state;
 
   return repo.stream;
 });
-
-//final musicViewModelStreamProvider
-/*
-final testRepositoryProvider = StateProvider<TestRepository>((ref) {
-  print('######## testRepositoryProvider build ########');
-  ref.onDispose(() {
-    print('%%%%%% testRepositoryProvider dispose %%%%');
-  });
-  return TestRepository();
-});
-
-final testViewModelsProvider = StreamProvider.autoDispose<List<String>?>((ref) {
-  print('######## testViewModelsProvider build ########');
-  final repo = ref.watch(repositoryProvider).state;
-  ref.onDispose(() {
-    print('%%%%%% testViewModelsProvider dispose %%%%');
-    repo.dispose();
-  });
-  return repo.stream;
-});
-*/
