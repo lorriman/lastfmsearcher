@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:jobtest_lastfm/app/models/item.dart';
 import 'lastfmapi.dart';
 
+// this is disabled because we use empty anonymous callbacks instead of nulls
+// to avoid testing for null in unused callbacks.
 // ignore_for_file: prefer_function_declarations_over_variables
 
 enum FetchPhase { none, fetching, fetched }
@@ -23,6 +25,9 @@ const Map<MusicInfoType, String> musicInfoTypeUIStrings = {
   MusicInfoType.artists: 'artists',
 };
 
+///An object of this type is the result-set from a fetches, and is sent in the
+///streams. They are not returned by any methods. Implementations are expected
+///to use StreamBuilders or streamProviders.
 class RepoFetchResult<T> {
   RepoFetchResult(
     this.infoType,
@@ -112,6 +117,8 @@ class Repository<T> {
     );
   };
 
+  ///this is normally called by searchInit. Unless the repo is already reset
+  ///calling this function will send nulls to both streams.
   void reset() {
     assert(_fetchPhase == FetchPhase.none);
     if (_status == RepoStatus.none) return;
@@ -124,7 +131,7 @@ class Repository<T> {
     _streamPageController.add(null);
   }
 
-  //initialise a search, ready for calling next()
+  ///initialise a search, ready for calling next()
   void searchInit(String searchStr, MusicInfoType searchType) {
     assert(_fetchPhase == FetchPhase.none);
     final str = searchStr.trim();
