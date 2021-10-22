@@ -16,17 +16,16 @@ class MusicViewModel extends ChangeNotifier {
 
   String get searchString => _searchString;
   int get totalItems => _repository.totalItems;
-  bool get hasItems => totalItems > 0;
+  bool get hasSearched => _repository.status == RepoStatus.loaded;
   MusicInfoType get searchType => _searchType;
   //various, useful to make UI more readable
-  bool get isLoading => _repository.status == RepoStatus.loading;
+  bool get isLoading => _repository.fetchPhase == FetchPhase.fetching;
   bool get notLoading => !isLoading;
-
   bool get isFirst => _isFirst ?? false;
   bool get notReady => !isReady;
   bool get isReady =>
       (_searchString.trim().length > 2) &&
-      (_repository.status != RepoStatus.loading);
+      (_repository.fetchPhase != FetchPhase.fetching);
 
   //setters
 
@@ -60,6 +59,9 @@ class MusicViewModel extends ChangeNotifier {
   ///Eg, to guarantee a progress indicator gets a chance to display.
   ///If the fetch is less than 350 milliseconds the repository method
   ///will delay the return of data through the stream by the difference.
+  ///isFirst=true on the frist fetch and listeners notified to allow a
+  ///loading indicator for the first fetch. This is because the API
+  ///is not live streamed and when.loading is not triggered.
   void fetch() {
     if (_isFirst == null) {
       _isFirst = true;

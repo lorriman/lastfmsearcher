@@ -5,7 +5,9 @@ import 'lastfmapi.dart';
 
 // ignore_for_file: prefer_function_declarations_over_variables
 
-enum RepoStatus { none, init, loading }
+enum FetchPhase { none, fetching, fetched }
+
+enum RepoStatus { none, init, loaded }
 
 enum MusicInfoType { albums, tracks, artists }
 
@@ -59,11 +61,13 @@ class Repository<T> {
   final List<T> _items = [];
   int _page = -1;
   int _totalItems = -1;
+  FetchPhase _fetchPhase = FetchPhase.none;
   RepoStatus _status = RepoStatus.none;
 
   //gets
 
   RepoStatus get status => _status;
+  FetchPhase get fetchPhase => _fetchPhase;
   int get totalItems => _totalItems;
 
   ///stream that is the main source of fetched data. (The next() call
@@ -109,23 +113,27 @@ class Repository<T> {
   };
 
   void reset() {
-    _items.clear();
+    assert(_fetchPhase == FetchPhase.none);
+    if (_status == RepoStatus.none) return;
     _page = -1;
     _totalItems = -1;
+    _fetchPhase = FetchPhase.none;
+    _status = RepoStatus.none;
+    _items.clear();
     _streamController.add(null);
     _streamPageController.add(null);
-    _status = RepoStatus.none;
   }
 
   //initialise a search, ready for calling next()
   void searchInit(String searchStr, MusicInfoType searchType) {
+    assert(_fetchPhase == FetchPhase.none);
     final str = searchStr.trim();
     if (str.isEmpty) reset();
     if (str != _searchString) reset();
     if (str.length > 2) _status = RepoStatus.init;
     _searchString = str;
     _musicInfoType = searchType;
-    _page = 1;
+    _page = 0;
   }
 
   ///next page of data added to previously fetched items and
@@ -133,18 +141,23 @@ class Repository<T> {
   ///The uiDelayMillisecs is to guarantee a progress indicator
   ///gets to be seen in case fetching is near instantaneous.
   Future<void> next({int uiDelayMillisecs = 0}) async {
+    assert(_page > -1);
+    assert(_searchString.length > 2);
+    assert(_status != RepoStatus.none);
     final stopWatch = Stopwatch()..start();
-    _status = RepoStatus.loading;
     try {
       beforeFetch(_items);
+      _fetchPhase = FetchPhase.fetching;
       final results = await _lastFMapi.search(_searchString,
-          searchType: searchTypeApiStrings[_musicInfoType]!, page: _page);
-      _page++;
+          searchType: searchTypeApiStrings[_musicInfoType]!, page: ++_page);
       _totalItems = results.totalItems;
+      _fetchPhase = FetchPhase.fetched;
+      _status = RepoStatus.loaded;
       afterFetch(results.items as List<T>);
       //page of results
       final fetchResultPage = RepoFetchResult<T>(_musicInfoType,
           results.items as List<T>, results.totalItems, _items.isEmpty, _page);
+
       _streamPageController.add(fetchResultPage);
       _items.addAll(results.items as List<T>);
       //all results, for infinite scrolling
@@ -155,14 +168,13 @@ class Repository<T> {
         _items.isEmpty,
         _page,
       );
-      _status = RepoStatus.none;
+      _fetchPhase = FetchPhase.none;
       _streamController.add(fetchResultAll);
       finalizedFetch(_items);
-      _status = RepoStatus.none;
       final delay = uiDelayMillisecs - stopWatch.elapsed.inMilliseconds;
       if (delay > 0) await Future.delayed(Duration(milliseconds: delay));
     } finally {
-      _status = RepoStatus.none;
+      _fetchPhase = FetchPhase.none;
     }
   }
 

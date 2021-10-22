@@ -69,9 +69,9 @@ class _HomePageState extends State<HomePage> {
             children: [
               Row(children: [
                 _radioButtons(viewModel),
-                if (viewModel.hasItems)
+                if (viewModel.hasSearched)
                   Text(
-                    'found: ${thousandsFormatter.format(viewModel.totalItems)} ',
+                    'found:\n${thousandsFormatter.format(viewModel.totalItems)} ',
                     maxLines: 2,
                   ),
               ]),
