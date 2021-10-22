@@ -44,41 +44,42 @@ typedef LastFmModelizer<T> = T Function(
   MapSD rawData,
 );
 
-class LastfmAPI<T> {
-// The API avoids data state, which should be managed by objects using the API.
+///Call the search method.
+class LastfmApiService<T> {
+// The service avoids data state, which should be managed by objects using it.
   final _client = http.Client();
   final String _apiKey;
   Duration rateLimit;
   DateTime? _fetchTime;
   final LastFmModelizer modelizer;
 
-  LastfmAPI({
+  LastfmApiService({
     required this.rateLimit,
     required String apiKey,
     required this.modelizer,
   })  : _apiKey = apiKey,
         assert(rateLimit.inMilliseconds > -1);
 
-  ///this is the only method that should be called.
-  ///Other public methods are for inheritance purposes.
   ///searchType is either 'album', 'track' or 'artist'.
   ///itemCount is number of items to fetch per page.
   ///fetching beyond the end returns an empty result, not null.
+  ///The total potential number of items returnable from
+  ///all pages is given in every returned LastFMSearchResult object
   Future<LastFMSearchResult> search(String searchString,
       {required String searchType, int page = 1, int itemCount = 50}) async {
     print('Api search');
-    final response = await networkFetch(searchType, searchString, page);
+    final response = await _networkFetch(searchType, searchString, page);
     final data = decode(response);
-    checkForServiceErrors(data);
+    _checkForServiceErrors(data);
     final items = <T>[];
-    final totalItems = jsonToOjects(data, items, searchType);
+    final totalItems = _jsonToOjects(data, items, searchType);
     return LastFMSearchResult(items, totalItems, page);
   }
 
-  Future<http.Response> networkFetch(
+  Future<http.Response> _networkFetch(
       String searchType, String searchString, int page) async {
     final link =
-        'https://ws.audioscrobbler.com/2.0/?method=${searchType}.search&${searchType}=$searchString&page=${page.toString()}&api_key=$_apiKey&format=json';
+        'https://ws.audioscrobbler.com/2.0/?method=$searchType.search&$searchType=$searchString&page=$page&api_key=$_apiKey&format=json';
     final url = Uri.parse(link);
     await _checkRateOrLimit(limit: kReleaseMode);
     final response = await _client
@@ -94,7 +95,7 @@ class LastfmAPI<T> {
     return data;
   }
 
-  void checkForServiceErrors(MapSD data) {
+  void _checkForServiceErrors(MapSD data) {
     if (data['error'] != null) {
       String msg = 'There was an error fetching the data from LastFM';
       switch (data['error']) {
@@ -119,7 +120,7 @@ class LastfmAPI<T> {
   ///items if all pages were fetched (totalItems) and
   ///then calls toitemJsonToModel to make ojects for
   ///each item.
-  int jsonToOjects(MapSD data, List<T> items, String searchType) {
+  int _jsonToOjects(MapSD data, List<T> items, String searchType) {
     late final int totalItems;
     try {
       final info = data['results'] as MapSD;
@@ -129,7 +130,7 @@ class LastfmAPI<T> {
       totalItems = int.parse(info['opensearch:totalResults']);
 
       for (int idx = 0; idx < itemsMatches.length; idx++) {
-        final T item = itemJsonToModel(itemsMatches[idx]);
+        final T item = _itemJsonToModel(itemsMatches[idx]);
         items.add(item);
       }
     } catch (e, st) {
@@ -142,7 +143,7 @@ class LastfmAPI<T> {
 
   ///produces a model object (with a callback, modelizer, provided by the
   ///client object)
-  T itemJsonToModel(MapSD itemData) {
+  T _itemJsonToModel(MapSD itemData) {
     final name = itemData['name'] as String;
     final imageSmall = (itemData['image']?[0]?['#text'] ?? '') as String;
     final imageMedium = (itemData['image']?[1]?['#text'] ?? '') as String;

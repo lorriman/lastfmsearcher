@@ -43,7 +43,7 @@ class RepoFetchResult<T> {
 }
 
 class Repository<T> {
-  Repository({required LastfmAPI lastFMapi}) : _lastFMapi = lastFMapi {
+  Repository({required LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
     _streamController = StreamController<RepoFetchResult<T>?>(
         onListen: () => print('listening'));
     _streamPageController = StreamController<RepoFetchResult<T>?>(
@@ -52,7 +52,7 @@ class Repository<T> {
 
   //private
 
-  final LastfmAPI _lastFMapi;
+  final LastfmApiService _lastFMapi;
   //stream are expected to be used by StreamProviders, see getters
   late final StreamController<RepoFetchResult<T>?> _streamController;
   late final StreamController<RepoFetchResult<T>?> _streamPageController;

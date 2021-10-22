@@ -31,7 +31,7 @@ import 'models/viewmodel.dart';
 //todo: writeup MvvM
 
 final databaseProvider = Provider((ref) {
-  return LastfmAPI<MusicInfo>(
+  return LastfmApiService<MusicInfo>(
     apiKey: global_apiKey,
     modelizer: Repository.modelize,
     rateLimit: Duration(milliseconds: 350),

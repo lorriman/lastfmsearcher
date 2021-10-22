@@ -3,7 +3,8 @@ import 'package:jobtest_lastfm/app/models/item.dart';
 
 import 'lastfmapi.dart';
 
-class DevAPI<T> implements LastfmAPI {
+class DevAPI<T> implements LastfmApiService {
+  @override
   Future<LastFMSearchResult> search(String searchString,
       {required String searchType, int page = 1, int itemCount = 20}) async {
     final List<MusicInfo> items = [];
@@ -22,30 +23,8 @@ class DevAPI<T> implements LastfmAPI {
   Duration rateLimit = Duration.zero;
 
   @override
-  void checkForServiceErrors(MapSD data) {
-    // TODO: implement checkForServiceErrors
-  }
-
-  @override
-  void close() {
-    // TODO: implement close
-  }
-
-  @override
   MapSD decode(Response response) {
     // TODO: implement decode
-    throw UnimplementedError();
-  }
-
-  @override
-  T itemJsonToModel(MapSD itemData) {
-    // TODO: implement itemJsonToModel
-    throw UnimplementedError();
-  }
-
-  @override
-  int jsonToOjects(MapSD data, List items, String searchType) {
-    // TODO: implement jsonToOjects
     throw UnimplementedError();
   }
 
@@ -54,9 +33,7 @@ class DevAPI<T> implements LastfmAPI {
   LastFmModelizer get modelizer => throw UnimplementedError();
 
   @override
-  Future<Response> networkFetch(
-      String searchType, String searchString, int page) {
-    // TODO: implement networkFetch
-    throw UnimplementedError();
+  void close() {
+    // TODO: implement close
   }
 }
