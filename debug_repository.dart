@@ -1,9 +1,10 @@
 import 'lib/services/lastfmapi.dart';
 import 'lib/services/repository.dart';
+import 'lib/services/devapi.dart';
 
 void main() async {
-  final db = LastfmDatabase(_apiKey: '5b162553274ad0ff3d5a71d798de3f2c');
-  final repo = Repository(database: db);
+  final db = DevAPI();
+  final repo = Repository(lastFMapi: db);
   await repo.search('Black', searchType: MusicInfoType.tracks);
 
   final items = await repo.next();

@@ -1,7 +1,8 @@
 import 'lib/services/lastfmapi.dart';
+import 'lib/services/devapi.dart';
 
 void main() async {
-  final api = LastfmAPI(apiKey: '5b162553274ad0ff3d5a71d798de3f2c');
+  final api = DevAPI();
   final result = await api.search('Black', searchType: MusicInfoType.albums);
   final items = result.musicInfoList;
   print('items returned: $items.length');

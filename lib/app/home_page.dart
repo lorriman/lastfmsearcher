@@ -99,6 +99,7 @@ class _HomePageState extends State<HomePage> {
                       'Error $e ${kDebugMode ? st.toString() : ''}',
                     ),
                     data: (data) {
+                      print('on data');
                       return Expanded(
                           child: ListViewMusicInfo(
                         musicInfoItems: data?.items ?? [],

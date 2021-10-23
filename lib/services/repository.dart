@@ -25,9 +25,9 @@ const Map<MusicInfoType, String> musicInfoTypeUIStrings = {
   MusicInfoType.artists: 'artists',
 };
 
-///An object of this type is the result-set from a fetches, and is sent in the
-///streams. They are not returned by any methods. Implementations are expected
-///to use StreamBuilders or streamProviders.
+///A single object of this type is the result-set from a Repository.fetch(), and
+///is sent in the streams. They are not returned by any methods.
+///Implementation is to use StreamBuilders or streamProviders.
 class RepoFetchResult<T> {
   RepoFetchResult(
     this.infoType,
@@ -58,7 +58,7 @@ class Repository<T> {
   //private
 
   final LastfmApiService _lastFMapi;
-  //stream are expected to be used by StreamProviders, see getters
+  //stream are expected to be used by StreamProviders, see the stream getters
   late final StreamController<RepoFetchResult<T>?> _streamController;
   late final StreamController<RepoFetchResult<T>?> _streamPageController;
   String _searchString = '';
@@ -94,14 +94,16 @@ class Repository<T> {
   void Function(List<T> data) beforeFetch = (_) {};
 
   ///callback for immediately after fetching data in next(), before
-  ///adding data to a stream. data is newly fetched items.
+  ///adding data to a stream. Data is newly fetched items.
   ///totalItems, the total that can be returned on repeated fetches
   ///is valid.
   void Function(List<T> data) afterFetch = (_) {};
 
   ///callback for end of next() function, eg, after data has been added to
   ///a stream. data is both existing items and newly fetched items concatenated.
-  void Function(List<T> data) finalizedFetch = (_) {};
+  void Function(List<T> data) finalizedFetch = (_) {
+    print('finalized fetch');
+  };
 
   ///callback for use in the API, passed in the apiProvider to the api constructor
   ///rawData is the source data from the json for any other
@@ -177,9 +179,11 @@ class Repository<T> {
       );
       _fetchPhase = FetchPhase.none;
       _streamController.add(fetchResultAll);
+      print('call finalized fetch');
       finalizedFetch(_items);
+      print('after finalized fetch');
       final delay = uiDelayMillisecs - stopWatch.elapsed.inMilliseconds;
-      if (delay > 0) await Future.delayed(Duration(milliseconds: delay));
+      await Future.delayed(Duration(milliseconds: delay));
     } finally {
       _fetchPhase = FetchPhase.none;
     }
