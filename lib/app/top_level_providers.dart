@@ -19,15 +19,13 @@ import 'models/viewmodel.dart';
 ///   musicViewModelStreamProvider(a stream)
 ///
 /// ##initial call
-/// To fetch data, from the UI call repository.search().
+/// To fetch the first page of data, from the UI call repository.search().
 /// repository.next() gets further pages.
+/// In this MvvM architecture, a ViewModel calls the repository, not
+/// the UI directly. The UI registers with the streamProviders to 
+/// recieve data.
 ///
-/// ## expectation of use
-/// The repository receives MusicInfo model objects from the database
-/// which it adds as a list to the repository.stream.
-/// That stream is offered by musicInfoStreamProvider.
-/// The UI watches this stream.
-///
+
 //todo: writeup MvvM
 
 final databaseProvider = Provider((ref) {
