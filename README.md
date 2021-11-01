@@ -7,16 +7,15 @@ Simple project to demonstrate commercial development capabilities.
 ### It includes :
 
 - MvvM architecture (based on streams and provider)
-
-- Abstracted/pluggable backend (eg to allow easier replacement of lastFM API)
+- abstracted/pluggable backend (eg to allow easier replacement of lastFM API)
 
 ### The plumbing includes:
 
-* Use of the new Provider library, 'Riverpod'. https://pub.dev/packages/riverpod,  with some rxDart.
+* use of the new Provider library, 'Riverpod'. https://pub.dev/packages/riverpod,  with some rxDart.
 * streaming/reactive UI.
-* Immutable data models.
+* immutable data models.
 * accessibility/Semantic widgets
-* dependency injection
+* dependency inversion
 
 ### It doesn't include (among other things) :
 
