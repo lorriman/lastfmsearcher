@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:jobtest_lastfm/app/models/item.dart';
 import 'lastfmapi.dart';
 
-// this is disabled because we use empty anonymous callbacks instead of nulls
+// ignore_for_file disabled because we use empty anonymous callbacks instead of nulls
 // to avoid testing for null in unused callbacks.
 // ignore_for_file: prefer_function_declarations_over_variables
 
@@ -47,6 +47,15 @@ class RepoFetchResult<T> {
   }
 }
 
+///Repository class.
+///Implements domain-level (non-UI) methods around a database/API.
+///Does not currently implement paging properly (some code)
+///but this is where the code for paging would go as the Repository
+///is where the data is kept for each search.
+///This app uses cumulative scrolling, so each fetch of the next page
+///is just added to a large List.
+///The T parameter is the ViewModel's choice for model object and is passed
+///through to the API class, and implemented via a call back.
 class Repository<T> {
   Repository({required LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
     _streamController = StreamController<RepoFetchResult<T>?>(
