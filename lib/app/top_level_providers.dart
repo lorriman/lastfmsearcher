@@ -7,24 +7,20 @@ import 'models/viewmodel.dart';
 
 /// # Top Level Providers
 ///
-/// ##Data flow
+/// ## call order of classes (to explain the providers)
 ///
-/// (not call order)
+/// UI->MusicViewModel.search() and .next()->Repository.search()->LastFMAPI.search()->http calls
 ///
-/// http->Database(creates MusicInfo objects)->Repository->
-///   MusicViewModel objects->UI
+/// the data returned by the API is put in to model objects which are then pumped in to a stream.
+/// The UI is rigged up to a stream provider to listen to that stream.
 ///
-/// This is offered by riverpod provider objects:
-/// databaseProvider->repositoryProvider->musicInfoStreamProvider(a stream)->
-///   musicViewModelStreamProvider(a stream)
+/// ## provider 'flow' :
 ///
-/// ##initial call
-/// To fetch the first page of data, from the UI call repository.search().
-/// repository.next() gets further pages.
+/// databaseProvider(LastFMAPI)->repositoryProvider(Repository)->musicInfoStreamProvider(a stream)
+///
 /// In this MvvM architecture, a ViewModel calls the repository, not
-/// the UI directly. The UI registers with the streamProviders to 
+/// the UI calling the reposiroty. The UI registers with the streamProviders to 
 /// recieve data.
-///
 
 //todo: writeup MvvM
 
