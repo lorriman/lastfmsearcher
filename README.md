@@ -28,7 +28,7 @@ Simple project to demonstrate commercial development capabilities in Gogole's Fl
 - adherence to Material design guidelines
 - adherence to Apple guidelines
 
-##API info
+## API info
 
 If you wish to run the code create a file called lastfm_api.json in an assets folder
 with your own LastFM developer's api key. You can leave the key blank and change the project to 
