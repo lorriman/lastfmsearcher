@@ -26,6 +26,15 @@ class _HomePageState extends State<HomePage> {
     _textController = TextEditingController();
   }
 
+  void submit(MusicViewModel viewModel) {
+    //notLoading absorbs an accidental double-tap without
+    //disabling the button
+    if (viewModel.notLoading) {
+      viewModel.searchString = _textController.value.text;
+      viewModel.fetch();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, watch, _) {
@@ -51,16 +60,7 @@ class _HomePageState extends State<HomePage> {
               ),
               IconButton(
                 icon: Icon(Icons.search, semanticLabel: 'search button'),
-                onPressed: viewModel.notReady
-                    ? null
-                    : () {
-                        //notLoading absorbs an accidental double-tap without
-                        //disabling the button
-                        if (viewModel.notLoading) {
-                          viewModel.searchString = _textController.value.text;
-                          viewModel.fetch();
-                        }
-                      },
+                onPressed: viewModel.notReady ? null : ()=>submit(viewModel),
               ),
             ],
           ),
@@ -125,6 +125,7 @@ class _HomePageState extends State<HomePage> {
       )),
       child: TextField(
         controller: _textController,
+        onSubmitted: (_)=>submit(viewModel),
         onTap: () {
           _textController.selection = TextSelection(
             baseOffset: 0,
@@ -160,26 +161,29 @@ class _HomePageState extends State<HomePage> {
 
 //todo: turn this in to a loop
   Widget _radioButtons(MusicViewModel viewModel) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Text('albums'),
-        Radio<MusicInfoType>(
-          value: MusicInfoType.albums,
-          groupValue: viewModel.searchType,
-          onChanged: viewModel.onRadioChange,
-        ),
-        Text('songs'),
-        Radio<MusicInfoType>(
-            value: MusicInfoType.tracks,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 3, 0, 3),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text('albums'),
+          Radio<MusicInfoType>(
+            value: MusicInfoType.albums,
             groupValue: viewModel.searchType,
-            onChanged: viewModel.onRadioChange),
-        Text('artists'),
-        Radio<MusicInfoType>(
-            value: MusicInfoType.artists,
-            groupValue: viewModel.searchType,
-            onChanged: viewModel.onRadioChange),
-      ],
+            onChanged: viewModel.onRadioChange,
+          ),
+          Text('songs'),
+          Radio<MusicInfoType>(
+              value: MusicInfoType.tracks,
+              groupValue: viewModel.searchType,
+              onChanged: viewModel.onRadioChange),
+          Text('artists'),
+          Radio<MusicInfoType>(
+              value: MusicInfoType.artists,
+              groupValue: viewModel.searchType,
+              onChanged: viewModel.onRadioChange),
+        ],
+      ),
     );
   }
 
