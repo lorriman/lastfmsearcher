@@ -30,10 +30,12 @@ Simple project to demonstrate commercial development capabilities in Gogole's Fl
 
 ## API info
 
-If you wish to run the code create a file called lastfm_api.json in an assets folder
-with your own LastFM developer's api key. You can leave the key blank and change the project to 
-instantiate the dev/test class DevAPI instead which returns test data. Or remove the reference to this
-file in the yaml file.
+If you wish to compile an drun you must create a file called lastfm_api.json in an assets folder
+(placed in the root folder as usual) with your own LastFM developer's api key.
+
+You can leave the key blank and change the project to instantiate the dev/test class DevAPI
+instead which returns test data.  The file isn't supplied and so to compile without it remove the
+reference to the file in the pubspec.yaml file.
 
 The file should look like this:
 
