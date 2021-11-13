@@ -215,11 +215,38 @@ class ListViewCard extends StatelessWidget {
         elevation: 10.0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(
-            '${index + 1} - ${item.name}',
-            textScaleFactor: 1.5,
-            maxLines: 3,
-            softWrap: true,
+          child: Row(
+            children: [
+              SizedBox(width: 35, child: Text('${index + 1}  ')),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(5.0),
+                child: Image.network(
+                  item.imageLinkSmall,
+                  errorBuilder: (_, __, ___) => SizedBox(width: 35),
+                  loadingBuilder: (_, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return SizedBox(width: 35);
+                  },
+                  frameBuilder: (_, child, frame, __) {
+                    return AnimatedOpacity(
+                      child: child,
+                      opacity: frame == null ? 0 : 1,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeIn,
+                    );
+                  },
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  '  ${item.name}',
+                  textScaleFactor: 1.5,
+                  //maxLines: 3,
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
         ));
   }
@@ -253,6 +280,7 @@ class ListViewMusicInfo extends StatelessWidget {
   }
 
   //some inline convenience functions
+
   int computeElementCount() {
     final items = musicInfoItems;
     if (results == null) return 1; //element for a message
