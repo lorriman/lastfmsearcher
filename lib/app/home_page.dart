@@ -27,12 +27,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void submit(MusicViewModel viewModel) {
-    //notLoading absorbs an accidental double-tap without
-    //disabling the button
-    if (viewModel.notLoading) {
-      viewModel.searchString = _textController.value.text;
-      viewModel.fetch();
-    }
+    //test isLoading to absorbs an accidental double-tap without
+    //having to disable the button
+    if (viewModel.isLoading) return;
+    viewModel.searchString = _textController.value.text;
+    viewModel.fetch();
   }
 
   @override
@@ -60,7 +59,8 @@ class _HomePageState extends State<HomePage> {
               ),
               IconButton(
                 icon: Icon(Icons.search, semanticLabel: 'search button'),
-                onPressed: viewModel.notReady ? null : ()=>submit(viewModel),
+                //not enough text etc so disable the button
+                onPressed: viewModel.notReady ? null : () => submit(viewModel),
               ),
             ],
           ),
@@ -125,7 +125,9 @@ class _HomePageState extends State<HomePage> {
       )),
       child: TextField(
         controller: _textController,
-        onSubmitted: (_)=>submit(viewModel),
+        //support enter key for desktop
+        onSubmitted: (_) => submit(viewModel),
+        //select
         onTap: () {
           _textController.selection = TextSelection(
             baseOffset: 0,
