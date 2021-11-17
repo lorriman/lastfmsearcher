@@ -120,8 +120,13 @@ class Repository<T> {
   ///more fields etc.
   static LastFmModelizer modelize =
       (name, imageLinkSmall, imageLinkMedium, otherData, rawData) {
+    String newName=name;
+    if(name=='(null)'){
+      newName='('+( otherData['artist'] ?? '') +')';
+    }
+
     return MusicInfo(
-      name,
+      newName ,
       imageLinkSmall,
       imageLinkMedium,
       otherData,
