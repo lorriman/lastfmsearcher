@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
           ),
           body: Column(
             children: [
-              header(viewModel, screenSize),
+              _header(viewModel, screenSize),
               Consumer(
                 builder: (context, watch, _) {
                   final modelsAsyncValue = watch(musicInfoProvider);
@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
 
                   return modelsAsyncValue.when(
                     //data isn't livestreamed (unlike firestore) so
-                    //loading is never called.
+                    //loading: is never called.
                     //see fetchAndIndicate() in [ListViewMusicInfo.build]
                     loading: () => Center(child: Placeholder()),
                     error: (e, st) => SelectableText(
@@ -110,8 +110,8 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              if (viewModel.hasSearched && screenSize.width < 400)
-                footer(viewModel),
+              if (screenSize.width < 400 && viewModel.hasSearched)
+                _footer(viewModel),
             ],
           ),
         ),
@@ -119,28 +119,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Row header(MusicViewModel viewModel, Size screenSize) {
+  Row _header(MusicViewModel viewModel, Size screenSize) {
     return Row(children: [
-              _radioButtons(viewModel),
-              Expanded(child: Container()),
-              if (viewModel.hasSearched && screenSize.width >= 400)
-                Text(
-                  'total items: ${asThousands(viewModel.totalItems)} ',
-                ),
-            ]);
+      if (viewModel.hasSearched && screenSize.width >= 400)
+        Text('total items: ${asThousands(viewModel.totalItems)} '),
+      Expanded(child: Container()),
+      _radioButtons(viewModel),
+    ]);
   }
 
-  SizedBox footer(MusicViewModel viewModel) {
+  SizedBox _footer(MusicViewModel viewModel) {
     return SizedBox(
-                  height: 40,
-                  child: Row( mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                          'total items : ${asThousands(viewModel.totalItems)}'),
-                    ),
-                  ]));
+        height: 40,
+        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text('total items : ${asThousands(viewModel.totalItems)}'),
+          ),
+        ]));
   }
 
   Widget _searchTextField(MusicViewModel viewModel) {
@@ -152,7 +148,9 @@ class _HomePageState extends State<HomePage> {
       child: TextField(
         controller: _textController,
         //support enter key for desktop
-        onSubmitted: (_){ if (viewModel.isReady) submit(viewModel);},
+        onSubmitted: (_) {
+          if (viewModel.isReady) submit(viewModel);
+        },
         //select
         onTap: () {
           _textController.selection = TextSelection(
