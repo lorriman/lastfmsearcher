@@ -1,5 +1,8 @@
-import 'package:flutter/services.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+// Project imports:
 import 'app/home_page.dart';
 
 class MyApp extends StatefulWidget {
@@ -13,7 +16,7 @@ class _MyAppState extends State<MyApp> {
     return Listener(
       //keyboard popdown
       onPointerDown: (_) {
-        FocusScopeNode currentFocus = FocusScope.of(context);
+        final currentFocus = FocusScope.of(context);
         if (!currentFocus.hasPrimaryFocus) {
           SystemChannels.textInput.invokeMethod<dynamic>('TextInput.hide');
         }

@@ -1,6 +1,13 @@
+// Dart imports:
 import 'dart:convert';
+
+// Flutter imports:
 import 'package:flutter/foundation.dart';
+
+// Package imports:
 import 'package:http/http.dart' as http;
+
+// Project imports:
 import 'globals.dart';
 
 //shorthand as there's a lot of this

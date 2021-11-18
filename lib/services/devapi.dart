@@ -1,6 +1,8 @@
+// Package imports:
 import 'package:http/http.dart';
-import 'package:jobtest_lastfm/app/models/item.dart';
 
+// Project imports:
+import 'package:jobtest_lastfm/app/models/item.dart';
 import 'lastfmapi.dart';
 
 class DevAPI<T> implements LastfmApiService {

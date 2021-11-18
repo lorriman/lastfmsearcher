@@ -1,4 +1,7 @@
+// Flutter imports:
 import 'package:flutter/foundation.dart';
+
+// Project imports:
 import 'package:jobtest_lastfm/services/repository.dart';
 
 class MusicViewModel extends ChangeNotifier {

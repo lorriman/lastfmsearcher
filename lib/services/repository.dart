@@ -1,5 +1,7 @@
+// Dart imports:
 import 'dart:async';
 
+// Project imports:
 import 'package:jobtest_lastfm/app/models/item.dart';
 import 'lastfmapi.dart';
 
@@ -33,6 +35,7 @@ class RepoFetchResult<T> {
     this.infoType,
     this.items,
     this.totalItems,
+    // ignore: avoid_positional_boolean_parameters
     this.isFirst,
     this.page,
   );
@@ -122,7 +125,8 @@ class Repository<T> {
       (name, imageLinkSmall, imageLinkMedium, otherData, rawData) {
     String newName=name;
     if(name=='(null)'){
-      newName='('+( otherData['artist'] ?? '') +')';
+      final str= otherData['artist'] ?? '';
+      newName='($str)';
     }
 
     return MusicInfo(

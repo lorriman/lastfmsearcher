@@ -1,7 +1,12 @@
+// Dart imports:
 import 'dart:convert';
-import 'package:intl/intl.dart';
-import 'package:flutter/services.dart' show rootBundle;
+
+// Flutter imports:
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+
+// Package imports:
+import 'package:intl/intl.dart';
 
 const uInt32maxValue = 0xFFFFFFFF;
 const uInt32minValue = 0;
@@ -24,7 +29,7 @@ Widget loadingIndicator({String semantics = 'waiting', double size = 50}) {
     //color: Colors.red,
     alignment: Alignment.center,
     child: Center(
-      child: Container(
+      child: SizedBox(
         //color: Colors.blue,
         height: size,
         width: size,

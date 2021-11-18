@@ -1,4 +1,7 @@
+// Package imports:
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Project imports:
 import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/lastfmapi.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
