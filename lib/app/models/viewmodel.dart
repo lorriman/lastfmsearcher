@@ -12,7 +12,7 @@ class MusicViewModel extends ChangeNotifier {
   MusicInfoType _searchType = MusicInfoType.albums;
   final Repository _repository;
 
-  //getters
+  //getters (mostly to help de-clutter the UI code)
 
   String get searchString => _searchString;
   int get totalItems => _repository.totalItems;
@@ -22,11 +22,11 @@ class MusicViewModel extends ChangeNotifier {
   bool get isLoading => _repository.fetchPhase == FetchPhase.fetching;
   bool get notLoading => !isLoading;
   bool get isFirst => _isFirst ?? false;
-  bool get notReady => !isReady;
   bool get isReady =>
       (_searchString.trim().length > 2) &&
       (_repository.fetchPhase != FetchPhase.fetching);
-
+  bool get notReady => !isReady;
+  
   //setters
 
   set searchString(String str) {
