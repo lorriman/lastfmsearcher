@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
               semanticsLabel: 'app title: LastFM searcher',
             ),
             actions: [
-              Container(
+              SizedBox(
                 width: 150,
                 child: _searchTextField(viewModel),
               ),
@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
       child: TextField(
         controller: _textController,
         //support enter key for desktop
-        onSubmitted: (_) => submit(viewModel),
+        onSubmitted: (_){ if (viewModel.isReady) submit(viewModel);},
         //select
         onTap: () {
           _textController.selection = TextSelection(
