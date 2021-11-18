@@ -64,6 +64,7 @@ class MusicViewModel extends ChangeNotifier {
   ///indicator gets a chance to display.
   ///If the fetch is less than 350 milliseconds the repository method
   ///will delay the return of data through the stream by the difference.
+  ///
   ///isFirst=true on the first fetch and listeners notified to allow a
   ///loading indicator for the first fetch. This is because the API
   ///is not live streamed and when.loading: is not triggered.
