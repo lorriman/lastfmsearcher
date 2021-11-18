@@ -5,9 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 
 ///A number of properties are provided to reduce UI clutter as well as serve
-///specific UI requirements. Eg, 'first' is because the (reactive) UI needs to
-///know if the fetch is the first fetch.
-
+///specific UI requirements.
 class MusicViewModel extends ChangeNotifier {
   MusicViewModel(this._repository);
 
