@@ -4,7 +4,12 @@ http://github/lorriman/
 
 (To compile see 'API info' below about recreating an api key file, not supplied.)
 
-A simple project to demonstrate commercial development capabilities in Gogole's Flutter/Dart.
+# LastFm demonstrator 
+
+## What is this?
+
+A simple project to demonstrate commercial development capabilities of Greg Lorriman 
+in Google's Flutter/Dart.
 
 ### It includes :
 
