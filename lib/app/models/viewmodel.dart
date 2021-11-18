@@ -58,15 +58,15 @@ class MusicViewModel extends ChangeNotifier {
 
   //methods
 
-  ///fetches data, but does not return it. Data comes async through
+  ///fetches data, but does not return it. Data comes through
   ///the repository streams.
-  ///With a calculated delay for UI purposes.
-  ///Eg, to guarantee a progress indicator gets a chance to display.
+  ///With a calculated delay for UI purposes. Eg, to guarantee a progress
+  ///indicator gets a chance to display.
   ///If the fetch is less than 350 milliseconds the repository method
   ///will delay the return of data through the stream by the difference.
   ///isFirst=true on the first fetch and listeners notified to allow a
   ///loading indicator for the first fetch. This is because the API
-  ///is not live streamed and when.loading is not triggered.
+  ///is not live streamed and when.loading: is not triggered.
   Future<void> fetch() async {
     if (_isFirst == null) {
       _isFirst = true;
