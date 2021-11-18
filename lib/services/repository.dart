@@ -5,8 +5,8 @@ import 'dart:async';
 import 'package:jobtest_lastfm/app/models/item.dart';
 import 'lastfmapi.dart';
 
-// ignore_for_file disabled because we use empty anonymous callbacks instead of nulls
-// to avoid testing for null in unused callbacks.
+// ignore_for_file disabled because we use empty anonymous callbacks instead of
+// nulls to avoid testing for null in unused callbacks.
 // ignore_for_file: prefer_function_declarations_over_variables
 
 enum FetchPhase { none, fetching, fetched }
@@ -27,7 +27,7 @@ const Map<MusicInfoType, String> musicInfoTypeUIStrings = {
   MusicInfoType.artists: 'artists',
 };
 
-///A single object of this type is the result-set from a Repository.fetch(), and
+///A single object of this type is the result from a Repository.fetch(), and
 ///is sent in the streams. They are not returned by any methods.
 ///Implementation is to use StreamBuilders or streamProviders.
 class RepoFetchResult<T> {
@@ -50,15 +50,14 @@ class RepoFetchResult<T> {
   }
 }
 
-///Repository class.
 ///Implements domain-level (non-UI) methods around a database/API.
-///Does not currently implement paging properly (some code)
+///Does not currently implement paging properly (some code, incomplete)
 ///but this is where the code for paging would go as the Repository
 ///is where the data is kept for each search.
 ///This app uses cumulative scrolling, so each fetch of the next page
 ///is just added to a large List.
 ///The T parameter is the ViewModel's choice for model object and is passed
-///through to the API class, and implemented via a call back.
+///through to the API class, but implemented via a call back.
 class Repository<T> {
   Repository({required LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
     _streamController = StreamController<RepoFetchResult<T>?>(
@@ -81,46 +80,49 @@ class Repository<T> {
   FetchPhase _fetchPhase = FetchPhase.none;
   RepoStatus _status = RepoStatus.none;
 
-  //gets
+  //getters
 
   RepoStatus get status => _status;
   FetchPhase get fetchPhase => _fetchPhase;
   int get totalItems => _totalItems;
 
-  ///stream that is the main source of fetched data. (The next() call
+  ///Suitable for endless scrolling listviews.
+  ///
+  ///Stream that is the main source of fetched data. (The next() call
   ///does not return data.) The data added is all items from all pages
   ///that have so far been fetched for the current search string.
-  ///Suitable for endless scrolling listviews.
   Stream<RepoFetchResult<T>?> get stream => _streamController.stream;
-  //stream that is the main source for fetched data. (The next() call
-  //does not return data.) The data added is a single page of items
-  //that have been fetched on the last next() call.
-  //Suitable for paged views with next button.
+
+  ///Suitable for paged views with next button.
+  ///stream that is the main source for fetched data. (The next() call
+  ///does not return data.) The data added is a single page of items
+  ///that have been fetched on the last next() call.
   Stream<RepoFetchResult<T>?> get streamPage => _streamPageController.stream;
 
   //events/callback
 
-  ///callback for immediately prior to fetching data in next()
-  ///data is existing fetched items. totalItems is -1
+  ///Callback for immediately prior to fetching data in next()
+  ///data is existing fetched items. [totalItems] is -1
   ///on the first fetch, and valid after that.
   void Function(List<T> data) beforeFetch = (_) {};
 
-  ///callback for immediately after fetching data in next(), before
-  ///adding data to a stream. Data is newly fetched items.
-  ///totalItems, the total that can be returned on repeated fetches
+  ///Callback for immediately after fetching data in next(), before
+  ///adding data to a stream. [data] is newly fetched items.
+  ///[totalItems], the total that can be returned on repeated fetches
   ///is valid.
   void Function(List<T> data) afterFetch = (_) {};
 
-  ///callback for end of next() function, eg, after data has been added to
-  ///a stream. data is both existing items and newly fetched items concatenated.
+  ///Callback for end of next() function, eg, after data has been added to
+  ///a stream. [data] is both existing items and newly fetched items
+  ///concatenated.
   void Function(List<T> data) finalizedFetch = (_) {
     print('finalized fetch');
   };
 
-  ///callback for use in the API, passed in the apiProvider to the api constructor
-  ///rawData is the source data from the json for any other
-  ///info that could be extracted or further processed to add to a MusicInfo with
-  ///more fields etc.
+  ///Callback for use in the API, passed in the apiProvider to the api
+  ///constructor [rawData] is the source data from the json for any other
+  ///info that could be extracted or further processed to add to a [MusicInfo]
+  ///with more fields etc.
   static LastFmModelizer modelize =
       (name, imageLinkSmall, imageLinkMedium, otherData, rawData) {
     String newName=name;
@@ -137,7 +139,7 @@ class Repository<T> {
     );
   };
 
-  ///this is normally called by searchInit. Unless the repo is already reset
+  ///This is normally called by searchInit(). Unless the repo is already reset
   ///calling this function will send nulls to both streams.
   void reset() {
     assert(_fetchPhase == FetchPhase.none);
@@ -151,7 +153,7 @@ class Repository<T> {
     _streamPageController.add(null);
   }
 
-  ///initialise a search, ready for calling next()
+  ///Initialise a search, ready for calling next()
   void searchInit(String searchStr, MusicInfoType searchType) {
     assert(_fetchPhase == FetchPhase.none);
     final str = searchStr.trim();
@@ -163,10 +165,10 @@ class Repository<T> {
     _page = 0;
   }
 
-  ///next page of data added to previously fetched items and
+  ///Next page of data added to previously fetched items and
   ///added to the stream.
-  ///The uiDelayMillisecs is to guarantee a progress indicator
-  ///gets to be seen in case fetching is near instantaneous.
+  ///The uiDelayMillisecs is to guarantee that a progress indicator gets to be
+  /// seen in case fetching is near instantaneous.
   Future<void> next({int uiDelayMillisecs = 0}) async {
     assert(_page > -1);
     assert(_searchString.length > 2);
