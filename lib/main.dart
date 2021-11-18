@@ -1,3 +1,8 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:window_size/window_size.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jobtest_lastfm/services/globals.dart';
@@ -7,6 +12,11 @@ import 'myapp.dart';
 
 Future<void> main({List<String>? args}) async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (kDebugMode && (Platform.isWindows || Platform.isLinux) ) {
+    setWindowMaxSize(const Size(384, 600));
+    setWindowMinSize(const Size(384, 600));
+  }
 
   final apikeys = await parseJsonFromAssets('assets/lastfm_api.json');
   global_apiKey = apikeys['api_key'] as String;
