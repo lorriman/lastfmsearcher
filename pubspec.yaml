@@ -35,7 +35,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   fast_immutable_collections: ^7.0.3
   intl: ^0.17.0
+  #shouldn't this be in dev?
   flutter_launcher_icons: ^0.9.2
+  # the sizer is to help debug on desktop, the sizer
+  #code is transitional and will be built in to flutter
+  #eventually
   window_size:
     git:
       url: git://github.com/google/flutter-desktop-embedding.git
