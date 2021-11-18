@@ -33,7 +33,6 @@ class MusicViewModel extends ChangeNotifier {
   //setters
 
   set searchString(String str) {
-    if(str.trim()!='' && str==_searchString) return;
     if (str != _searchString) _isFirst = null;
     _searchString = str;
     _repository.searchInit(searchString, _searchType);
