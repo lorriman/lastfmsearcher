@@ -57,7 +57,7 @@ class RepoFetchResult<T> {
 ///This app uses cumulative scrolling, so each fetch of the next page
 ///is just added to a large List.
 ///The T parameter is the ViewModel's choice for model object and is passed
-///through to the API class, but implemented via a call back.
+///through to the API class, and implemented via a call back.
 class Repository<T> {
   Repository({required LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
     _streamController = StreamController<RepoFetchResult<T>?>(
