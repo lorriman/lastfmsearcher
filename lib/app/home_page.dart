@@ -73,14 +73,7 @@ class _HomePageState extends State<HomePage> {
           ),
           body: Column(
             children: [
-              Row(children: [
-                _radioButtons(viewModel),
-                Expanded(child: Container()),
-                if (viewModel.hasSearched && screenSize.width >= 400)
-                  Text(
-                    'total items: ${asThousands(viewModel.totalItems)} ',
-                  ),
-              ]),
+              header(viewModel, screenSize),
               Consumer(
                 builder: (context, watch, _) {
                   final modelsAsyncValue = watch(musicInfoProvider);
@@ -118,21 +111,36 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               if (viewModel.hasSearched && screenSize.width < 400)
-                SizedBox(
-                    height: 40,
-                    child: Row( mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                            'total items : ${asThousands(viewModel.totalItems)}'),
-                      ),
-                    ])),
+                footer(viewModel),
             ],
           ),
         ),
       );
     });
+  }
+
+  Row header(MusicViewModel viewModel, Size screenSize) {
+    return Row(children: [
+              _radioButtons(viewModel),
+              Expanded(child: Container()),
+              if (viewModel.hasSearched && screenSize.width >= 400)
+                Text(
+                  'total items: ${asThousands(viewModel.totalItems)} ',
+                ),
+            ]);
+  }
+
+  SizedBox footer(MusicViewModel viewModel) {
+    return SizedBox(
+                  height: 40,
+                  child: Row( mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                          'total items : ${asThousands(viewModel.totalItems)}'),
+                    ),
+                  ]));
   }
 
   Widget _searchTextField(MusicViewModel viewModel) {
