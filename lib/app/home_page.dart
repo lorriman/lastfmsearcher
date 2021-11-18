@@ -34,8 +34,11 @@ class _HomePageState extends State<HomePage> {
     viewModel.fetch();
   }
 
+  dynamic asThousands(int number) => thousandsFormatter.format(number);
+
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return Consumer(builder: (context, watch, _) {
       final viewModel = watch(viewModelProvider);
       return GestureDetector(
@@ -68,10 +71,10 @@ class _HomePageState extends State<HomePage> {
             children: [
               Row(children: [
                 _radioButtons(viewModel),
-                if (viewModel.hasSearched)
+                Expanded(child: Container()),
+                if (viewModel.hasSearched && screenSize.width >= 400)
                   Text(
-                    'found:\n${thousandsFormatter.format(viewModel.totalItems)} ',
-                    maxLines: 2,
+                    'total items: ${asThousands(viewModel.totalItems)} ',
                   ),
               ]),
               Consumer(
@@ -109,7 +112,18 @@ class _HomePageState extends State<HomePage> {
                     },
                   );
                 },
-              )
+              ),
+              if (viewModel.hasSearched && screenSize.width < 400)
+                SizedBox(
+                    height: 40,
+                    child: Row( mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                            'total items : ${asThousands(viewModel.totalItems)}'),
+                      ),
+                    ])),
             ],
           ),
         ),
@@ -223,7 +237,12 @@ class ListViewCard extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
-              SizedBox(width: 35, child: Text('${index + 1}  ')),
+              SizedBox(
+                  width: 33,
+                  child: Text(
+                    '${index + 1}  ',
+                    textScaleFactor: 0.8,
+                  )),
               ClipRRect(
                 borderRadius: BorderRadius.circular(5.0),
                 child: Image.network(
