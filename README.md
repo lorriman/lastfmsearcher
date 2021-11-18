@@ -2,7 +2,9 @@
 Copyright Greg Lorriman mob: 0044 777520 3753
 http://github/lorriman/
 
-Simple project to demonstrate commercial development capabilities in Gogole's Flutter/Dart.
+(To compile see 'API info' below about recreating an api key file, not supplied.)
+
+A simple project to demonstrate commercial development capabilities in Gogole's Flutter/Dart.
 
 ### It includes :
 
@@ -30,7 +32,9 @@ Simple project to demonstrate commercial development capabilities in Gogole's Fl
 
 ## API info
 
-If you wish to compile and run you must create a file called lastfm_api.json in an assets folder
+I don't include my personal developer's LastFM api key.
+
+If you wish to compile and run you must create a file called lastfm_api.json in the assets folder
 (placed in the root folder as usual) with your own LastFM developer's api key.
 
 You can leave the key blank and change the project to instantiate the dev/test class DevAPI
