@@ -4,24 +4,28 @@ import 'package:flutter/foundation.dart';
 // Project imports:
 import 'package:jobtest_lastfm/services/repository.dart';
 
+///A number of properties are provided to reduce UI clutter as well as serve
+///specific UI requirements. Eg, 'first' is because the (reactive) UI needs to
+///know if the fetch is the first fetch.
+
 class MusicViewModel extends ChangeNotifier {
   MusicViewModel(this._repository);
 
   //private
 
-  String _searchString = '';
-  bool? _isFirst;
-
-  MusicInfoType _searchType = MusicInfoType.albums;
   final Repository _repository;
 
-  //getters (mostly to help de-clutter the UI code)
+  String _searchString = '';
+  bool? _isFirst;
+  MusicInfoType _searchType = MusicInfoType.albums;
+
+  //getters
 
   String get searchString => _searchString;
   int get totalItems => _repository.totalItems;
   bool get hasSearched => _repository.status == RepoStatus.loaded;
   MusicInfoType get searchType => _searchType;
-  //various, useful to make UI more readable
+  //useful to make UI more readable and less cluttered
   bool get isLoading => _repository.fetchPhase == FetchPhase.fetching;
   bool get notLoading => !isLoading;
   bool get isFirst => _isFirst ?? false;
