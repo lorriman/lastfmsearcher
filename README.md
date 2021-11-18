@@ -2,7 +2,8 @@
 Copyright Greg Lorriman mob: 0044 777520 3753
 http://github/lorriman/
 
-(To compile see 'API info' below about recreating an api key file, not supplied.)
+(To compile, into Android or Linux Desktop, see 'API info' below about recreating an api key file,
+ not supplied. Linux desktop support requires only Flutter Stable as a preview is included.)
 
 # LastFm demonstrator 
 
