@@ -5,8 +5,8 @@ import 'dart:async';
 import 'package:jobtest_lastfm/app/models/item.dart';
 import 'lastfmapi.dart';
 
-// ignore_for_file disabled because we use empty anonymous callbacks instead of
-// nulls to avoid testing for null in unused callbacks.
+// here ignore_for_file directive is because we use empty anonymous callbacks
+// instead of nulls to avoid testing for null in unused callbacks.
 // ignore_for_file: prefer_function_declarations_over_variables
 
 enum FetchPhase { none, fetching, fetched }
