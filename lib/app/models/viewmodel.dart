@@ -26,6 +26,8 @@ class MusicViewModel extends ChangeNotifier {
   //useful to make UI more readable and less cluttered
   bool get isLoading => _repository.fetchPhase == FetchPhase.fetching;
   bool get notLoading => !isLoading;
+  //replicated by [RepoFetchResult.isFirst] but needed in the loading phase
+  //prior to a RepoFetchResult coming through in the streams.
   bool get isFirst => _isFirst ?? false;
   bool get isReady =>
       (_searchString.trim().length > 2) &&
