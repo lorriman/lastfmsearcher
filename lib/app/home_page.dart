@@ -43,6 +43,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final isWideScreen=screenSize.width>=400;
     return Consumer(builder: (context, watch, _) {
       final viewModel = watch(viewModelProvider);
       return GestureDetector(
@@ -73,7 +74,7 @@ class _HomePageState extends State<HomePage> {
           ),
           body: Column(
             children: [
-              _header(viewModel, screenSize),
+              _header(viewModel, isWideScreen),
               Consumer(
                 builder: (context, watch, _) {
                   final modelsAsyncValue = watch(musicInfoProvider);
@@ -110,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              if (screenSize.width < 400 && viewModel.hasSearched)
+              if (!isWideScreen && viewModel.hasSearched)
                 _footer(viewModel),
             ],
           ),
@@ -119,9 +120,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Row _header(MusicViewModel viewModel, Size screenSize) {
+  Row _header(MusicViewModel viewModel, bool isWideScreen) {
     return Row(children: [
-      if (viewModel.hasSearched && screenSize.width >= 400)
+      if (viewModel.hasSearched && isWideScreen)
         Text('total items: ${asThousands(viewModel.totalItems)} '),
       Expanded(child: Container()),
       _radioButtons(viewModel),
