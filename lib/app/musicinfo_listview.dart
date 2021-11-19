@@ -54,6 +54,7 @@ class ListViewCard extends StatelessWidget {
                   child: Text(
                     item.name,
                     textScaleFactor: 1.5,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
