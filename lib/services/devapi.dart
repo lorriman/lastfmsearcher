@@ -5,6 +5,7 @@ import 'package:http/http.dart';
 import 'package:jobtest_lastfm/app/models/item.dart';
 import 'lastfmapi.dart';
 
+//For debugging and perhaps testing.
 class DevAPI<T> implements LastfmApiService {
   @override
   Future<LastFMSearchResult> search(String searchString,
@@ -25,17 +26,13 @@ class DevAPI<T> implements LastfmApiService {
   Duration rateLimit = Duration.zero;
 
   @override
-  MapSD decode(Response response) {
-    // TODO: implement decode
-    throw UnimplementedError();
-  }
+  MapSD decode(Response response)=> throw UnimplementedError();
+
 
   @override
-  // TODO: implement modelize
   LastFmModelizer get modelizer => throw UnimplementedError();
 
   @override
   void close() {
-    // TODO: implement close
   }
 }

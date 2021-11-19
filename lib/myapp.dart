@@ -14,7 +14,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Listener(
-      //keyboard popdown
+      //keyboard popdown, see HomePage for a disabled alternative
       onPointerDown: (_) {
         final currentFocus = FocusScope.of(context);
         if (!currentFocus.hasPrimaryFocus) {

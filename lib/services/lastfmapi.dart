@@ -13,7 +13,7 @@ import 'globals.dart';
 //shorthand as there's a lot of this
 typedef MapSD = Map<String, dynamic>;
 
-//todo: exceptions not working as expected
+//todo: make custom exceptions work like native exceptions.
 
 class LastFmServerException implements Exception {
   final String cause;
@@ -67,7 +67,8 @@ class LastfmApiService<T> {
   })  : _apiKey = apiKey,
         assert(rateLimit.inMilliseconds > -1);
 
-  ///searchType is either 'album', 'track' or 'artist'.
+  ///searchType is either 'album', 'track' or 'artist' as String.
+  ///LastFM server handles errors.
   ///itemCount is number of items to fetch per page.
   ///fetching beyond the end returns an empty result, not null.
   ///The total potential number of items returnable from
@@ -88,7 +89,7 @@ class LastfmApiService<T> {
     final link =
         'https://ws.audioscrobbler.com/2.0/?method=$searchType.search&$searchType=$searchString&page=$page&api_key=$_apiKey&format=json';
     final url = Uri.parse(link);
-    await _checkRateOrLimit(limit: kReleaseMode);
+    await _rateExceptionOrLimit(limit: kReleaseMode);
     final response = await _client
         .get(url, headers: {'Accept': 'application/json; charset=UTF-8'});
     if (response.statusCode != 200) {
@@ -137,7 +138,7 @@ class LastfmApiService<T> {
       totalItems = int.parse(info['opensearch:totalResults']);
 
       for (int idx = 0; idx < itemsMatches.length; idx++) {
-        final T item = _itemJsonToModel(itemsMatches[idx]);
+        final T item = _itemJsonToObject(itemsMatches[idx]);
         items.add(item);
       }
     } catch (e, st) {
@@ -150,14 +151,13 @@ class LastfmApiService<T> {
 
   ///produces a model object (with a callback, modelizer, provided by the
   ///client object)
-  T _itemJsonToModel(MapSD itemData) {
+  T _itemJsonToObject(MapSD itemData) {
     final name = itemData['name'] as String;
     final imageSmall = (itemData['image']?[0]?['#text'] ?? '') as String;
     final imageMedium = (itemData['image']?[1]?['#text'] ?? '') as String;
     final strData = Map.from(itemData);
     //remove non-strings
     strData.removeWhere((dynamic key, dynamic value) => value is! String);
-    //make a Map(String,String)
     final other = strData.map<String, String>(
         (dynamic k, dynamic v) => MapEntry(k, v as String));
     other.remove('name');
@@ -166,8 +166,10 @@ class LastfmApiService<T> {
     return item;
   }
 
-  ///guard against hammering the lastfM server and getting a ban
-  Future<void> _checkRateOrLimit({required bool limit}) async {
+  ///Guard against hammering the lastfM server and getting a ban.
+  ///limit==true for release, otherwise throws an exception as
+  ///likely a bug.
+  Future<void> _rateExceptionOrLimit({required bool limit}) async {
     final now = DateTime.now();
     if (_fetchTime != null) {
       final prev = _fetchTime;

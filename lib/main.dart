@@ -16,11 +16,13 @@ import 'myapp.dart';
 Future<void> main({List<String>? args}) async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  //helps test as phone dimensions when debugging.
   if (kDebugMode && (Platform.isWindows || Platform.isLinux) ) {
     setWindowMaxSize(const Size(384, 600));
     setWindowMinSize(const Size(384, 600));
   }
 
+  //lastFM supplied developer key.
   final apikeys = await parseJsonFromAssets('assets/lastfm_api.json');
   global_apiKey = apikeys['api_key'] as String;
 
