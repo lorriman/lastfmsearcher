@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 
 // Package imports:
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 
 // Project imports:
 import 'package:jobtest_lastfm/app/top_level_providers.dart';
@@ -238,6 +240,7 @@ class ListViewCard extends StatelessWidget {
 
   final MusicInfo item;
   final int index;
+  static const double lastFmSmallImageSize =34;
 
   @override
   Widget build(BuildContext context) {
@@ -249,37 +252,33 @@ class ListViewCard extends StatelessWidget {
           child: Row(
             children: [
               SizedBox(
-                  width: 33,
+                  width: 35,
                   child: Text(
                     '${index + 1}  ',
                     textScaleFactor: 0.8,
                   )),
               ClipRRect(
                 borderRadius: BorderRadius.circular(5.0),
-                child: Image.network(
-                  item.imageLinkSmall,
-                  errorBuilder: (_, __, ___) => SizedBox(width: 35),
-                  loadingBuilder: (_, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return SizedBox(width: 35);
-                  },
-                  frameBuilder: (_, child, frame, __) {
-                    return AnimatedOpacity(
-                      child: child,
-                      opacity: frame == null ? 0 : 1,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeIn,
-                    );
-                  },
+                child: CachedNetworkImage(
+                  maxHeightDiskCache: lastFmSmallImageSize.toInt(),
+                  imageUrl: item.imageLinkSmall,
+                  placeholder: (context, url) =>
+                  const SizedBox(width: lastFmSmallImageSize),
+                  //lots of errors and blanks, so just swallow
+                  errorWidget: (_,__ , dynamic ___ ) => const SizedBox(width:lastFmSmallImageSize ),
+                  fadeInDuration: const Duration(milliseconds: 150),
                 ),
               ),
               Expanded(
-                child: Text(
-                  '  ${item.name}',
-                  textScaleFactor: 1.5,
-                  //maxLines: 3,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: Text(
+                    '${item.name}',
+                    textScaleFactor: 1.5,
+                    //maxLines: 3,
+                    //softWrap: true,
+                    //overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ],
@@ -352,3 +351,23 @@ class ListViewMusicInfo extends StatelessWidget {
     return loadingIndicator(semantics: 'waiting for LastFM');
   }
 }
+
+//retired:
+/*
+                Image.network(
+                  item.imageLinkSmall,
+                  errorBuilder: (_, __, ___) => SizedBox(width: 35),
+                  loadingBuilder: (_, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return SizedBox(width: 35);
+                  },
+                  frameBuilder: (_, child, frame, __) {
+                    return AnimatedOpacity(
+                      child: child,
+                      opacity: frame == null ? 0 : 1,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeIn,
+                    );
+                  },
+                ),
+ */
