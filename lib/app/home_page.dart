@@ -38,7 +38,6 @@ class _HomePageState extends State<HomePage> {
     viewModel.fetch();
   }
 
-  dynamic asThousands(int number) => thousandsFormatter.format(number);
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +88,7 @@ class _HomePageState extends State<HomePage> {
                         semantics: 'waiting for LastFM', size: 100);
                   }
                   if (modelsAsyncValue.data == null)
-                    return textPressSearchIcon();
+                    return _textPressSearchIcon();
 
                   return modelsAsyncValue.when(
                     //data isn't livestreamed (unlike firestore) so
@@ -122,7 +121,7 @@ class _HomePageState extends State<HomePage> {
   Row _header(MusicViewModel viewModel, bool isWideScreen) {
     return Row(children: [
       if (viewModel.hasSearched && isWideScreen)
-        Text('total items: ${asThousands(viewModel.totalItems)} '),
+        Text('total items: ${viewModel.totalItems.toThousands()} '),
       Expanded(child: Container()),
       _radioButtons(viewModel),
     ]);
@@ -134,7 +133,7 @@ class _HomePageState extends State<HomePage> {
         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('total items : ${asThousands(viewModel.totalItems)}'),
+            child: Text('total items : ${viewModel.totalItems.toThousands()}'),
           ),
         ]));
   }
@@ -216,7 +215,7 @@ class _HomePageState extends State<HomePage> {
   //Add an extra element for a loadingIndicator when the user
   // scrolls down to the last element, but not if there are no more items
 
-  Widget textPressSearchIcon() {
+  Widget _textPressSearchIcon() {
     return Center(
         heightFactor: 2,
         child:

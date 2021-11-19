@@ -23,6 +23,11 @@ const Int64minValue = -0x8000000000000000;
 
 final dynamic thousandsFormatter = NumberFormat.decimalPattern();
 //var thousandsFormatter = NumberFormat('#,##,000');
+extension IntUtils on int {
+
+  dynamic toThousands() => thousandsFormatter.format(this);
+
+}
 
 Widget loadingIndicator({String semantics = 'waiting', double size = 50}) {
   return Container(
