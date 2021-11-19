@@ -1,16 +1,15 @@
 // Flutter imports:
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 // Package imports:
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
 // Project imports:
 import 'package:jobtest_lastfm/app/top_level_providers.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
+
 import 'models/item.dart';
 import 'models/viewmodel.dart';
 

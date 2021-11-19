@@ -4,14 +4,13 @@ import 'dart:io';
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 // Package imports:
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:window_size/window_size.dart';
-
 // Project imports:
 import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
+import 'package:window_size/window_size.dart';
+
 import 'myapp.dart';
 
 Future<void> main({List<String>? args}) async {
