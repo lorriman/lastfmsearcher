@@ -81,12 +81,12 @@ class ListViewMusicInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = musicInfoItems;
     return ListView.builder(
-      itemCount: computeElementCount(),
-      itemBuilder: (context, idx) {
-        if (results == null) return textPressSearchIcon();
-        if (items.isEmpty) return textNoItemsFound();
+      itemCount: _computeElementCount(),
+      itemBuilder: (_, idx) {
+        if (results == null) return _textPressSearchIcon();
+        if (items.isEmpty) return _textNoItemsFound();
         //if this element is > items then it's a fetch and circular indicator
-        if (idx == items.length) return fetchAndIndicate();
+        if (idx == items.length) return _fetchAndIndicate();
         return ListViewCard(item: items[idx], index: idx);
       },
     );
@@ -94,7 +94,7 @@ class ListViewMusicInfo extends StatelessWidget {
 
   //some inline convenience functions
 
-  int computeElementCount() {
+  int _computeElementCount() {
     final items = musicInfoItems;
     if (results == null) return 1; //element for a message
     if (items.isEmpty) return 1; //ditto
@@ -102,7 +102,7 @@ class ListViewMusicInfo extends StatelessWidget {
     return items.length + 1;
   }
 
-  Widget textPressSearchIcon() {
+  Widget _textPressSearchIcon() {
     return Center(
         heightFactor: 2,
         child:
@@ -113,7 +113,7 @@ class ListViewMusicInfo extends StatelessWidget {
         ]));
   }
 
-  Widget textNoItemsFound() {
+  Widget _textNoItemsFound() {
     return Center(
         heightFactor: 2,
         child: Text(
@@ -124,7 +124,7 @@ class ListViewMusicInfo extends StatelessWidget {
         ));
   }
 
-  Widget fetchAndIndicate() {
+  Widget _fetchAndIndicate() {
     viewModel.fetch();
     return loadingIndicator(semantics: 'waiting for LastFM');
   }
