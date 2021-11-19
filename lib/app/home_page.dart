@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-
 // Project imports:
 import 'package:jobtest_lastfm/app/top_level_providers.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
@@ -45,7 +44,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final isWideScreen=screenSize.width>=400;
+    final isWideScreen = screenSize.width >= 400;
     return Consumer(builder: (context, watch, _) {
       final viewModel = watch(viewModelProvider);
       return GestureDetector(
@@ -113,8 +112,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              if (!isWideScreen && viewModel.hasSearched)
-                _footer(viewModel),
+              if (!isWideScreen && viewModel.hasSearched) _footer(viewModel),
             ],
           ),
         ),
@@ -240,7 +238,7 @@ class ListViewCard extends StatelessWidget {
 
   final MusicInfo item;
   final int index;
-  static const double lastFmSmallImageSize =34;
+  static const double lastFmSmallImageSize = 34;
 
   @override
   Widget build(BuildContext context) {
@@ -262,18 +260,18 @@ class ListViewCard extends StatelessWidget {
                 child: CachedNetworkImage(
                   maxHeightDiskCache: lastFmSmallImageSize.toInt(),
                   imageUrl: item.imageLinkSmall,
-                  placeholder: (context, url) =>
-                  const SizedBox(width: lastFmSmallImageSize),
+                  placeholder: (_, __) => SizedBox(width: lastFmSmallImageSize),
                   //lots of errors and blanks, so just swallow
-                  errorWidget: (_,__ , dynamic ___ ) => const SizedBox(width:lastFmSmallImageSize ),
-                  fadeInDuration: const Duration(milliseconds: 150),
+                  errorWidget: (_, __, dynamic ___) =>
+                      SizedBox(width: lastFmSmallImageSize),
+                  fadeInDuration: Duration(milliseconds: 150),
                 ),
               ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12.0),
                   child: Text(
-                    '${item.name}',
+                    item.name,
                     textScaleFactor: 1.5,
                     //maxLines: 3,
                     //softWrap: true,
