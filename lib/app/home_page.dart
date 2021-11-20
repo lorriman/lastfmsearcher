@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // Project imports:
 import 'package:jobtest_lastfm/app/top_level_providers.dart';
+import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
 
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final isWideScreen = screenSize.width >= 400;
+    final isWideScreen = screenSize.width >= global_screen_width_breakpoint;
     return Consumer(builder: (context, watch, _) {
       final viewModel = watch(viewModelProvider);
       return GestureDetector(
@@ -72,7 +73,10 @@ class _HomePageState extends State<HomePage> {
           ),
           body: Column(
             children: [
-              _header(viewModel, isWideScreen),
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: _header(viewModel, isWideScreen),
+              ),
               Consumer(
                 builder: (context, watch, _) {
                   final modelsAsyncValue = watch(musicInfoProvider);
@@ -117,13 +121,16 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Row _header(MusicViewModel viewModel, bool isWideScreen) {
-    return Row(children: [
-      if (viewModel.hasSearched && isWideScreen)
-        Text('total items: ${viewModel.totalItems.toThousands()} '),
-      Expanded(child: Container()),
-      _radioButtons(viewModel),
-    ]);
+  Widget _header(MusicViewModel viewModel, bool isWideScreen) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0),
+      child: Row(children: [
+        if (viewModel.hasSearched && isWideScreen)
+          Text('found: ${viewModel.totalItems.toThousands()} '),
+        Expanded(child: Container()),
+        _radioButtons(viewModel),
+      ]),
+    );
   }
 
   SizedBox _footer(MusicViewModel viewModel) {
@@ -186,9 +193,9 @@ class _HomePageState extends State<HomePage> {
 //todo: turn this in to a loop
   Widget _radioButtons(MusicViewModel viewModel) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 3, 0, 3),
+      padding: const EdgeInsets.only(right: 0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text('albums'),
           Radio<MusicInfoType>(

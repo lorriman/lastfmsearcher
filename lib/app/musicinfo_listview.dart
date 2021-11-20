@@ -2,6 +2,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:url_launcher/url_launcher.dart';
 // Project imports:
 import 'package:jobtest_lastfm/services/repository.dart';
@@ -27,11 +28,13 @@ class ListViewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isWideScreen = screenSize.width >= global_screen_width_breakpoint;
     return Card(
         margin: EdgeInsets.all(5),
         elevation: 10.0,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(6.0),
           child: Row(
             children: [
               SizedBox(
@@ -41,29 +44,38 @@ class ListViewCard extends StatelessWidget {
                     textScaleFactor: 0.8,
                   )),
               ClipRRect(
-                borderRadius: BorderRadius.circular(5.0),
+                 borderRadius: BorderRadius.circular(5.0),
                 child: CachedNetworkImage(
                   maxHeightDiskCache: lastFmSmallImageSize.toInt(),
                   imageUrl: item.imageLinkSmall,
                   placeholder: (_, __) => SizedBox(width: lastFmSmallImageSize),
-                  //lots of errors and blanks, so just swallow
+                  //lots of errors and blanks, so just swallow them
                   errorWidget: (_, __, dynamic ___) =>
                       SizedBox(width: lastFmSmallImageSize),
                   fadeInDuration: Duration(milliseconds: 150),
                 ),
               ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 12.0),
-                  child: InkWell(
-                    onTap:  ()=>_launchUrl(item.otherData['url'] ??''),
-                    child: Text(
-                      item.name,
-                      textScaleFactor: 1.5,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                child: Column( crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: InkWell(
+                        onTap:  ()=>_launchUrl(item.otherData['url'] ??''),
+                        child: Text(
+                          item.name,
+                          textScaleFactor: 1.5,
+                          //maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+
+              ),
                     ),
-                  ),
+                    if (item.otherData['artist']!=null) Padding( padding: const EdgeInsets.only(left: 12.0),
+                      child : Text(item.otherData['artist']!),
+                    )
+
+                  ],
                 ),
               ),
             ],
