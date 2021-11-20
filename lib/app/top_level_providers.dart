@@ -8,11 +8,10 @@ import 'package:jobtest_lastfm/services/repository.dart';
 import 'models/item.dart';
 import 'models/viewmodel.dart';
 
-/// # Top Level Providers
-///
+
 /// ## call order of classes (to explain the providers)
 ///
-/// UI->MusicViewModel.search() and .next()->Repository.search()->LastFMAPI.search()->http calls
+/// UI->MusicViewModel.search() and ..next()->Repository.search()->LastFMAPI.search()->http calls
 ///
 /// the data returned by the API is put in to model objects which are then pumped in to a stream.
 /// The UI is rigged up to a stream provider to listen to that stream.
