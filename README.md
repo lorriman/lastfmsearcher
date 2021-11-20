@@ -42,7 +42,9 @@ backspace key doesn't work in some desktop environments
 
 ### API info
 
-I don't include my personal developer's LastFM api key.
+The app has only been compiled in Android and Linux desktop versions.
+
+I don't include my developer's LastFM api key.
 
 If you wish to compile and run you must create a file called lastfm_api.json in the assets folder
 (placed in the root folder as usual) with your own LastFM developer's api key.
