@@ -2,6 +2,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 // Project imports:
 import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
@@ -11,6 +12,9 @@ import 'models/viewmodel.dart';
 
 
 class ListViewCard extends StatelessWidget {
+
+
+
   const ListViewCard({
     Key? key,
     required this.item,
@@ -51,17 +55,33 @@ class ListViewCard extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12.0),
-                  child: Text(
-                    item.name,
-                    textScaleFactor: 1.5,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  child: InkWell(
+                    onTap:  ()=>_launchUrl(item.otherData['url'] ??''),
+                    child: Text(
+                      item.name,
+                      textScaleFactor: 1.5,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               ),
             ],
           ),
         ));
+  }
+
+  Future<void> _launchUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: true,
+        forceWebView: true,
+        enableJavaScript: true,
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
 
