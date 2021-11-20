@@ -2,7 +2,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:url_launcher/url_launcher.dart';
 // Project imports:
 import 'package:jobtest_lastfm/services/repository.dart';
@@ -11,11 +10,85 @@ import 'package:jobtest_lastfm/services/utils.dart';
 import 'models/item.dart';
 import 'models/viewmodel.dart';
 
+///Utility widget before a search, to indicate to the user
+///to type a search string and press the search icon.
+class PressSearchIcon extends StatelessWidget {
+  const PressSearchIcon({
+    Key? key,
+  }) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+        heightFactor: 2,
+        child:
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
+          Text('Press search icon'),
+          Icon(Icons.search),
+          Text('to search'),
+        ]));
+  }
+}
+
+///ListView for search results. See [ListViewCard] below
+///for individual items
+class ListViewMusicInfo extends StatelessWidget {
+  const ListViewMusicInfo({
+    Key? key,
+    required this.musicInfoItems,
+    required this.viewModel,
+    required this.results,
+  }) : super(key: key);
+
+  final List<MusicInfo> musicInfoItems;
+  final MusicViewModel viewModel;
+  final RepoFetchResult? results;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = musicInfoItems;
+    return ListView.builder(
+      itemCount: _computeElementCount(),
+      itemBuilder: (_, idx) {
+        if (results == null) return PressSearchIcon();
+        if (items.isEmpty) return _textNoItemsFound();
+        //if this element is > items then it's a fetch and circular indicator
+        if (idx == items.length) return _fetchAndIndicate();
+        return ListViewCard(item: items[idx], index: idx);
+      },
+    );
+  }
+
+  //some inline convenience functions
+
+  int _computeElementCount() {
+    final items = musicInfoItems;
+    if (results == null) return 1; //element for a message
+    if (items.isEmpty) return 1; //ditto
+    if (results!.isLast) return items.length;
+    return items.length + 1;
+  }
+
+
+  Widget _textNoItemsFound() {
+    return Center(
+        heightFactor: 2,
+        child: Text(
+          'No items found',
+          semanticsLabel: 'No items found',
+          textScaleFactor: 2,
+          style: TextStyle(color: Colors.grey), //grey is darkMode compatible
+        ));
+  }
+
+  Widget _fetchAndIndicate() {
+    viewModel.fetch();
+    return loadingIndicator(semantics: 'waiting for LastFM');
+  }
+}
+
+///Card widget for item search result in a ListView
 class ListViewCard extends StatelessWidget {
-
-
-
   const ListViewCard({
     Key? key,
     required this.item,
@@ -28,8 +101,6 @@ class ListViewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isWideScreen = screenSize.width >= global_screen_width_breakpoint;
     return Card(
         margin: EdgeInsets.all(5),
         elevation: 10.0,
@@ -92,75 +163,11 @@ class ListViewCard extends StatelessWidget {
         enableJavaScript: true,
       );
     } else {
-      throw 'Could not launch $url';
+      throw Exception('Could not launch $url');
     }
   }
 }
 
-class ListViewMusicInfo extends StatelessWidget {
-  const ListViewMusicInfo({
-    Key? key,
-    required this.musicInfoItems,
-    required this.viewModel,
-    required this.results,
-  }) : super(key: key);
-
-  final List<MusicInfo> musicInfoItems;
-  final MusicViewModel viewModel;
-  final RepoFetchResult? results;
-
-  @override
-  Widget build(BuildContext context) {
-    final items = musicInfoItems;
-    return ListView.builder(
-      itemCount: _computeElementCount(),
-      itemBuilder: (_, idx) {
-        if (results == null) return _textPressSearchIcon();
-        if (items.isEmpty) return _textNoItemsFound();
-        //if this element is > items then it's a fetch and circular indicator
-        if (idx == items.length) return _fetchAndIndicate();
-        return ListViewCard(item: items[idx], index: idx);
-      },
-    );
-  }
-
-  //some inline convenience functions
-
-  int _computeElementCount() {
-    final items = musicInfoItems;
-    if (results == null) return 1; //element for a message
-    if (items.isEmpty) return 1; //ditto
-    if (results!.isLast) return items.length;
-    return items.length + 1;
-  }
-
-  Widget _textPressSearchIcon() {
-    return Center(
-        heightFactor: 2,
-        child:
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
-          Text('Press search icon'),
-          Icon(Icons.search),
-          Text('to search'),
-        ]));
-  }
-
-  Widget _textNoItemsFound() {
-    return Center(
-        heightFactor: 2,
-        child: Text(
-          'No items found',
-          semanticsLabel: 'No items found',
-          textScaleFactor: 2,
-          style: TextStyle(color: Colors.grey), //grey is darkMode compatible
-        ));
-  }
-
-  Widget _fetchAndIndicate() {
-    viewModel.fetch();
-    return loadingIndicator(semantics: 'waiting for LastFM');
-  }
-}
 
 //retired:
 /*

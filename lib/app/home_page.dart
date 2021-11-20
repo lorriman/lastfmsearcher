@@ -21,7 +21,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //todo: shoft the controller in to the ViewModel
+
   late final TextEditingController _textController;
 
   @override
@@ -48,9 +48,10 @@ class _HomePageState extends State<HomePage> {
       return GestureDetector(
         //legacy keyboard pop-down. We might have to resort to this
         //if the other one doesn't work out. See [MyApp.build]->Listener
-
-        //FocusManager.instance.primaryFocus?.unfocus(),
+/*
+        FocusManager.instance.primaryFocus?.unfocus(),
         //FocusScope.of(context).requestFocus(new FocusNode()),
+*/
         behavior: HitTestBehavior.translucent,
         child: Scaffold(
           appBar: AppBar(
@@ -66,7 +67,7 @@ class _HomePageState extends State<HomePage> {
               ),
               IconButton(
                 icon: Icon(Icons.search, semanticLabel: 'search button'),
-                //not enough text etc so disable the button
+                //if search string isn't long enough etc disable the button
                 onPressed: viewModel.notReady ? null : () => submit(viewModel),
               ),
             ],
@@ -81,22 +82,23 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, watch, _) {
                   final modelsAsyncValue = watch(musicInfoProvider);
 
-                  //first loading indicator is done here. Subsequently,
-                  //to allow infinite scrolling, loading indicators
-                  //are done at final element of the listview on scrolling
+                  //The first loading indicator is done here.
+                  //To allow infinite scrolling subsequent loading indicators
+                  //are done in the final element of the listview on scrolling
                   //to the end.
                   //see fetchAndIndicate() in [ListViewMusicInfo.build]
                   if (viewModel.isLoading && viewModel.isFirst) {
                     return loadingIndicator(
-                        semantics: 'waiting for LastFM', size: 100);
+                        semantics: 'waiting for LastFM', size: 50);
                   }
                   if (modelsAsyncValue.data == null)
-                    return _textPressSearchIcon();
+                    return PressSearchIcon();
 
                   return modelsAsyncValue.when(
                     //data isn't livestreamed (unlike firestore) so
                     //loading: is never called.
                     //see fetchAndIndicate() in [ListViewMusicInfo.build]
+                    //This may change.
                     loading: () => Center(child: Placeholder()),
                     error: (e, st) => SelectableText(
                       'Error $e ${kDebugMode ? st.toString() : ''}',
@@ -121,6 +123,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  /// search total and radio buttons for artist, song, album searches.
   Widget _header(MusicViewModel viewModel, bool isWideScreen) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
@@ -133,6 +136,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  ///search total when screen is narrow
   SizedBox _footer(MusicViewModel viewModel) {
     return SizedBox(
         height: 40,
@@ -143,7 +147,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ]));
   }
-
+ /// text field for search string.
   Widget _searchTextField(MusicViewModel viewModel) {
     return Theme(
       data: ThemeData(
@@ -218,19 +222,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //Add an extra element for a loadingIndicator when the user
-  // scrolls down to the last element, but not if there are no more items
 
-  Widget _textPressSearchIcon() {
-    return Center(
-        heightFactor: 2,
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
-          Text('Press search icon'),
-          Icon(Icons.search),
-          Text('to search'),
-        ]));
-  }
 }
 
 

@@ -18,8 +18,8 @@ Future<void> main({List<String>? args}) async {
 
   //helps test as phone dimensions when debugging.
   if (kDebugMode && (Platform.isWindows || Platform.isLinux) ) {
-    setWindowMaxSize(const Size(400, 600));
-    setWindowMinSize(const Size(400, 600));
+    setWindowMaxSize(const Size(384, 600));
+    setWindowMinSize(const Size(384, 600));
   }
 
   //lastFM supplied developer key.
