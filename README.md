@@ -36,7 +36,11 @@ in Google's Flutter/Dart.
 - adherence to Material design guidelines
 - adherence to Apple guidelines
 
-## API info
+### Issues:
+
+backspace key doesn't work in some desktop environments
+
+### API info
 
 I don't include my personal developer's LastFM api key.
 
