@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lorriman.jobtest_lastfm">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="jobtest_lastfm"
         android:icon="@mipmap/launcher_icon">
