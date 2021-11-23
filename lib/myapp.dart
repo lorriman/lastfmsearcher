@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Project imports:
-import 'app/home_page.dart';
+import 'app/main_view.dart';
 
 class MyApp extends StatefulWidget {
   @override

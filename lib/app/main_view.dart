@@ -10,8 +10,8 @@ import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
 
-import 'models/viewmodel.dart';
-import 'musicinfo_listview.dart';
+import 'models/items_viewmodel.dart';
+import 'list_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
     _textController = TextEditingController();
   }
 
-  void submit(MusicViewModel viewModel) {
+  void submit(MusicItemsViewModel viewModel) {
     //test isLoading to absorbs an accidental double-tap without
     //having to disable the button
     if (viewModel.isLoading) return;
@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// search total and radio buttons for artist, song, album searches.
-  Widget _header(MusicViewModel viewModel, bool isWideScreen) {
+  Widget _header(MusicItemsViewModel viewModel, bool isWideScreen) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
       child: Row(children: [
@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   ///search total when screen is narrow
-  SizedBox _footer(MusicViewModel viewModel) {
+  SizedBox _footer(MusicItemsViewModel viewModel) {
     return SizedBox(
         height: 40,
         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -148,7 +148,7 @@ class _HomePageState extends State<HomePage> {
         ]));
   }
  /// text field for search string.
-  Widget _searchTextField(MusicViewModel viewModel) {
+  Widget _searchTextField(MusicItemsViewModel viewModel) {
     return Theme(
       data: ThemeData(
           textSelectionTheme: TextSelectionThemeData(
@@ -195,7 +195,7 @@ class _HomePageState extends State<HomePage> {
   }
 
 //todo: turn this in to a loop
-  Widget _radioButtons(MusicViewModel viewModel) {
+  Widget _radioButtons(MusicItemsViewModel viewModel) {
     return Padding(
       padding: const EdgeInsets.only(right: 0),
       child: Row(

@@ -2,8 +2,8 @@
 import 'dart:async';
 
 // Project imports:
-import 'package:jobtest_lastfm/app/models/item.dart';
-import 'lastfmapi.dart';
+import 'package:jobtest_lastfm/app/models/item_model.dart';
+import 'lastfm_api.dart';
 
 // here ignore_for_file directive is because we use empty anonymous callbacks
 // instead of nulls to avoid testing for null in unused callbacks.
@@ -30,8 +30,8 @@ const Map<MusicInfoType, String> musicInfoTypeUIStrings = {
 ///A single object of this type is the result from a Repository.fetch(), and
 ///is sent in the streams. They are not returned by any methods.
 ///Implementation is to use StreamBuilders or streamProviders.
-class RepoFetchResult<T> {
-  RepoFetchResult(
+class RepositoryFetchResult<T> {
+  RepositoryFetchResult(
     this.infoType,
     this.items,
     this.totalItems,
@@ -50,19 +50,19 @@ class RepoFetchResult<T> {
   }
 }
 
-///Implements domain-level (non-UI) methods around a database/API.
+///Implements domain-level methods around a database/API.
 ///Does not currently implement paging properly (some code, incomplete)
 ///but this is where the code for paging would go as the Repository
 ///is where the data is kept for each search.
 ///This app uses cumulative scrolling, so each fetch of the next page
-///is just added to a large List.
+///is added to a large and larger List.
 ///The T parameter is the ViewModel's choice for model object and is passed
 ///through to the API class, and implemented via a call back.
 class Repository<T> {
   Repository({required LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
-    _streamController = StreamController<RepoFetchResult<T>?>(
+    _streamController = StreamController<RepositoryFetchResult<T>?>(
         onListen: () => print('listening'));
-    _streamPageController = StreamController<RepoFetchResult<T>?>(
+    _streamPageController = StreamController<RepositoryFetchResult<T>?>(
         onListen: () => print('pager listening'));
   }
 
@@ -70,8 +70,8 @@ class Repository<T> {
 
   final LastfmApiService _lastFMapi;
   //stream are expected to be used by StreamProviders, see the stream getters
-  late final StreamController<RepoFetchResult<T>?> _streamController;
-  late final StreamController<RepoFetchResult<T>?> _streamPageController;
+  late final StreamController<RepositoryFetchResult<T>?> _streamController;
+  late final StreamController<RepositoryFetchResult<T>?> _streamPageController;
   String _searchString = '';
   MusicInfoType _musicInfoType = MusicInfoType.albums;
   final List<T> _items = [];
@@ -91,13 +91,13 @@ class Repository<T> {
   ///Stream that is the main source of fetched data. (The next() call
   ///does not return data.) The data added is all items from all pages
   ///that have so far been fetched for the current search string.
-  Stream<RepoFetchResult<T>?> get stream => _streamController.stream;
+  Stream<RepositoryFetchResult<T>?> get stream => _streamController.stream;
 
   ///Suitable for paged views with next button.
   ///stream that is the main source for fetched data. (The next() call
   ///does not return data.) The data added is a single page of items
   ///that have been fetched on the last next() call.
-  Stream<RepoFetchResult<T>?> get streamPage => _streamPageController.stream;
+  Stream<RepositoryFetchResult<T>?> get streamPage => _streamPageController.stream;
 
   //events/callback
 
@@ -124,7 +124,7 @@ class Repository<T> {
   ///info that could be extracted or further processed to add to a [MusicInfo]
   ///with more fields etc.
   static LastFmModelizer modelize =
-      (name, imageLinkSmall, imageLinkMedium, otherData, rawData) {
+      (name, imageLinkSmall, imageLinkMedium, url, otherData, rawData) {
     String newName=name;
     if(name=='(null)'){
       final str= otherData['artist'] ?? '';
@@ -135,6 +135,7 @@ class Repository<T> {
       newName ,
       imageLinkSmall,
       imageLinkMedium,
+      url,
       otherData,
     );
   };
@@ -184,13 +185,13 @@ class Repository<T> {
       _status = RepoStatus.loaded;
       afterFetch(results.items as List<T>);
       //page of results
-      final fetchResultPage = RepoFetchResult<T>(_musicInfoType,
+      final fetchResultPage = RepositoryFetchResult<T>(_musicInfoType,
           results.items as List<T>, results.totalItems, _items.isEmpty, _page);
 
       _streamPageController.add(fetchResultPage);
       _items.addAll(results.items as List<T>);
       //all results, for infinite scrolling
-      final fetchResultAll = RepoFetchResult<T>(
+      final fetchResultAll = RepositoryFetchResult<T>(
         _musicInfoType,
         _items,
         results.totalItems,

@@ -2,8 +2,8 @@
 import 'package:http/http.dart';
 
 // Project imports:
-import 'package:jobtest_lastfm/app/models/item.dart';
-import 'lastfmapi.dart';
+import 'package:jobtest_lastfm/app/models/item_model.dart';
+import 'lastfm_api.dart';
 
 //For debugging and perhaps testing.
 class DevAPI<T> implements LastfmApiService {
@@ -13,7 +13,7 @@ class DevAPI<T> implements LastfmApiService {
     final List<MusicInfo> items = [];
     for (var i = 0; i < itemCount; i++) {
       items.add(
-          MusicInfo('$searchString${i.toString()}', '', '', {'test': 'test'}));
+          MusicInfo('$searchString${i.toString()}', '', '','', {'test': 'test'}));
     }
     await Future.delayed(Duration(milliseconds: 2000));
     if (page > 3) {

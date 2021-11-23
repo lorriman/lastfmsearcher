@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Project imports:
 import 'package:jobtest_lastfm/services/globals.dart';
-import 'package:jobtest_lastfm/services/lastfmapi.dart';
+import 'package:jobtest_lastfm/services/lastfm_api.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
-import 'models/item.dart';
-import 'models/viewmodel.dart';
+import 'models/item_model.dart';
+import 'models/items_viewmodel.dart';
 
 
 /// ## call order of classes (to explain the providers)
@@ -41,11 +41,11 @@ final repositoryProvider = StateProvider<Repository<MusicInfo>>((ref) {
   return Repository<MusicInfo>(lastFMapi: database);
 });
 
-final viewModelProvider = ChangeNotifierProvider<MusicViewModel>((ref) {
-  return MusicViewModel(ref.watch(repositoryProvider).state);
+final viewModelProvider = ChangeNotifierProvider<MusicItemsViewModel>((ref) {
+  return MusicItemsViewModel(ref.watch(repositoryProvider).state);
 });
 
-final musicInfoProvider = StreamProvider<RepoFetchResult<MusicInfo>?>((ref) {
+final musicInfoProvider = StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
   final repo = ref.watch(repositoryProvider).state;
 
   return repo.stream;

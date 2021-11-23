@@ -6,8 +6,8 @@ import 'package:jobtest_lastfm/services/repository.dart';
 
 ///A number of properties are provided to reduce UI clutter as well as serve
 ///specific UI requirements.
-class MusicViewModel extends ChangeNotifier {
-  MusicViewModel(this._repository);
+class MusicItemsViewModel extends ChangeNotifier {
+  MusicItemsViewModel(this._repository);
 
   //private
 

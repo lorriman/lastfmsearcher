@@ -2,15 +2,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 // Project imports:
 import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import 'models/item.dart';
-import 'models/viewmodel.dart';
+import 'models/item_model.dart';
+import 'models/item_viewmodel.dart';
+import 'models/items_viewmodel.dart';
 
-///Utility widget before a search, to indicate to the user
+///Small Utility widget before a search, to indicate to the user
 ///to type a search string and press the search icon.
 class PressSearchIcon extends StatelessWidget {
   const PressSearchIcon({
@@ -41,8 +42,8 @@ class ListViewMusicInfo extends StatelessWidget {
   }) : super(key: key);
 
   final List<MusicInfo> musicInfoItems;
-  final MusicViewModel viewModel;
-  final RepoFetchResult? results;
+  final MusicItemsViewModel viewModel;
+  final RepositoryFetchResult? results;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +55,7 @@ class ListViewMusicInfo extends StatelessWidget {
         if (items.isEmpty) return _textNoItemsFound();
         //if this element is > items then it's a fetch and circular indicator
         if (idx == items.length) return _fetchAndIndicate();
-        return ListViewCard(item: items[idx], index: idx);
+        return ListViewCard(item: MusicInfoViewModel.fromMusicInfo(items[idx]), index: idx);
       },
     );
   }
@@ -95,7 +96,7 @@ class ListViewCard extends StatelessWidget {
     required this.index,
   }) : super(key: key);
 
-  final MusicInfo item;
+  final MusicInfoViewModel item;
   final int index;
   static const double lastFmSmallImageSize = 34;
 
@@ -132,9 +133,9 @@ class ListViewCard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 12.0),
                       child: InkWell(
-                        onTap:  ()=>_launchUrl(item.otherData['url'] ??''),
+                        onTap:  ()=>_launchUrl(item.url),
                         child: Text(
-                          item.name,
+                          item.title,
                           textScaleFactor: 1.5,
                           //maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -142,8 +143,8 @@ class ListViewCard extends StatelessWidget {
 
               ),
                     ),
-                    if (item.otherData['artist']!=null) Padding( padding: const EdgeInsets.only(left: 12.0),
-                      child : Text(item.otherData['artist']!),
+                    if (item.subTitle!='') Padding( padding: const EdgeInsets.only(left: 12.0),
+                      child : Text(item.subTitle),
                     )
 
                   ],
@@ -169,7 +170,7 @@ class ListViewCard extends StatelessWidget {
 }
 
 
-//retired:
+//retired in favour of CachedNetworkImage:
 /*
                 Image.network(
                   item.imageLinkSmall,

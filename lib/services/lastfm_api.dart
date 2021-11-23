@@ -47,6 +47,7 @@ typedef LastFmModelizer<T> = T Function(
   String name,
   String imageLinkSmall,
   String imageLinkMedium,
+  String url,
   Map<String, String> otherData,
   MapSD rawData,
 );
@@ -80,7 +81,7 @@ class LastfmApiService<T> {
     final data = decode(response);
     _checkForServiceErrors(data);
     final items = <T>[];
-    final totalItems = _jsonToOjects(data, items, searchType);
+    final totalItems = _jsonToObjects(data, items, searchType);
     return LastFMSearchResult(items, totalItems, page);
   }
 
@@ -126,9 +127,9 @@ class LastfmApiService<T> {
 
   ///extracts meta data, like the total available number of
   ///items if all pages were fetched (totalItems) and
-  ///then calls toitemJsonToModel to make ojects for
+  ///then calls toItemJsonToModel to make objects for
   ///each item.
-  int _jsonToOjects(MapSD data, List<T> items, String searchType) {
+  int _jsonToObjects(MapSD data, List<T> items, String searchType) {
     late final int totalItems;
     try {
       final info = data['results'] as MapSD;
@@ -155,14 +156,16 @@ class LastfmApiService<T> {
     final name = itemData['name'] as String;
     final imageSmall = (itemData['image']?[0]?['#text'] ?? '') as String;
     final imageMedium = (itemData['image']?[1]?['#text'] ?? '') as String;
+
     final strData = Map.from(itemData);
     //remove non-strings
     strData.removeWhere((dynamic key, dynamic value) => value is! String);
     final other = strData.map<String, String>(
         (dynamic k, dynamic v) => MapEntry(k, v as String));
     other.remove('name');
+    final url=other['url'] ?? '';
     //callback, note the cast at the end
-    final item = modelizer(name, imageSmall, imageMedium, other, itemData) as T;
+    final item = modelizer(name, imageSmall, imageMedium, url, other, itemData) as T;
     return item;
   }
 
