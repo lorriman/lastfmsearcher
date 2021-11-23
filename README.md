@@ -21,13 +21,13 @@ in Google's Flutter/Dart.
 
 * use of the new Provider library, 'Riverpod'. https://pub.dev/packages/riverpod.
 * streaming/reactive UI.
-* immutable data models.
 * accessibility/Semantic widgets
 * dependency inversion
 
 ### It doesn't include (among other things) :
 
 - unit and integration tests
+- immutable data models (though they are finalised)
 - internationalisation
 - comprehensive documentation
 - flavours
