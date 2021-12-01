@@ -28,7 +28,7 @@ Future<void> main({List<String>? args}) async {
 
   args ??= [];
   if (args.contains('integration_testing'))
-    global_testing_active = TestingEnum.integration;
+    global_testing_active = TestingEnum.integrationTestData;
   if (args.contains('unit_testing')) global_testing_active = TestingEnum.unit;
 
   runApp(ProviderScope(child: MyApp()));

@@ -59,7 +59,11 @@ class LastfmApiService<T> {
   final String _apiKey;
   Duration rateLimit;
   DateTime? _fetchTime;
-  final LastFmModelizer modelizer;
+ final  LastFmModelizer modelizer;
+//  LastFmModelizer modelizer=(_,__,___,____,______,_______){return 'placeholder - see lastfm_api.dart';};
+
+  //retired: for testing purposes, see [DevAPI]
+  //LastfmApiService.test(): _apiKey='' , rateLimit=Duration(seconds: 1);
 
   LastfmApiService({
     required this.rateLimit,

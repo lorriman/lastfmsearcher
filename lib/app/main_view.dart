@@ -10,6 +10,7 @@ import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
 
+import 'models/item_model.dart';
 import 'models/items_viewmodel.dart';
 import 'list_view.dart';
 
@@ -65,7 +66,7 @@ class _HomePageState extends State<HomePage> {
                 width: 150,
                 child: _searchTextField(viewModel),
               ),
-              IconButton(
+              IconButton( key: Key('search_button'),
                 icon: Icon(Icons.search, semanticLabel: 'search button'),
                 //if search string isn't long enough etc disable the button
                 onPressed: viewModel.notReady ? null : () => submit(viewModel),
@@ -107,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                       print('on data');
                       return Expanded(
                           child: ListViewMusicInfo(
-                        musicInfoItems: data?.items ?? [],
+                        musicInfoItems: data?.items ?? <MusicInfo>[],
                         viewModel: viewModel,
                         results: data,
                       ));
@@ -154,7 +155,7 @@ class _HomePageState extends State<HomePage> {
           textSelectionTheme: TextSelectionThemeData(
         selectionColor: Colors.grey,
       )),
-      child: TextField(
+      child: TextField( key: Key('search_text_field'),
         controller: _textController,
         //support enter key for desktop
         onSubmitted: (_) {

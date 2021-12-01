@@ -90,7 +90,7 @@ class ListViewMusicInfo extends StatelessWidget {
 
 ///Card widget for item search result in a ListView
 class ListViewCard extends StatelessWidget {
-  const ListViewCard({
+   ListViewCard({
     Key? key,
     required this.item,
     required this.index,
@@ -99,10 +99,13 @@ class ListViewCard extends StatelessWidget {
   final MusicInfoViewModel item;
   final int index;
   static const double lastFmSmallImageSize = 34;
+  final cardKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+
+    return Card( key : index==0 ? cardKey : null,
+
         margin: EdgeInsets.all(5),
         elevation: 10.0,
         child: Padding(
@@ -113,6 +116,7 @@ class ListViewCard extends StatelessWidget {
                   width: 35,
                   child: Text(
                     '${index + 1}  ',
+                    key : Key('item${index}' ),
                     textScaleFactor: 0.8,
                   )),
               ClipRRect(
@@ -136,6 +140,7 @@ class ListViewCard extends StatelessWidget {
                         onTap:  ()=>_launchUrl(item.url),
                         child: Text(
                           item.title,
+
                           textScaleFactor: 1.5,
                           //maxLines: 2,
                           overflow: TextOverflow.ellipsis,

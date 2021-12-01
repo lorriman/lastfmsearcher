@@ -59,7 +59,7 @@ class RepositoryFetchResult<T> {
 ///The T parameter is the ViewModel's choice for model object and is passed
 ///through to the API class, and implemented via a call back.
 class Repository<T> {
-  Repository({required LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
+  Repository({required  LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
     _streamController = StreamController<RepositoryFetchResult<T>?>(
         onListen: () => print('listening'));
     _streamPageController = StreamController<RepositoryFetchResult<T>?>(

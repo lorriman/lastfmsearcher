@@ -88,6 +88,20 @@ Future<Map<String, dynamic>> parseJsonFromAssets(String assetsPath) async {
   return jsonDecode(str) as Map<String, dynamic>;
 }
 
+
+extension GlobalKeyExtension on GlobalKey {
+  Rect? get globalPaintBounds {
+    final renderObject = currentContext?.findRenderObject();
+    final translation = renderObject?.getTransformTo(null).getTranslation();
+    if (translation != null && renderObject?.paintBounds != null) {
+      final offset = Offset(translation.x, translation.y);
+      return renderObject!.paintBounds.shift(offset);
+    } else {
+      return null;
+    }
+  }
+}
+
 //todo: over-complicated rate limiter converting from python
 /*sleep() to limit the rate according to a minimum time between calls
     (float in seconds).

@@ -4,7 +4,7 @@ import 'package:logger/logger.dart';
 //ignore_for_file: non_constant_identifier_names
 //ignore_for_file: constant_identifier_names
 
-enum TestingEnum { none, unit, integration }
+enum TestingEnum { none, unit, integrationTestData, integrationRealData }
 
 String global_apiKey = '';
 

@@ -1,5 +1,6 @@
 // Package imports:
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobtest_lastfm/services/dev_api.dart';
 
 // Project imports:
 import 'package:jobtest_lastfm/services/globals.dart';
@@ -21,12 +22,17 @@ import 'models/items_viewmodel.dart';
 /// databaseProvider(LastFMAPI)->repositoryProvider(Repository)->musicInfoStreamProvider(a stream)
 ///
 /// In this MvvM architecture, a ViewModel calls the repository, not
-/// the UI calling the reposiroty. The UI registers with the streamProviders to 
+/// the UI calling the repository. The UI registers with the streamProviders to
 /// recieve data.
 
 //todo: writeup MvvM
 
 final databaseProvider = Provider((ref) {
+  if(global_testing_active == TestingEnum.integrationTestData){
+    return DevAPI<MusicInfo>();
+  }
+  return DevAPI<MusicInfo>();// as LastfmApiService<MusicInfo>;
+
   return LastfmApiService<MusicInfo>(
     apiKey: global_apiKey,
     modelizer: Repository.modelize,
