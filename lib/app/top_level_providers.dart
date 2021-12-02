@@ -28,11 +28,6 @@ import 'models/items_viewmodel.dart';
 //todo: writeup MvvM
 
 final databaseProvider = Provider((ref) {
-  if(global_testing_active == TestingEnum.integrationTestData){
-    return DevAPI<MusicInfo>();
-  }
-  return DevAPI<MusicInfo>();// as LastfmApiService<MusicInfo>;
-
   return LastfmApiService<MusicInfo>(
     apiKey: global_apiKey,
     modelizer: Repository.modelize,
