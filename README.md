@@ -23,10 +23,11 @@ in Google's Flutter/Dart.
 * streaming/reactive UI.
 * accessibility/Semantic widgets
 * dependency inversion
+* integration test
 
 ### It doesn't include (among other things) :
 
-- unit and integration tests
+- unit tests
 - immutable data models (though they are finalised)
 - internationalisation
 - comprehensive documentation
