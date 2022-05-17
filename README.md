@@ -2,8 +2,8 @@
 Copyright Greg Lorriman mob: 0044 777520 3753
 http://github/lorriman/
 
-(To compile, into Android or Linux Desktop, see 'API info' below about recreating an api key file,
- not supplied. Linux desktop support requires only Flutter Stable as a beta preview is included.)
+(To compile, into Android or Linux Desktop, see 'building' below about recreating an api key file,
+ not supplied. )
 
 # LastFm demonstrator 
 
@@ -15,7 +15,8 @@ in Google's Flutter/Dart.
 ### It includes :
 
 - MvvM architecture (based on streams and provider)
-- abstracted/pluggable backend (eg to allow easier replacement of lastFM API)
+- abstracted/pluggable backend (eg to allow easy replacement of lastFM API to adapt
+the app for other search purposes.)
 
 ### The plumbing includes:
 
@@ -28,18 +29,19 @@ in Google's Flutter/Dart.
 ### It doesn't include (among other things) :
 
 - unit tests
-- immutable data models (though they are finalised)
+- immutable data models
 - internationalisation
 - comprehensive documentation
 - flavours
 - CI/CD
-- the polish expected of a fully released app (The UI is ugly/basic)
+- the polish expected of a fully released app (The UI is basic)
 - adherence to Material design guidelines
 - adherence to Apple guidelines
+- logging
 
 ### Issues:
 
-backspace key doesn't work in some desktop environments
+~~backspace key doesn't work in some desktop environments~~
 
 ### building
 
