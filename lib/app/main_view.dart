@@ -168,8 +168,8 @@ class _HomePageState extends State<HomePage> {
             extentOffset: viewModel.searchString.length,
           );
         },
-        autofocus: true,
-        focusNode: FocusNode(),
+        //autofocus: true,
+        //focusNode: FocusNode(),
         textAlign: TextAlign.end,
         decoration: InputDecoration(
           hintStyle: TextStyle(color: Colors.grey[300]),
