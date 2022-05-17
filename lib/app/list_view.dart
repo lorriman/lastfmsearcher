@@ -127,7 +127,7 @@ class ListViewCard extends StatelessWidget {
                   placeholder: (_, __) => SizedBox(width: lastFmSmallImageSize),
                   //lots of errors and blanks, so just swallow them
                   errorWidget: (_, __, dynamic ___) =>
-                      SizedBox(width: lastFmSmallImageSize),
+                      Container(width: lastFmSmallImageSize , child : Image.asset('assets/icon/icon_small.png', cacheWidth: lastFmSmallImageSize.toInt(), filterQuality : FilterQuality.high)),
                   fadeInDuration: Duration(milliseconds: 150),
                 ),
               ),
