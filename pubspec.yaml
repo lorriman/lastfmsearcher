@@ -81,6 +81,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/lastfm_api.json
+    - assets/icon/icon.png
+    - assets/icon/icon_small.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
