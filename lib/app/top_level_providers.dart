@@ -1,6 +1,5 @@
 // Package imports:
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jobtest_lastfm/services/dev_api.dart';
 
 // Project imports:
 import 'package:jobtest_lastfm/services/globals.dart';

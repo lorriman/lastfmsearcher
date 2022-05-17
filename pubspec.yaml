@@ -45,7 +45,7 @@ dependencies:
       url: git://github.com/google/flutter-desktop-embedding.git
       path: plugins/window_size
   cached_network_image: ^3.2.1
-  url_launcher: ^6.1.2
+  url_launcher: ^6.0.20
   introduction_screen: ^2.1.0
 
 dev_dependencies:

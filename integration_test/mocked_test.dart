@@ -35,7 +35,7 @@ void main() {
       await tester.flingFrom(Offset(150, 500), Offset(0, -300), 4000);
       await tester.pumpAndSettle();
     }
-    final elements = await tester.elementList(find.byType(Card));
+    final elements = tester.elementList(find.byType(Card));
     expect(find.byKey(Key('item59')), findsOneWidget);
     expect(find.byKey(Key('item60')), findsNothing);
     //one more scroll, no more widgets should be added
