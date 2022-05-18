@@ -1,6 +1,7 @@
 // Flutter imports:
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // Project imports:
 import 'package:jobtest_lastfm/services/repository.dart';
@@ -10,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'models/item_model.dart';
 import 'models/item_viewmodel.dart';
 import 'models/items_viewmodel.dart';
+import 'package:share_plus/share_plus.dart';
 
 ///Small Utility widget before a search, to indicate to the user
 ///to type a search string and press the search icon.
@@ -23,7 +25,7 @@ class PressSearchIcon extends StatelessWidget {
     return Center(
         heightFactor: 2,
         child:
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
           Text('Press search icon'),
           Icon(Icons.search),
           Text('to search'),
@@ -55,7 +57,8 @@ class ListViewMusicInfo extends StatelessWidget {
         if (items.isEmpty) return _textNoItemsFound();
         //if this element is > items then it's a fetch and circular indicator
         if (idx == items.length) return _fetchAndIndicate();
-        return ListViewCard(item: MusicInfoViewModel.fromMusicInfo(items[idx]), index: idx);
+        return ListViewCard(
+            item: MusicInfoViewModel.fromMusicInfo(items[idx]), index: idx);
       },
     );
   }
@@ -69,7 +72,6 @@ class ListViewMusicInfo extends StatelessWidget {
     if (results!.isLast) return items.length;
     return items.length + 1;
   }
-
 
   Widget _textNoItemsFound() {
     return Center(
@@ -90,7 +92,7 @@ class ListViewMusicInfo extends StatelessWidget {
 
 ///Card widget for item search result in a ListView
 class ListViewCard extends StatelessWidget {
-   ListViewCard({
+  ListViewCard({
     Key? key,
     required this.item,
     required this.index,
@@ -103,9 +105,8 @@ class ListViewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    return Card( key : index==0 ? cardKey : null,
-
+    return Card(
+        key: index == 0 ? cardKey : null,
         margin: EdgeInsets.all(5),
         elevation: 10.0,
         child: Padding(
@@ -113,31 +114,58 @@ class ListViewCard extends StatelessWidget {
           child: Row(
             children: [
               SizedBox(
-                  width: 35,
+                  width: 20,
                   child: Text(
                     '${index + 1}  ',
-                    key : Key('item${index}' ),
+                    key: Key('item$index'),
                     textScaleFactor: 0.8,
                   )),
-              ClipRRect(
-                 borderRadius: BorderRadius.circular(5.0),
-                child: CachedNetworkImage(
-                  maxHeightDiskCache: lastFmSmallImageSize.toInt(),
-                  imageUrl: item.imageLinkSmall,
-                  placeholder: (_, __) => SizedBox(width: lastFmSmallImageSize),
-                  //lots of errors and blanks, so just swallow them
-                  errorWidget: (_, __, dynamic ___) =>
-                      Container(width: lastFmSmallImageSize , child : Image.asset('assets/icon/icon_small.png', cacheWidth: lastFmSmallImageSize.toInt(), filterQuality : FilterQuality.high)),
-                  fadeInDuration: Duration(milliseconds: 150),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    side: BorderSide(width: 0, color: Colors.white)),
+                onPressed: () async {
+                  //_launchUrl(item.url, external: true);
+                  await Share.share(item.url);
+                  final isMobile = Platform.isAndroid || Platform.isIOS;
+                  final hint =
+                      isMobile ? 'click the text to use internal viewer' : '';
+                  if (isMobile) {
+                    final snackBar = SnackBar(
+                      content: Text(hint),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(5.0),
+                  clipBehavior: Clip.antiAlias,
+                  child: CachedNetworkImage(
+                    maxHeightDiskCache: lastFmSmallImageSize.toInt(),
+                    imageUrl: item.imageLinkSmall,
+                    placeholder: (_, __) =>
+                        SizedBox(width: lastFmSmallImageSize),
+                    //lots of errors and blanks, so just swallow them
+                    errorWidget: (_, __, dynamic ___) => SizedBox(
+                        width: lastFmSmallImageSize,
+                        child: Opacity(
+                          opacity: 0.1,
+                          child: Image.asset('assets/icon/icon_small.png',
+                              cacheWidth: lastFmSmallImageSize.toInt(),
+                              filterQuality: FilterQuality.high),
+                        )),
+                    fadeInDuration: Duration(milliseconds: 150),
+                  ),
                 ),
               ),
               Expanded(
-                child: Column( crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 12.0),
                       child: InkWell(
-                        onTap:  ()=>_launchUrl(item.url),
+                        onTap: () => _launchUrl(item.url),
                         child: Text(
                           item.title,
 
@@ -145,13 +173,13 @@ class ListViewCard extends StatelessWidget {
                           //maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-
-              ),
+                      ),
                     ),
-                    if (item.subTitle!='') Padding( padding: const EdgeInsets.only(left: 12.0),
-                      child : Text(item.subTitle),
-                    )
-
+                    if (item.subTitle != '')
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12.0),
+                        child: Text(item.subTitle),
+                      )
                   ],
                 ),
               ),
@@ -160,12 +188,13 @@ class ListViewCard extends StatelessWidget {
         ));
   }
 
-  Future<void> _launchUrl(String url) async {
+  Future<void> _launchUrl(String url, {bool external = false}) async {
     if (await canLaunch(url)) {
       await launch(
         url,
+        enableDomStorage: true,
         forceSafariVC: true,
-        forceWebView: true,
+        forceWebView: !external,
         enableJavaScript: true,
       );
     } else {
@@ -173,7 +202,6 @@ class ListViewCard extends StatelessWidget {
     }
   }
 }
-
 
 //retired in favour of CachedNetworkImage:
 /*

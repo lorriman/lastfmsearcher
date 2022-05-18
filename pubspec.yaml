@@ -47,6 +47,7 @@ dependencies:
   cached_network_image: ^3.2.1
   url_launcher: ^6.0.20
   introduction_screen: ^2.1.0
+  share_plus: ^2.2.0
 
 dev_dependencies:
   flutter_test:
