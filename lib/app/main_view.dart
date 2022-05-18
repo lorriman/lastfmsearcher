@@ -21,7 +21,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   late final TextEditingController _textController;
 
   @override
@@ -37,7 +36,6 @@ class _HomePageState extends State<HomePage> {
     viewModel.searchString = _textController.value.text;
     viewModel.fetch();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -55,17 +53,30 @@ class _HomePageState extends State<HomePage> {
         behavior: HitTestBehavior.translucent,
         child: Scaffold(
           appBar: AppBar(
-            title: Text(
-              'Searcher for LastFM',
-              maxLines: 2,
-              semanticsLabel: 'app title: LastFM searcher',
+            title: Column(
+              children: [
+                Text(
+                  'Search LastFM',
+                  maxLines: 2,
+                  semanticsLabel: 'app title: LastFM searcher',
+                ),
+                if (kDebugMode)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'debug build',
+                      textScaleFactor: 0.5,
+                    ),
+                  )
+              ],
             ),
             actions: [
               SizedBox(
                 width: 150,
                 child: _searchTextField(viewModel),
               ),
-              IconButton( key: Key('search_button'),
+              IconButton(
+                key: Key('search_button'),
                 icon: Icon(Icons.search, semanticLabel: 'search button'),
                 //if search string isn't long enough etc disable the button
                 onPressed: viewModel.notReady ? null : () => submit(viewModel),
@@ -80,7 +91,7 @@ class _HomePageState extends State<HomePage> {
               ),
               Consumer(
                 builder: (context, watch, _) {
-                  final modelsAsyncValue = watch(musicInfoProvider);
+                  final modelsAsyncValue = watch(musicInfoStreamProvider);
 
                   //The first loading indicator is done here.
                   //To allow infinite scrolling subsequent loading indicators
@@ -91,15 +102,15 @@ class _HomePageState extends State<HomePage> {
                     return loadingIndicator(
                         semantics: 'waiting for LastFM', size: 50);
                   }
-                  if (modelsAsyncValue.data == null)
-                    return PressSearchIcon();
+                  if (modelsAsyncValue.data == null) return PressSearchIcon();
 
                   return modelsAsyncValue.when(
                     //data isn't livestreamed (unlike firestore) so
                     //loading: is never called.
                     //see fetchAndIndicate() in [ListViewMusicInfo.build]
                     //This may change.
-                    loading: () => Center(child: Placeholder()),
+                    loading: () =>
+                        Center(child: CircularProgressIndicator.adaptive()),
                     error: (e, st) => SelectableText(
                       'Error $e ${kDebugMode ? st.toString() : ''}',
                     ),
@@ -147,14 +158,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ]));
   }
- /// text field for search string.
+
+  /// text field for search string.
   Widget _searchTextField(MusicItemsViewModel viewModel) {
     return Theme(
       data: ThemeData(
           textSelectionTheme: TextSelectionThemeData(
         selectionColor: Colors.grey,
       )),
-      child: TextField( key: Key('search_text_field'),
+      child: TextField(
+        key: Key('search_text_field'),
         controller: _textController,
         //support enter key for desktop
         onSubmitted: (_) {
@@ -221,8 +234,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-
 }
-
-

@@ -22,6 +22,7 @@ class _MyAppState extends State<MyApp> {
         }
       },
       child: MaterialApp(
+        //gets in the way of the button
         debugShowCheckedModeBanner : false,
         theme: ThemeData(
           visualDensity: VisualDensity.standard,

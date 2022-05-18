@@ -62,8 +62,8 @@ class MusicItemsViewModel extends ChangeNotifier {
 
   ///fetches data, but does not return it. Data comes through
   ///the repository streams.
-  ///With a calculated delay for UI purposes. Eg, to guarantee a progress
-  ///indicator gets a chance to display.
+  ///With a calculated delay for UI purposes. Eg, to guarantee a
+  ///circular progress indicator gets a chance to display.
   ///If the fetch is less than 350 milliseconds the repository method
   ///will delay the return of data through the stream by the difference.
   ///

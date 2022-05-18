@@ -45,7 +45,7 @@ final viewModelProvider = ChangeNotifierProvider<MusicItemsViewModel>((ref) {
   return MusicItemsViewModel(ref.watch(repositoryProvider).state);
 });
 
-final musicInfoProvider = StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
+final musicInfoStreamProvider = StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
   final repo = ref.watch(repositoryProvider).state;
 
   return repo.stream;

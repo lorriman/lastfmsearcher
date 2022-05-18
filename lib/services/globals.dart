@@ -10,7 +10,7 @@ String global_apiKey = '';
 
 TestingEnum global_testing_active = TestingEnum.none;
 
-const int global_screen_width_breakpoint=400;
+const int global_screen_width_breakpoint=360;
 
 final logger = Logger(
   printer: PrettyPrinter(

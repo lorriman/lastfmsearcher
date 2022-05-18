@@ -1,5 +1,8 @@
 .gitignore
 
+/assets/lastfm_api.json
+
+
 # Web related
 lib/generated_plugin_registrant.dart
 
