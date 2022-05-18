@@ -3,7 +3,7 @@ Copyright Greg Lorriman mob: 0044 777520 3753
 http://github/lorriman/
 
 (To compile, into Android or Linux Desktop, see 'building' below about recreating an api key file,
- not supplied. )
+ not supplied.)
 
 # LastFm demonstrator 
 
