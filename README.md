@@ -45,7 +45,7 @@ the app for other search purposes.)
 
 ### building
 
-To view an android debug build download and install the apk from here: [android build](https://drive.google.com/file/d/1X-ATwzBrcpBNuzcHxroXucsH-vYbdyzl/view?usp=sharing).
+<!-- To view an android debug build download and install the apk from here: [android build](https://drive.google.com/file/d/1X-ATwzBrcpBNuzcHxroXucsH-vYbdyzl/view?usp=sharing). -->
 
 The app has only been compiled in Android and Linux desktop versions.
 
@@ -60,8 +60,4 @@ The file should look like this:
    "api_key" : "your key goes here"
 }
 
-
-You can leave the key blank and change the project to instantiate the dev/test class DevAPI
-instead which supplies api test data.  The file isn't supplied and so to compile without it remove
-the reference to the file in the pubspec.yaml file.
 
