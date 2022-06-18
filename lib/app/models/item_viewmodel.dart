@@ -6,16 +6,33 @@ class MusicInfoViewModel{
   late final String subTitle;
   final String imageLinkSmall;
   final String imageLinkMedium;
-  final String url;
-  late final Map<String,String> _otherData;
+  final String imageLinkLarge;
+  final String imageLinkXLarge;
 
-  MusicInfoViewModel(this.title,this.imageLinkSmall,this.imageLinkMedium, this.url, Map<String,String>  otherData){
-    _otherData=otherData;
-    subTitle= _otherData['artist'] ?? '';
+  final String url;
+  late final Map<String, String> _otherData;
+
+  MusicInfoViewModel(
+      this.title,
+      this.imageLinkSmall,
+      this.imageLinkMedium,
+      this.imageLinkLarge,
+      this.imageLinkXLarge,
+      this.url,
+      Map<String, String> otherData) {
+    _otherData = otherData;
+    subTitle = _otherData['artist'] ?? '';
   }
 
-  factory MusicInfoViewModel.fromMusicInfo(MusicInfo item){
-    return MusicInfoViewModel(item.name,item.imageLinkSmall,item.imageLinkMedium,item.url,item.otherData);
+  factory MusicInfoViewModel.fromMusicInfo(MusicInfo item) {
+    return MusicInfoViewModel(
+        item.name,
+        item.imageLinkSmall,
+        item.imageLinkMedium,
+        item.imageLinkLarge,
+        item.imageLinkXLarge,
+        item.url,
+        item.otherData);
   }
 
 }

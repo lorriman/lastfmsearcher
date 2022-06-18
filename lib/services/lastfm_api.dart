@@ -47,6 +47,8 @@ typedef LastFmModelizer<T> = T Function(
   String name,
   String imageLinkSmall,
   String imageLinkMedium,
+  String imageLinkLarge,
+  String imageLinkXLarge,
   String url,
   Map<String, String> otherData,
   MapSD rawData,
@@ -59,7 +61,8 @@ class LastfmApiService<T> {
   final String _apiKey;
   Duration rateLimit;
   DateTime? _fetchTime;
- final  LastFmModelizer modelizer;
+  final LastFmModelizer modelizer;
+
 //  LastFmModelizer modelizer=(_,__,___,____,______,_______){return 'placeholder - see lastfm_api.dart';};
 
   //retired: for testing purposes, see [DevAPI]
@@ -160,6 +163,8 @@ class LastfmApiService<T> {
     final name = itemData['name'] as String;
     final imageSmall = (itemData['image']?[0]?['#text'] ?? '') as String;
     final imageMedium = (itemData['image']?[1]?['#text'] ?? '') as String;
+    final imageLarge = (itemData['image']?[2]?['#text'] ?? '') as String;
+    final imageXLarge = (itemData['image']?[3]?['#text'] ?? '') as String;
 
     final strData = Map.from(itemData);
     //remove non-strings
@@ -167,9 +172,10 @@ class LastfmApiService<T> {
     final other = strData.map<String, String>(
         (dynamic k, dynamic v) => MapEntry(k, v as String));
     other.remove('name');
-    final url=other['url'] ?? '';
+    final url = other['url'] ?? '';
     //callback, note the cast at the end
-    final item = modelizer(name, imageSmall, imageMedium, url, other, itemData) as T;
+    final item = modelizer(name, imageSmall, imageMedium, imageLarge,
+        imageXLarge, url, other, itemData) as T;
     return item;
   }
 
