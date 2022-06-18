@@ -2,10 +2,11 @@
     package="com.lorriman.jobtest_lastfm">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="jobtest_lastfm"
-        android:icon="@mipmap/launcher_icon">
+        android:label="Fast LastFM searcher"
+       android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
+            android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -46,4 +47,5 @@
             <data android:scheme="https" />
         </intent>
     </queries>
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
