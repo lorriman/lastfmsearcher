@@ -49,10 +49,8 @@ the app for other search purposes.)
 
 The app has only been compiled in Android and Linux desktop versions.
 
-I don't include my developer's LastFM api key.
-
-If you wish to compile and run you must create a file called lastfm_api.json in the assets folder
-(placed in the root folder as usual) with your own LastFM developer's api key.
+I don't include my developer's LastFM api key, nor required image assets.
+It would be a little work to compile this on your own computer.
 
 The file should look like this:
 
