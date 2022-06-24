@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner : false,
         theme: ThemeData(
           visualDensity: VisualDensity.standard,
-          primarySwatch: Colors.lightGreen,
+          primarySwatch: Colors.purple,
           textSelectionTheme:
               TextSelectionThemeData(selectionHandleColor: Colors.transparent),
         ),

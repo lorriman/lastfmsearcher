@@ -133,7 +133,7 @@ class _ListViewCardState extends State<ListViewCard>
 
   void initController() {
     controller = BottomSheet.createAnimationController(this);
-    controller.duration = const Duration(milliseconds: 50);
+    controller.duration = const Duration(milliseconds: 70);
     controller.reverseDuration = const Duration(milliseconds: 20);
   }
 
@@ -162,8 +162,7 @@ class _ListViewCardState extends State<ListViewCard>
                   //_launchUrl(item.url, external: true);
                   await Share.share(widget.item.url);
                   final isMobile = Platform.isAndroid || Platform.isIOS;
-                  final hint =
-                      isMobile ? 'click the text to use internal viewer' : '';
+                  final hint = isMobile ? 'click the text to see details' : '';
                   if (isMobile) {
                     final snackBar = SnackBar(
                       content: Text(hint),
@@ -253,6 +252,7 @@ class _ListViewCardState extends State<ListViewCard>
       imageUrl: url,
       placeholder: (_, __) => SizedBox(width: maxLength.toDouble()),
       //lots of errors and blanks, so just swallow them
+
       errorWidget: (_, __, dynamic ___) => SizedBox(
           width: maxLength.toDouble(),
           child: Opacity(
@@ -281,32 +281,85 @@ class _ListViewCardState extends State<ListViewCard>
       //color: Colors.amber,
       child: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(5.0),
-                    clipBehavior: Clip.antiAlias,
-                    child: Hero(
-                        tag: 'image', child: image(item, ImageSizing.large))),
+                PhysicalModel(
+                  color: Colors.white,
+                  elevation: 8,
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5.0),
+                      clipBehavior: Clip.antiAlias,
+                      child: Hero(
+                          tag: 'image',
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                    height: 175,
+                                    child: image(item, ImageSizing.large)),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  width: 190,
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: SelectableText(
+                                      item.title,
+                                      textScaleFactor: 1.3,
+                                      maxLines: 4,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                            ],
+                          ))),
+                ),
+                SizedBox(width: 5),
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      SelectableText(item.title,
-                          textScaleFactor: 1.6, maxLines: 4),
-                      SelectableText(
-                        item.subTitle,
-                        textScaleFactor: 1.3,
-                      )
-                    ],
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: SelectableText(
+                            item.subTitle,
+                            textScaleFactor: 2,
+                            maxLines: 4,
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
+            SizedBox(height: 5),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              ElevatedButton(
+                child: Icon(Icons.share),
+                onPressed: () async {
+                  await Share.share(widget.item.url);
+                },
+              ),
+              ElevatedButton(
+                child: Icon(Icons.open_in_browser),
+                onPressed: () {
+                  _launchUrl(item.url);
+                },
+              ),
+            ])
           ],
         ),
       ),
