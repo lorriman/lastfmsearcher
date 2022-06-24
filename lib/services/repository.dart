@@ -59,7 +59,7 @@ class RepositoryFetchResult<T> {
 ///The T parameter is the ViewModel's choice for model object and is passed
 ///through to the API class, and implemented via a call back.
 class Repository<T> {
-  Repository({required  LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
+  Repository({required LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
     _streamController = StreamController<RepositoryFetchResult<T>?>(
         onListen: () => print('listening'));
     _streamPageController = StreamController<RepositoryFetchResult<T>?>(
@@ -97,7 +97,8 @@ class Repository<T> {
   ///stream that is the main source for fetched data. (The next() call
   ///does not return data.) The data added is a single page of items
   ///that have been fetched on the last next() call.
-  Stream<RepositoryFetchResult<T>?> get streamPage => _streamPageController.stream;
+  Stream<RepositoryFetchResult<T>?> get streamPage =>
+      _streamPageController.stream;
 
   //events/callback
 
@@ -123,18 +124,20 @@ class Repository<T> {
   ///constructor [rawData] is the source data from the json for any other
   ///info that could be extracted or further processed to add to a [MusicInfo]
   ///with more fields etc.
-  static LastFmModelizer modelize =
-      (name, imageLinkSmall, imageLinkMedium, url, otherData, rawData) {
-    String newName=name;
-    if(name=='(null)'){
-      final str= otherData['artist'] ?? '';
-      newName='($str)';
+  static LastFmModelizer modelize = (name, imageLinkSmall, imageLinkMedium,
+      imageLinkLarge, imageLinkXLarge, url, otherData, rawData) {
+    String newName = name;
+    if (name == '(null)') {
+      final str = otherData['artist'] ?? '';
+      newName = '($str)';
     }
 
     return MusicInfo(
-      newName ,
+      newName,
       imageLinkSmall,
       imageLinkMedium,
+      imageLinkLarge,
+      imageLinkXLarge,
       url,
       otherData,
     );
