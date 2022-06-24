@@ -43,7 +43,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         //applicationId "com.lorriman.jobtest_lastfm"
         applicationId "com.lorriman.fast_lastfm_searcher"
-        minSdkVersion 28
+        minSdkVersion 21
         targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
