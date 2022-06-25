@@ -116,25 +116,25 @@ class _ListViewCardState extends State<ListViewCard>
   final cardKey = GlobalKey();
 
   //we need this for a faster bottomsheet transition
-  late AnimationController controller;
+  late AnimationController animController;
 
   @override
   initState() {
     super.initState();
     // Initialize AnimationController
-    initController();
+    initAnimController();
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    animController.dispose();
     super.dispose();
   }
 
-  void initController() {
-    controller = BottomSheet.createAnimationController(this);
-    controller.duration = const Duration(milliseconds: 70);
-    controller.reverseDuration = const Duration(milliseconds: 20);
+  void initAnimController() {
+    animController = BottomSheet.createAnimationController(this);
+    animController.duration = const Duration(milliseconds: 70);
+    animController.reverseDuration = const Duration(milliseconds: 20);
   }
 
   @override
@@ -175,7 +175,8 @@ class _ListViewCardState extends State<ListViewCard>
                     clipBehavior: Clip.antiAlias,
                     child: Hero(
                         tag: 'image',
-                        child: image(widget.item, ImageSizing.small))),
+                        child: LastFMImage(
+                            item: widget.item, sizing: ImageSizing.small))),
               ),
               Expanded(
                 child: Column(
@@ -186,6 +187,7 @@ class _ListViewCardState extends State<ListViewCard>
                       child: InkWell(
                         onTap: () => showItemBottomSheet(
                             context, widget.item), //_launchUrl(item.url),
+                        //todo: why does this bring up a keyboard? Inkwell?
                         child: Text(
                           widget.item.title,
 
@@ -222,56 +224,14 @@ class _ListViewCardState extends State<ListViewCard>
     }
   }
 
-  Widget image(MusicInfoViewModel item, ImageSizing sizing) {
-    late int maxLength;
-    late String url;
-    switch (sizing) {
-      case ImageSizing.small:
-        {
-          maxLength = ListViewCard.lastFmSmallImageSize.toInt();
-          url = item.imageLinkSmall;
-        }
-        break;
-      case ImageSizing.medium:
-        {
-          maxLength = ListViewCard.lastFmMediumImageSize.toInt();
-          url = item.imageLinkMedium;
-        }
-        break;
-      case ImageSizing.large:
-        {
-          maxLength = ListViewCard.lastFmLargeImageSize.toInt();
-          url = item.imageLinkLarge;
-        }
-        break;
-    }
-
-    return CachedNetworkImage(
-      width: maxLength.toDouble(),
-      maxHeightDiskCache: maxLength,
-      imageUrl: url,
-      placeholder: (_, __) => SizedBox(width: maxLength.toDouble()),
-      //lots of errors and blanks, so just swallow them
-
-      errorWidget: (_, __, dynamic ___) => SizedBox(
-          width: maxLength.toDouble(),
-          child: Opacity(
-            opacity: 0.1,
-            child: Image.asset('assets/icon/icon_small.png',
-                cacheWidth: maxLength, filterQuality: FilterQuality.high),
-          )),
-      fadeInDuration: Duration(milliseconds: 150),
-    );
-  }
-
   void showItemBottomSheet(BuildContext context, MusicInfoViewModel item) {
     showModalBottomSheet<void>(
       context: context,
-      transitionAnimationController: controller,
+      transitionAnimationController: animController,
       builder: (BuildContext context) {
         return detailsView(item);
       },
-    ).whenComplete(() => initController());
+    ).whenComplete(() => initAnimController());
   }
 
   Widget detailsView(MusicInfoViewModel item) {
@@ -302,7 +262,8 @@ class _ListViewCardState extends State<ListViewCard>
                                 padding: const EdgeInsets.all(8.0),
                                 child: SizedBox(
                                     height: 175,
-                                    child: image(item, ImageSizing.large)),
+                                    child: LastFMImage(
+                                        item: item, sizing: ImageSizing.large)),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -363,6 +324,60 @@ class _ListViewCardState extends State<ListViewCard>
           ],
         ),
       ),
+    );
+  }
+}
+
+class LastFMImage extends StatelessWidget {
+  const LastFMImage({
+    Key? key,
+    required this.item,
+    required this.sizing,
+  }) : super(key: key);
+
+  final MusicInfoViewModel item;
+  final ImageSizing sizing;
+
+  @override
+  Widget build(BuildContext context) {
+    late int maxLength;
+    late String url;
+    switch (sizing) {
+      case ImageSizing.small:
+        {
+          maxLength = ListViewCard.lastFmSmallImageSize.toInt();
+          url = item.imageLinkSmall;
+        }
+        break;
+      case ImageSizing.medium:
+        {
+          maxLength = ListViewCard.lastFmMediumImageSize.toInt();
+          url = item.imageLinkMedium;
+        }
+        break;
+      case ImageSizing.large:
+        {
+          maxLength = ListViewCard.lastFmLargeImageSize.toInt();
+          url = item.imageLinkLarge;
+        }
+        break;
+    }
+
+    return CachedNetworkImage(
+      width: maxLength.toDouble(),
+      maxHeightDiskCache: maxLength,
+      imageUrl: url,
+      placeholder: (_, __) => SizedBox(width: maxLength.toDouble()),
+      //lots of errors and blanks, so just swallow them
+
+      errorWidget: (_, __, dynamic ___) => SizedBox(
+          width: maxLength.toDouble(),
+          child: Opacity(
+            opacity: 0.1,
+            child: Image.asset('assets/icon/icon_small.png',
+                cacheWidth: maxLength, filterQuality: FilterQuality.high),
+          )),
+      fadeInDuration: Duration(milliseconds: 150),
     );
   }
 }
