@@ -2,10 +2,10 @@
     package="com.lorriman.jobtest_lastfm">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- android:label="Fast LastFM searcher" -->
     <application
-    //android:label="Fast LastFM searcher"
-    android:label="FastFM searcher for LastFM"
-    android:icon="@mipmap/launcher_icon">
+        android:label="Fast searcher for LastFM"
+        android:icon="@mipmap/launcher_icon">
     <activity
         android:name=".MainActivity"
         android:exported="true"
