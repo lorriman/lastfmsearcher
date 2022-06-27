@@ -9,8 +9,8 @@ http://github/lorriman/
 
 ## What is this?
 
-A simple app over-engineered to demonstrate commercial development capabilities of Greg Lorriman 
-in Google's Flutter/Dart.
+A simple app that has been over-engineered to demonstrate commercial development capabilities
+of Greg Lorriman in Google's Flutter/Dart.
 
 ### It includes :
 
