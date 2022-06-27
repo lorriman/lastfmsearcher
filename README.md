@@ -9,7 +9,7 @@ http://github/lorriman/
 
 ## What is this?
 
-A simple project to demonstrate commercial development capabilities of Greg Lorriman 
+A simple app over-engineered to demonstrate commercial development capabilities of Greg Lorriman 
 in Google's Flutter/Dart.
 
 ### It includes :
@@ -21,15 +21,14 @@ the app for other search purposes.)
 ### The plumbing includes:
 
 * use of the new Provider library, 'Riverpod'. https://pub.dev/packages/riverpod.
-* streaming/reactive UI.
+* streaming
 * accessibility/Semantic widgets
-* dependency inversion
 * integration test
 
 ### It doesn't include (among other things) :
 
 - unit tests
-- immutable data models
+- fully immutable data models
 - internationalisation
 - comprehensive documentation
 - flavours
