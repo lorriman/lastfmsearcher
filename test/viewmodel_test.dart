@@ -1,8 +1,24 @@
+import 'package:flutter_test/flutter_test.dart';
+
+//import 'package:mocking/main.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+
+import 'viewmodel_test.mocks.dart';
+
 // Flutter imports:
 import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:test/test.dart';
+import 'package:jobtest_lastfm/services/repository.dart' as repository;
+import 'package:jobtest_lastfm/app/models/items_viewmodel.dart';
+
+@GenerateMocks([repository.Repository])
+Future<void> main() async {
+  //repo=MockRepository();
+  //MusicItemsViewModel()
+}
 
 /*
 Future<void> main() async {
