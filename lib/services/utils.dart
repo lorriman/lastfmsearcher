@@ -102,54 +102,29 @@ extension GlobalKeyExtension on GlobalKey {
   }
 }
 
-//todo: over-complicated rate limiter converting from python
-/*sleep() to limit the rate according to a minimum time between calls
-    (float in seconds).
-    limit() checks for elapsed time and
-    calls sleep(secs) for the difference if too fast.
-    eg rl=RateLimiter(.5) will sleep on calls to .limit() if
-    the time elapsed since the previous call is less than
-    500 milliseconds.
-    The first call to limit() starts the clock but does not
-    rate limit unless the object was initialised with a
-    start_time, which avoids haivng to write awkward flow-control loops.
-    */
-/*
-class RateLimiter{
-
-  RateLimiter({required this.minimum, this.start_time=0.0}) {
-    reset(start_time);
+///Time-based Stateless rate limiter. Pauses for rateLimit duration, and returns
+///current time after pausing.
+///Return value can help keep track of the previous time, example:
+///
+///  _fetchTime=await rateLimiter(_fetchTime,_rateLimit);
+///  data=await _networkFetch(params);
+///
+/// This assumes _fetchTime was the time at previous fetch, and that
+/// a fetch will occur immediately after the rateLimiter call.
+/// Else set a _fetchTime value yourself at a more suitable time.
+/// For ease of use, the initial value can be null where there
+/// is no previous data, which helps reduce code to one
+/// function and no 'if' statements
+Future<DateTime> rateLimiter(DateTime? previous, Duration rateLimit) async {
+  final now = DateTime.now();
+  if (previous != null) {
+    final diff = now.difference(previous);
+    if (diff.compareTo(rateLimit) < 0) {
+      final required = rateLimit - diff;
+      print(
+          'LastfmApiService rate limiting, requires ${required.inMilliseconds}ms to reach ${rateLimit.inMilliseconds}ms');
+      await Future.delayed(required);
+    }
   }
-
- double minimum;
-  double start_time;
-
-
-
-//call limit to start the clock, and each time we want some limiting/sleeping
-//ie before calls to BGG since it's rate limited to 2 calls a sec
-void limit()  async {
-//sleep if elapsed time less than minimum'''
-  final time_taken = DateTime.now - _prev_time;
-  __prev_time = Datetime.now();
-  if time_taken < _minimum:
-  final s=_minimum-time_taken;
-  _counter+=s;
-  await Future.delayed(Duration(seconds : s));
-  //read timer again since sleep may be longer than requested
-  _prev_time = Datetime.now();
+  return DateTime.now();
 }
-
-
-def reset(self,start_time=0.0):
-'''re-initialize but keep the minimum'''
-self.__prev_time=start_time
-self.__counter=0.0
-
-def count(self):
-'''Give cumulative amount of limiting, which maybe zero if
-        operations are slower than the rate limit'''
-return self.__counter
-
-
-*/

@@ -10,6 +10,8 @@ import 'package:http/http.dart' as http;
 // Project imports:
 import 'globals.dart';
 
+import 'utils.dart';
+
 //shorthand as there's a lot of this
 typedef MapSD = Map<String, dynamic>;
 
@@ -17,6 +19,7 @@ typedef MapSD = Map<String, dynamic>;
 
 class LastFmServerException implements Exception {
   final String cause;
+
   LastFmServerException(this.cause);
 }
 
@@ -27,10 +30,13 @@ class LastFmApiException implements Exception {
 
 class LastFmRateLimitException implements Exception {
   final Duration millisecondsLimit;
-  LastFmRateLimitException(this.millisecondsLimit);
+  final Duration excess;
+
+  LastFmRateLimitException(this.millisecondsLimit, this.excess);
+
   @override
   String toString() {
-    return 'Rate limit of ${millisecondsLimit.inMilliseconds} exceeded';
+    return 'Rate limit of ${millisecondsLimit.inMilliseconds}ms exceeded by ${excess.inMilliseconds}ms ';
   }
 }
 
@@ -97,7 +103,10 @@ class LastfmApiService<T> {
     final link =
         'https://ws.audioscrobbler.com/2.0/?method=$searchType.search&$searchType=$searchString&page=$page&api_key=$_apiKey&format=json';
     final url = Uri.parse(link);
-    await _rateExceptionOrLimit(limit: kReleaseMode);
+
+    //Guard against hammering the lastfM server and getting a ban.
+    _fetchTime = await rateLimiter(_fetchTime, rateLimit);
+
     final response = await _client
         .get(url, headers: {'Accept': 'application/json; charset=UTF-8'});
     if (response.statusCode != 200) {
@@ -177,25 +186,6 @@ class LastfmApiService<T> {
     final item = modelizer(name, imageSmall, imageMedium, imageLarge,
         imageXLarge, url, other, itemData) as T;
     return item;
-  }
-
-  ///Guard against hammering the lastfM server and getting a ban.
-  ///limit==true for release, otherwise throws an exception as
-  ///likely a bug.
-  Future<void> _rateExceptionOrLimit({required bool limit}) async {
-    final now = DateTime.now();
-    if (_fetchTime != null) {
-      final prev = _fetchTime;
-      final diff = now.difference(prev!);
-      if (diff.compareTo(rateLimit) < 0) {
-        if (limit) {
-          await Future.delayed(diff);
-        } else {
-          throw LastFmRateLimitException(rateLimit);
-        }
-      }
-    }
-    _fetchTime = now;
   }
 
   void close() {
