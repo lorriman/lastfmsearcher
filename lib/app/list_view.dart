@@ -247,45 +247,50 @@ class _ListViewCardState extends State<ListViewCard>
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                PhysicalModel(
-                  color: Colors.white,
-                  elevation: 8,
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5.0),
-                      clipBehavior: Clip.antiAlias,
-                      child: Hero(
-                          tag: 'image',
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                    height: 175,
-                                    child: LastFMImage(
-                                        item: item, sizing: ImageSizing.large)),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  width: 190,
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: SelectableText(
-                                      item.title,
-                                      textScaleFactor: 1.3,
-                                      maxLines: 4,
-                                      textAlign: TextAlign.center,
+                Expanded(
+                  flex: 2,
+                  child: PhysicalModel(
+                    color: Colors.white,
+                    elevation: 8,
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(5.0),
+                        clipBehavior: Clip.antiAlias,
+                        child: Hero(
+                            tag: 'image',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                      height: 190,
+                                      child: LastFMImage(
+                                          item: item,
+                                          sizing: ImageSizing.large)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    //width: 190,
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: SelectableText(
+                                        item.title,
+                                        textScaleFactor: 1.2,
+                                        maxLines: 4,
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(height: 10),
-                            ],
-                          ))),
+                                //SizedBox(height: 10),
+                              ],
+                            ))),
+                  ),
                 ),
                 SizedBox(width: 5),
                 Expanded(
+                  flex: 1,
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -295,7 +300,7 @@ class _ListViewCardState extends State<ListViewCard>
                           alignment: Alignment.center,
                           child: SelectableText(
                             item.subTitle,
-                            textScaleFactor: 2,
+                            textScaleFactor: 1.5,
                             maxLines: 4,
                             textAlign: TextAlign.center,
                           ),
@@ -358,7 +363,7 @@ class LastFMImage extends StatelessWidget {
       case ImageSizing.large:
         {
           maxLength = ListViewCard.lastFmLargeImageSize.toInt();
-          url = item.imageLinkLarge;
+          url = item.imageLinkXLarge;
         }
         break;
     }
