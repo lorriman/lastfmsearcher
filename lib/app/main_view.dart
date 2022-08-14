@@ -1,6 +1,7 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 // Package imports:
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // Project imports:
@@ -55,14 +56,17 @@ class _HomePageState extends State<HomePage> {
           appBar: AppBar(
             title: Column(
               children: [
-                Text(
-                  'Search LastFM',
-                  maxLines: 2,
-                  semanticsLabel: 'app title: LastFM searcher',
+                GestureDetector(
+                  onTap: () => _showAboutDialog(context),
+                  child: Text(
+                    'Search LastFM',
+                    maxLines: 2,
+                    semanticsLabel: 'app title: LastFM searcher',
+                  ),
                 ),
                 if (kDebugMode)
                   Align(
-                    alignment: Alignment.centerRight,
+                    //alignment: Alignment.centerRight,
                     child: Text(
                       'debug build',
                       textScaleFactor: 0.5,
@@ -72,10 +76,11 @@ class _HomePageState extends State<HomePage> {
             ),
             actions: [
               SizedBox(
-                width: 150,
+                width: 200,
                 child: _searchTextField(viewModel),
               ),
               IconButton(
+                color: Colors.white,
                 key: Key('search_button'),
                 icon: Icon(Icons.search, semanticLabel: 'search button'),
                 //if search string isn't long enough etc disable the button
@@ -132,6 +137,16 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     });
+  }
+
+  void _showAboutDialog(BuildContext context) async {
+    final info = await PackageInfo.fromPlatform();
+    showAboutDialog(
+      context: context,
+      applicationName: 'Searcher for LastFM',
+      applicationVersion: 'v. ${info.version.toString()} +${info.buildNumber}',
+      applicationIcon: Icon(Icons.info_outline),
+    );
   }
 
   /// search total and radio buttons for artist, song, album searches.
@@ -196,7 +211,8 @@ class _HomePageState extends State<HomePage> {
             borderSide: BorderSide(color: Colors.white),
           ),
         ),
-        cursorColor: Colors.black,
+        cursorColor: Colors.white,
+        style: TextStyle(color: Colors.white),
         showCursor: true,
         onChanged: (value) {
           //setState(() {
