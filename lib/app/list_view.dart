@@ -160,15 +160,8 @@ class _ListViewCardState extends State<ListViewCard>
                     side: BorderSide(width: 0, color: Colors.white)),
                 onPressed: () async {
                   //_launchUrl(item.url, external: true);
-                  await Share.share(widget.item.url);
-                  final isMobile = Platform.isAndroid || Platform.isIOS;
-                  final hint = isMobile ? 'click the text to see details' : '';
-                  if (isMobile) {
-                    final snackBar = SnackBar(
-                      content: Text(hint),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }
+                  //await Share.share(widget.item.url);
+                  // Use Builder to get the widget context
                 },
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(5.0),
@@ -179,15 +172,14 @@ class _ListViewCardState extends State<ListViewCard>
                             item: widget.item, sizing: ImageSizing.small))),
               ),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12.0),
-                      child: InkWell(
-                        onTap: () => showItemBottomSheet(
-                            context, widget.item), //_launchUrl(item.url),
-                        //todo: why does this bring up a keyboard? Inkwell?
+                child: InkWell(
+                  onTap: () => showItemBottomSheet(
+                      context, widget.item), //_launchUrl(item.url),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12.0),
                         child: Text(
                           widget.item.title,
 
@@ -196,13 +188,13 @@ class _ListViewCardState extends State<ListViewCard>
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                    if (widget.item.subTitle != '')
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(widget.item.subTitle),
-                      )
-                  ],
+                      if (widget.item.subTitle != '')
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12.0),
+                          child: Text(widget.item.subTitle),
+                        )
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -211,13 +203,14 @@ class _ListViewCardState extends State<ListViewCard>
   }
 
   Future<void> _launchUrl(String url, {bool external = false}) async {
-    if (await canLaunch(url)) {
-      await launch(
-        url,
-        enableDomStorage: true,
-        forceSafariVC: true,
-        forceWebView: !external,
-        enableJavaScript: true,
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(
+        uri,
+        //enableDomStorage: true,
+        //forceSafariVC: true,
+        //forceWebView: !external,
+        //enableJavaScript: true,
       );
     } else {
       throw Exception('Could not launch $url');
@@ -316,7 +309,17 @@ class _ListViewCardState extends State<ListViewCard>
               ElevatedButton(
                 child: Icon(Icons.share),
                 onPressed: () async {
-                  await Share.share(widget.item.url);
+                  //share_plus docs specify this as needed for IOS
+                  final box = context.findRenderObject() as RenderBox?;
+
+                  await Share.share(
+                    widget.item.url,
+                    subject: 'share',
+                    sharePositionOrigin:
+                        box!.localToGlobal(Offset.zero) & box.size,
+                  );
+
+                  //await Share.share(widget.item.url);
                 },
               ),
               ElevatedButton(
