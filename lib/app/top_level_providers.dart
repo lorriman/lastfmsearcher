@@ -26,7 +26,7 @@ import 'models/items_viewmodel.dart';
 
 //todo: writeup MvvM
 
-final databaseProvider = Provider((ref) {
+final databaseProvider = Provider<LastfmApiService<MusicInfo>>((ref) {
   return LastfmApiService<MusicInfo>(
     apiKey: global_apiKey,
     modelizer: Repository.modelize,
@@ -42,11 +42,11 @@ final repositoryProvider = StateProvider<Repository<MusicInfo>>((ref) {
 });
 
 final viewModelProvider = ChangeNotifierProvider<MusicItemsViewModel>((ref) {
-  return MusicItemsViewModel(ref.watch(repositoryProvider).state);
+  return MusicItemsViewModel(ref.watch(repositoryProvider));
 });
 
 final musicInfoStreamProvider = StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
-  final repo = ref.watch(repositoryProvider).state;
+  final repo = ref.watch(repositoryProvider);
 
   return repo.stream;
 });

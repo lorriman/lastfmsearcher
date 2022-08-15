@@ -27,7 +27,7 @@ dependencies:
   package_info_plus:
   http: ^0.13.5
   provider: ^5.0.0
-  flutter_riverpod: ^0.13.0
+  flutter_riverpod: ^1.0.1
   logger: ^1.1.0
   rxdart: ^0.27.5 #0.26.0
   state_notifier: ^0.7.2+1

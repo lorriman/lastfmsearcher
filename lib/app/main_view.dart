@@ -42,8 +42,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isWideScreen = screenSize.width >= global_screen_width_breakpoint;
-    return Consumer(builder: (context, watch, _) {
-      final viewModel = watch(viewModelProvider);
+    return Consumer(builder: (context, ref, _) {
+      final viewModel = ref.watch(viewModelProvider);
       return GestureDetector(
         //legacy keyboard pop-down. We might have to resort to this
         //if the other one doesn't work out. See [MyApp.build]->Listener
@@ -95,8 +95,8 @@ class _HomePageState extends State<HomePage> {
                 child: _header(viewModel, isWideScreen),
               ),
               Consumer(
-                builder: (context, watch, _) {
-                  final modelsAsyncValue = watch(musicInfoStreamProvider);
+                builder: (context, ref, _) {
+                  final modelsAsyncValue = ref.watch(musicInfoStreamProvider);
 
                   //The first loading indicator is done here.
                   //To allow infinite scrolling subsequent loading indicators
