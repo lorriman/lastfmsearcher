@@ -133,8 +133,8 @@ class _ListViewCardState extends State<ListViewCard>
 
   void initAnimController() {
     animController = BottomSheet.createAnimationController(this);
-    animController.duration = const Duration(milliseconds: 70);
-    animController.reverseDuration = const Duration(milliseconds: 20);
+    animController.duration = const Duration(milliseconds: 120);
+    animController.reverseDuration = const Duration(milliseconds: 70);
   }
 
   @override

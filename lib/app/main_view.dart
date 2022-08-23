@@ -75,6 +75,12 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             actions: [
+              IconButton(
+                color: Colors.red,
+                key: Key('faves_button'),
+                icon: Icon(Icons.favorite),
+                onPressed: showFavourites,
+              ),
               SizedBox(
                 width: 150,
                 child: _searchTextField(viewModel),
@@ -107,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                     return loadingIndicator(
                         semantics: 'waiting for LastFM', size: 50);
                   }
-                  if (modelsAsyncValue.data == null) return PressSearchIcon();
+                  if (modelsAsyncValue.asData == null) return PressSearchIcon();
 
                   return modelsAsyncValue.when(
                     //data isn't livestreamed (unlike firestore) so
@@ -138,6 +144,8 @@ class _HomePageState extends State<HomePage> {
       );
     });
   }
+
+  void showFavourites() {}
 
   void _showAboutDialog(BuildContext context) async {
     final info = await PackageInfo.fromPlatform();
