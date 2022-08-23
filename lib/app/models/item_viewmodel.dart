@@ -35,4 +35,9 @@ class MusicInfoViewModel{
         item.otherData);
   }
 
+  MusicInfo toMusicInfo() {
+    final data = <String, String>{'artist': subTitle};
+    return MusicInfo(title, imageLinkSmall, imageLinkMedium, imageLinkLarge,
+        imageLinkXLarge, url, data);
+  }
 }
