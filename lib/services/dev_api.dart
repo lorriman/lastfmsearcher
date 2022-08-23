@@ -42,9 +42,9 @@ class DevAPI<T> implements ApiService<T> {
     throw UnimplementedError();
   }
 
-  void add(T item) {}
+  Future<void> add(T item) async {}
 
-  void delete(T item) {}
+  Future<void> delete(T item) async {}
 
   @override
   void close() {}

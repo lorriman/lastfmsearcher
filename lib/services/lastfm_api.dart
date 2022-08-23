@@ -68,38 +68,11 @@ abstract class ApiService<T> {
   Future<LastFMSearchResult> search(String searchString,
       {required String searchType, int page = 1, int itemCount = 50});
 
-  void add(T item);
+  Future<void> add(T item);
 
-  void delete(T item);
+  Future<void> delete(T item);
 }
 
-///Call the search method.
-class FavouritesApiService<T> extends ApiService<T> {
-  FavouritesApiService({
-    required LastFmModelizer modelizer,
-  }) {
-    this.modelizer = modelizer;
-  }
-
-  @override
-  Future<LastFMSearchResult> search(String searchString,
-      {required String searchType, int page = 1, int itemCount = 50}) async {
-    print('Api search');
-    final response = await _networkFetch(searchType, searchString, page);
-    final data = decode(response);
-    _checkForServiceErrors(data);
-    final items = <T>[];
-    final totalItems = _jsonToObjects(data, items, searchType);
-    return LastFMSearchResult(items, totalItems, page);
-  }
-
-  void add(T item) {}
-
-  void delete(T item) {}
-
-  @override
-  void close() {}
-}
 
 ///Call the search method.
 class LastfmApiService<T> extends ApiService<T> {
@@ -109,11 +82,11 @@ class LastfmApiService<T> extends ApiService<T> {
 
   DateTime? _fetchTime;
 
-  void add(T item) {
+  Future<void> add(T item) {
     throw Exception('add not implemented in LastfmApiService');
   }
 
-  void delete(T item) {
+  Future<void> delete(T item) {
     throw Exception('delete not implemented in LastfmApiService');
   }
 

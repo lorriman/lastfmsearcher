@@ -214,6 +214,10 @@ class Repository<T> {
     }
   }
 
+  void addfavourite(T item) async {
+    await _lastFMapi.add(item);
+  }
+
   void dispose() {
     _streamController.close();
     _streamPageController.close();
