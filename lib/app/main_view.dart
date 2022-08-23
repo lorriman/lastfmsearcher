@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
             ),
             actions: [
               SizedBox(
-                width: 200,
+                width: 150,
                 child: _searchTextField(viewModel),
               ),
               IconButton(
