@@ -8,13 +8,14 @@ import 'lastfm_api.dart';
 const int devApiPageLength=20;
 
 //For debugging and perhaps testing.
-class DevAPI<T> implements LastfmApiService<T> {
-
+class DevAPI<T> implements ApiService<T> {
   //DevAPI.test(): super.test();
 
   @override
   Future<LastFMSearchResult> search(String searchString,
-      {required String searchType, int page = 1, int itemCount = devApiPageLength}) async {
+      {required String searchType,
+      int page = 1,
+      int itemCount = devApiPageLength}) async {
     final List<MusicInfo> items = [];
     for (var i = 0; i < itemCount; i++) {
       items.add(MusicInfo('$searchString${i.toString()}', '', '', '', '', '',
@@ -31,14 +32,20 @@ class DevAPI<T> implements LastfmApiService<T> {
   Duration rateLimit = Duration.zero;
 
   @override
-  MapSD decode(Response response)=> throw UnimplementedError();
-
+  MapSD decode(Response response) => throw UnimplementedError();
 
   @override
   LastFmModelizer get modelizer => throw UnimplementedError();
 
+  @override
+  set modelizer(LastFmModelizer mlzr) {
+    throw UnimplementedError();
+  }
+
+  void add(T item) {}
+
+  void delete(T item) {}
 
   @override
-  void close() {
-  }
+  void close() {}
 }

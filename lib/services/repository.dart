@@ -13,7 +13,8 @@ enum FetchPhase { none, fetching, fetched }
 
 enum RepoStatus { none, init, loaded }
 
-enum MusicInfoType { albums, tracks, artists }
+//all is used for favourites
+enum MusicInfoType { albums, tracks, artists, all }
 
 const Map<MusicInfoType, String> searchTypeApiStrings = <MusicInfoType, String>{
   MusicInfoType.albums: 'album',

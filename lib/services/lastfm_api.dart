@@ -1,8 +1,6 @@
 // Dart imports:
 import 'dart:convert';
-
-// Flutter imports:
-import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Package imports:
 import 'package:http/http.dart' as http;
@@ -60,14 +58,64 @@ typedef LastFmModelizer<T> = T Function(
   MapSD rawData,
 );
 
+abstract class ApiService<T> {
+  late Duration rateLimit;
+  late LastFmModelizer modelizer;
+
+  @override
+  void close();
+
+  Future<LastFMSearchResult> search(String searchString,
+      {required String searchType, int page = 1, int itemCount = 50});
+
+  void add(T item);
+
+  void delete(T item);
+}
+
 ///Call the search method.
-class LastfmApiService<T> {
+class FavouritesApiService<T> extends ApiService<T> {
+  FavouritesApiService({
+    required LastFmModelizer modelizer,
+  }) {
+    this.modelizer = modelizer;
+  }
+
+  @override
+  Future<LastFMSearchResult> search(String searchString,
+      {required String searchType, int page = 1, int itemCount = 50}) async {
+    print('Api search');
+    final response = await _networkFetch(searchType, searchString, page);
+    final data = decode(response);
+    _checkForServiceErrors(data);
+    final items = <T>[];
+    final totalItems = _jsonToObjects(data, items, searchType);
+    return LastFMSearchResult(items, totalItems, page);
+  }
+
+  void add(T item) {}
+
+  void delete(T item) {}
+
+  @override
+  void close() {}
+}
+
+///Call the search method.
+class LastfmApiService<T> extends ApiService<T> {
 // The service avoids data state, which should be managed by objects using it.
   final _client = http.Client();
   final String _apiKey;
-  Duration rateLimit;
+
   DateTime? _fetchTime;
-  final LastFmModelizer modelizer;
+
+  void add(T item) {
+    throw Exception('add not implemented in LastfmApiService');
+  }
+
+  void delete(T item) {
+    throw Exception('delete not implemented in LastfmApiService');
+  }
 
 //  LastFmModelizer modelizer=(_,__,___,____,______,_______){return 'placeholder - see lastfm_api.dart';};
 
@@ -75,11 +123,14 @@ class LastfmApiService<T> {
   //LastfmApiService.test(): _apiKey='' , rateLimit=Duration(seconds: 1);
 
   LastfmApiService({
-    required this.rateLimit,
+    required Duration rateLimit,
     required String apiKey,
-    required this.modelizer,
+    required LastFmModelizer modelizer,
   })  : _apiKey = apiKey,
-        assert(rateLimit.inMilliseconds > -1);
+        assert(rateLimit.inMilliseconds > -1) {
+    this.rateLimit = rateLimit;
+    this.modelizer = modelizer;
+  }
 
   ///searchType is either 'album', 'track' or 'artist' as String.
   ///LastFM server handles errors.
@@ -87,6 +138,7 @@ class LastfmApiService<T> {
   ///fetching beyond the end returns an empty result, not null.
   ///The total potential number of items returnable from
   ///all pages is given in every returned LastFMSearchResult object
+  @override
   Future<LastFMSearchResult> search(String searchString,
       {required String searchType, int page = 1, int itemCount = 50}) async {
     print('Api search');
