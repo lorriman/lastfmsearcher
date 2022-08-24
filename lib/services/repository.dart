@@ -13,19 +13,22 @@ enum FetchPhase { none, fetching, fetched }
 
 enum RepoStatus { none, init, loaded }
 
-//all is used for favourites
+///all is used for favourites
+// todo: convert to modern enums
 enum MusicInfoType { albums, tracks, artists, all }
 
 const Map<MusicInfoType, String> searchTypeApiStrings = <MusicInfoType, String>{
   MusicInfoType.albums: 'album',
   MusicInfoType.tracks: 'track',
   MusicInfoType.artists: 'artist',
+  MusicInfoType.all: 'all',
 };
 
 const Map<MusicInfoType, String> musicInfoTypeUIStrings = {
   MusicInfoType.albums: 'albums',
   MusicInfoType.tracks: 'tracks',
   MusicInfoType.artists: 'artists',
+  MusicInfoType.all: 'all',
 };
 
 ///A single object of this type is the result from a Repository.fetch(), and
@@ -70,12 +73,14 @@ class Repository<T> {
   //private
 
   final LastfmApiService _lastFMapi;
+
   //stream are expected to be used by StreamProviders, see the stream getters
   late final StreamController<RepositoryFetchResult<T>?> _streamController;
   late final StreamController<RepositoryFetchResult<T>?> _streamPageController;
   String _searchString = '';
   MusicInfoType _musicInfoType = MusicInfoType.albums;
   final List<T> _items = [];
+  final Map<String, T> _lookupItems = {};
   int _page = -1;
   int _totalItems = -1;
   FetchPhase _fetchPhase = FetchPhase.none;
@@ -84,7 +89,9 @@ class Repository<T> {
   //getters
 
   RepoStatus get status => _status;
+
   FetchPhase get fetchPhase => _fetchPhase;
+
   int get totalItems => _totalItems;
 
   ///Suitable for endless scrolling listviews.
@@ -125,16 +132,28 @@ class Repository<T> {
   ///constructor [rawData] is the source data from the json for any other
   ///info that could be extracted or further processed to add to a [MusicInfo]
   ///with more fields etc.
-  static LastFmModelizer modelize = (name, imageLinkSmall, imageLinkMedium,
-      imageLinkLarge, imageLinkXLarge, url, otherData, rawData) {
+  static LastFmModelizer modelize = (favourite,
+      name,
+      imageLinkSmall,
+      imageLinkMedium,
+      imageLinkLarge,
+      imageLinkXLarge,
+      url,
+      otherData,
+      rawData) {
     String newName = name;
+    String artist = '';
     if (name == '(null)') {
-      final str = otherData['artist'] ?? '';
-      newName = '($str)';
+      artist = otherData['artist'] ?? '';
+      newName = '($artist)';
+      artist =
+          ''; //blank the artist because it's an entry with no name, so the artist takes its place
     }
 
     return MusicInfo(
+      favourite,
       newName,
+      artist,
       imageLinkSmall,
       imageLinkMedium,
       imageLinkLarge,

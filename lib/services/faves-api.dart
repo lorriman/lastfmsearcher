@@ -55,16 +55,17 @@ class FavouritesApiService<T> extends ApiService<T> {
   ///produces a model object (with a callback, modelizer, provided by the
   ///client object)
   T _itemJsonToObject(MapSD itemData) {
-    final String name = (itemData['name]'] ?? '') as String;
-    final String imageSmall = (itemData['nameimageLinkSmall]'] ?? '') as String;
-    final String imageMedium = (itemData['imageLinkMedium]'] ?? '') as String;
-    final String imageLarge = (itemData['imageLinkLarge]'] ?? '') as String;
-    final String imageXLarge = (itemData['imageLinkXLarge]'] ?? '') as String;
-    final String url = (itemData['url]'] ?? '') as String;
-    final String other = (itemData['other]'] ?? '') as String;
+    final favourite = (itemData['favourite'] ?? '') as String;
+    final String name = (itemData['name'] ?? '') as String;
+    final String imageSmall = (itemData['nameimageLinkSmall'] ?? '') as String;
+    final String imageMedium = (itemData['imageLinkMedium'] ?? '') as String;
+    final String imageLarge = (itemData['imageLinkLarge'] ?? '') as String;
+    final String imageXLarge = (itemData['imageLinkXLarge'] ?? '') as String;
+    final String url = (itemData['url'] ?? '') as String;
+    final String other = (itemData['other'] ?? '') as String;
 
     //callback, note the cast at the end
-    final item = modelizer(name, imageSmall, imageMedium, imageLarge,
+    final item = modelizer(favourite, name, imageSmall, imageMedium, imageLarge,
         imageXLarge, url, other, itemData) as T;
     return item;
   }

@@ -1,6 +1,5 @@
 // Dart imports:
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // Package imports:
 import 'package:http/http.dart' as http;
@@ -48,6 +47,7 @@ class LastFMSearchResult<T> {
 
 ///for a client to supply a callback to produce the T objects they want
 typedef LastFmModelizer<T> = T Function(
+  bool favourite,
   String name,
   String imageLinkSmall,
   String imageLinkMedium,
@@ -208,7 +208,7 @@ class LastfmApiService<T> extends ApiService<T> {
     other.remove('name');
     final url = other['url'] ?? '';
     //callback, note the cast at the end
-    final item = modelizer(name, imageSmall, imageMedium, imageLarge,
+    final item = modelizer(false, name, imageSmall, imageMedium, imageLarge,
         imageXLarge, url, other, itemData) as T;
     return item;
   }

@@ -18,8 +18,8 @@ class DevAPI<T> implements ApiService<T> {
       int itemCount = devApiPageLength}) async {
     final List<MusicInfo> items = [];
     for (var i = 0; i < itemCount; i++) {
-      items.add(MusicInfo('$searchString${i.toString()}', '', '', '', '', '',
-          {'test': 'test'}));
+      items.add(MusicInfo(false, '$searchString${i.toString()}', '', '', '', '',
+          '', '', {'test': 'test'}));
     }
     await Future.delayed(Duration(milliseconds: 350));
     if (page > 3) {
