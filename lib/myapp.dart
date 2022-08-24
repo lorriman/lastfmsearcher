@@ -13,6 +13,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    debugInvertOversizedImages = true;
     return Listener(
       //keyboard popdown, see HomePage for a disabled alternative
       onPointerDown: (_) {
@@ -28,7 +29,7 @@ class _MyAppState extends State<MyApp> {
           visualDensity: VisualDensity.standard,
           primarySwatch: Colors.purple,
           textSelectionTheme:
-              TextSelectionThemeData(selectionHandleColor: Colors.transparent),
+          TextSelectionThemeData(selectionHandleColor: Colors.transparent),
         ),
         darkTheme: ThemeData(
           primarySwatch: Colors.lightGreen,

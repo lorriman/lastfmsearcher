@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/lastfm_api.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
+import '../services/faves-api.dart';
 import 'models/item_model.dart';
 import 'models/items_viewmodel.dart';
 
@@ -45,8 +46,34 @@ final viewModelProvider = ChangeNotifierProvider<MusicItemsViewModel>((ref) {
   return MusicItemsViewModel(ref.watch(repositoryProvider));
 });
 
-final musicInfoStreamProvider = StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
+final musicInfoStreamProvider =
+    StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
   final repo = ref.watch(repositoryProvider);
 
+  return repo.stream;
+});
+
+final favouritesProvider = Provider<FavouritesApiService<MusicInfo>>((ref) {
+  return FavouritesApiService<MusicInfo>(
+    modelizer: Repository.modelize,
+  );
+});
+
+final favouritesRepositoryProvider =
+    StateProvider<Repository<MusicInfo>>((ref) {
+  final database = ref.watch(favouritesProvider);
+
+  ref.onDispose(() {});
+  return Repository<MusicInfo>(lastFMapi: database);
+});
+
+final favouritesViewModelProvider =
+    ChangeNotifierProvider<MusicItemsViewModel>((ref) {
+  return MusicItemsViewModel(ref.watch(favouritesRepositoryProvider));
+});
+
+final favouritesMusicInfoStreamProvider =
+    StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
+  final repo = ref.watch(favouritesRepositoryProvider);
   return repo.stream;
 });

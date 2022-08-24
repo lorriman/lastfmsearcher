@@ -55,14 +55,14 @@ class FavouritesApiService<T> extends ApiService<T> {
   ///produces a model object (with a callback, modelizer, provided by the
   ///client object)
   T _itemJsonToObject(MapSD itemData) {
-    final favourite = (itemData['favourite'] ?? '') as String;
+    final favourite = (itemData['favourite'] ?? false) as bool;
     final String name = (itemData['name'] ?? '') as String;
     final String imageSmall = (itemData['nameimageLinkSmall'] ?? '') as String;
     final String imageMedium = (itemData['imageLinkMedium'] ?? '') as String;
     final String imageLarge = (itemData['imageLinkLarge'] ?? '') as String;
     final String imageXLarge = (itemData['imageLinkXLarge'] ?? '') as String;
     final String url = (itemData['url'] ?? '') as String;
-    final String other = (itemData['other'] ?? '') as String;
+    final other = (itemData['other'] ?? {}) as Map<String, dynamic>;
 
     //callback, note the cast at the end
     final item = modelizer(favourite, name, imageSmall, imageMedium, imageLarge,
@@ -74,10 +74,17 @@ class FavouritesApiService<T> extends ApiService<T> {
     final searchResults = await search('');
     searchResults.items.insert(0, item);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_favouritesKey, searchResults.items);
+    await prefs.setStringList(
+        _favouritesKey, searchResults.items as List<String>);
   }
 
-  Future<void> delete(T item) async {}
+  Future<void> delete(T item) async {
+    final searchResults = await search('');
+    searchResults.items.remove(item);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+        _favouritesKey, searchResults.items as List<String>);
+  }
 
   @override
   void close() {}

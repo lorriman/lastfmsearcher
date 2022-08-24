@@ -54,7 +54,7 @@ typedef LastFmModelizer<T> = T Function(
   String imageLinkLarge,
   String imageLinkXLarge,
   String url,
-  Map<String, String> otherData,
+  Map<String, dynamic> otherData,
   MapSD rawData,
 );
 
@@ -82,11 +82,11 @@ class LastfmApiService<T> extends ApiService<T> {
 
   DateTime? _fetchTime;
 
-  Future<void> add(T item) {
+  Future<void> add(T item) async {
     throw Exception('add not implemented in LastfmApiService');
   }
 
-  Future<void> delete(T item) {
+  Future<void> delete(T item) async {
     throw Exception('delete not implemented in LastfmApiService');
   }
 

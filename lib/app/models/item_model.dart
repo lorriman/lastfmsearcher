@@ -21,7 +21,7 @@ class MusicInfo extends Equatable {
   final String imageLinkLarge;
   final String imageLinkXLarge;
   final String url;
-  final Map<String, String> otherData;
+  final Map<String, dynamic> otherData;
 
   @override
   List<Object> get props => [name, artist];

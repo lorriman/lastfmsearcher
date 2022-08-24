@@ -63,7 +63,7 @@ class RepositoryFetchResult<T> {
 ///The T parameter is the ViewModel's choice for model object and is passed
 ///through to the API class, and implemented via a call back.
 class Repository<T> {
-  Repository({required LastfmApiService lastFMapi}) : _lastFMapi = lastFMapi {
+  Repository({required ApiService lastFMapi}) : _lastFMapi = lastFMapi {
     _streamController = StreamController<RepositoryFetchResult<T>?>(
         onListen: () => print('listening'));
     _streamPageController = StreamController<RepositoryFetchResult<T>?>(
@@ -72,7 +72,7 @@ class Repository<T> {
 
   //private
 
-  final LastfmApiService _lastFMapi;
+  final ApiService _lastFMapi;
 
   //stream are expected to be used by StreamProviders, see the stream getters
   late final StreamController<RepositoryFetchResult<T>?> _streamController;
@@ -143,7 +143,7 @@ class Repository<T> {
       rawData) {
     String newName = name;
     String artist = '';
-    artist = otherData['artist'] ?? '';
+    artist = (otherData['artist'] ?? '') as String;
     if (name == '(null)') {
       newName = '($artist)';
       artist =
@@ -233,8 +233,13 @@ class Repository<T> {
     }
   }
 
-  void addfavourite(T item) async {
+  ///for example: to add to a favourites list
+  Future<void> addItem(T item) async {
     await _lastFMapi.add(item);
+  }
+
+  Future<void> removeItem(T item) async {
+    await _lastFMapi.delete(item);
   }
 
   void dispose() {
