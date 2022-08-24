@@ -32,7 +32,7 @@ class MusicInfo extends Equatable {
     return MusicInfo(
       data['favourite'] ?? false,
       data['name]'] ?? '',
-      data['otherData']?['artists'] ?? '',
+      data['otherData']?['artist'] ?? '',
       data['imageLinkSmall'] ?? '',
       data['imageLinkMedium'] ?? '',
       data['imageLinkMedium'] ?? '',

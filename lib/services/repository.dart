@@ -143,8 +143,8 @@ class Repository<T> {
       rawData) {
     String newName = name;
     String artist = '';
+    artist = otherData['artist'] ?? '';
     if (name == '(null)') {
-      artist = otherData['artist'] ?? '';
       newName = '($artist)';
       artist =
           ''; //blank the artist because it's an entry with no name, so the artist takes its place
