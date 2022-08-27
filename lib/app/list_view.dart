@@ -26,12 +26,12 @@ class PressSearchIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-        heightFactor: 2,
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
-          Text('Press search icon'),
-          Icon(Icons.search),
-          Text('to search'),
+        heightFactor: 3,
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Text('Press search icon',
+              style: Theme.of(context).textTheme.headlineSmall),
+          Icon(Icons.search, size: 50),
+          Text('to search', style: Theme.of(context).textTheme.headlineSmall),
         ]));
   }
 }
@@ -57,7 +57,7 @@ class ListViewMusicInfo extends StatelessWidget {
       itemCount: _computeElementCount(),
       itemBuilder: (_, idx) {
         if (results == null) return PressSearchIcon();
-        if (items.isEmpty) return _textNoItemsFound();
+        if (items.isEmpty) return _textNoItemsFound(context);
         //if this element is > items then it's a fetch and circular indicator
         if (idx == items.length) return _fetchAndIndicate();
         return ListViewCard(
@@ -76,14 +76,17 @@ class ListViewMusicInfo extends StatelessWidget {
     return items.length + 1;
   }
 
-  Widget _textNoItemsFound() {
+  Widget _textNoItemsFound(BuildContext context) {
     return Center(
         heightFactor: 2,
         child: Text(
           'No items found',
           semanticsLabel: 'No items found',
-          textScaleFactor: 2,
-          style: TextStyle(color: Colors.grey), //grey is darkMode compatible
+
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall!
+              .copyWith(color: Colors.grey), //grey is darkMode compatible
         ));
   }
 
@@ -152,7 +155,7 @@ class _ListViewCardState extends State<ListViewCard>
                   child: Text(
                     '${widget.index + 1}  ',
                     key: Key('item${widget.index}'),
-                    textScaleFactor: 0.8,
+                    style: Theme.of(context).textTheme.bodySmall,
                   )),
               OutlinedButton(
                 style: OutlinedButton.styleFrom(
@@ -270,7 +273,9 @@ class _ListViewCardState extends State<ListViewCard>
                                       alignment: Alignment.center,
                                       child: SelectableText(
                                         item.title,
-                                        textScaleFactor: 1.2,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
                                         maxLines: 4,
                                         textAlign: TextAlign.center,
                                       ),
@@ -294,7 +299,7 @@ class _ListViewCardState extends State<ListViewCard>
                           alignment: Alignment.center,
                           child: SelectableText(
                             item.subTitle,
-                            textScaleFactor: 1.5,
+                            style: Theme.of(context).textTheme.headline6,
                             maxLines: 4,
                             textAlign: TextAlign.center,
                           ),

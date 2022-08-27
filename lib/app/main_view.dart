@@ -201,9 +201,10 @@ class _HomePageState extends State<HomePage> {
         child: Row(children: [
           if (viewModel.hasSearched && isWideScreen)
             Text('Favourites searched: ${viewModel.totalItems.toThousands()} ',
-                textScaleFactor: 1.5)
+                style: Theme.of(context).textTheme.headlineSmall)
           else
-            Text('Favourites', textScaleFactor: 1.5),
+            Text('Favourites',
+                style: Theme.of(context).textTheme.headlineMedium),
           Expanded(
               child: Align(
                   child: Icon(Icons.favorite, color: Colors.red),
