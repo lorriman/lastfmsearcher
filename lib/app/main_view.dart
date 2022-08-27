@@ -88,24 +88,28 @@ class _HomePageState extends State<HomePage> {
                 child: SizedBox(
                   width: 48,
                   height: 48,
-                  child: NeumorphicButton(
-                    padding: EdgeInsets.all(5),
+                  child: Semantics(
+                    button: true,
+                    label: 'toggle favourites list',
+                    child: NeumorphicButton(
+                      padding: EdgeInsets.all(5),
 
-                    //color: Colors.red,
-                    //isSelected: true,
-                    key: Key('faves_button'),
-                    //icon: Icon(Icons.favorite),
-                    child: Icon(Icons.favorite, color: Colors.red),
-                    onPressed: () {
-                      ref.read(isFavouritesViewProvider.notifier).state =
-                          !ref.read(isFavouritesViewProvider);
-                    },
-                    style: isFavouritesView
-                        ? NeumorphicStyle(
-                            color: Colors.purple, depth: -4, intensity: 1)
-                        : NeumorphicStyle(
-                            color: Colors.purple, depth: 3, intensity: .4),
-                    //ButtonStyle(elevation: ButtonStyleButton.allOrNull(20)),
+                      //color: Colors.red,
+                      //isSelected: true,
+                      key: Key('faves_button'),
+                      //icon: Icon(Icons.favorite),
+                      child: Icon(Icons.favorite, color: Colors.red),
+                      onPressed: () {
+                        ref.read(isFavouritesViewProvider.notifier).state =
+                            !ref.read(isFavouritesViewProvider);
+                      },
+                      style: isFavouritesView
+                          ? NeumorphicStyle(
+                              color: Colors.purple, depth: -4, intensity: 1)
+                          : NeumorphicStyle(
+                              color: Colors.purple, depth: 3, intensity: .4),
+                      //ButtonStyle(elevation: ButtonStyleButton.allOrNull(20)),
+                    ),
                   ),
                 ),
               ),

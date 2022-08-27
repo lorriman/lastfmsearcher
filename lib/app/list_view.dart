@@ -14,6 +14,8 @@ import 'models/item_viewmodel.dart';
 import 'models/items_viewmodel.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 enum ImageSizing { small, medium, large }
 
 ///Small Utility widget before a search, to indicate to the user
@@ -120,6 +122,7 @@ class _ListViewCardState extends State<ListViewCard>
 
   //we need this for a faster bottomsheet transition
   late AnimationController animController;
+  int compactViewAdjust = 0;
 
   @override
   initState() {
@@ -143,36 +146,48 @@ class _ListViewCardState extends State<ListViewCard>
   @override
   Widget build(BuildContext context) {
     return Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(17),
+        ),
         key: widget.index == 0 ? cardKey : null,
-        margin: EdgeInsets.all(5),
-        elevation: 10.0,
+        margin: EdgeInsets.all(10 + compactViewAdjust / 4),
+        elevation: 15.0,
         child: Padding(
-          padding: const EdgeInsets.all(6.0),
+          padding: EdgeInsets.all(20.0 + compactViewAdjust),
           child: Row(
             children: [
               SizedBox(
                   width: 20,
                   child: Text(
                     '${widget.index + 1}  ',
+                    semanticsLabel: 'item ${widget.index + 1}',
                     key: Key('item${widget.index}'),
                     style: Theme.of(context).textTheme.bodySmall,
                   )),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: BorderSide(width: 0, color: Colors.white)),
-                onPressed: () async {
+              Semantics(
+                button: true,
+                label: 'search Youtube for ${widget.item.title}',
+                //not a true button
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      side: BorderSide(width: 0, color: Colors.white)),
+                  onPressed: () async => _launchYoutube(widget.item)
                   //_launchUrl(item.url, external: true);
                   //await Share.share(widget.item.url);
                   // Use Builder to get the widget context
-                },
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(5.0),
-                    clipBehavior: Clip.antiAlias,
-                    child: Hero(
-                        tag: 'image',
-                        child: LastFMImage(
-                            item: widget.item, sizing: ImageSizing.small))),
+                  ,
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5.0),
+                      clipBehavior: Clip.antiAlias,
+                      child: Hero(
+                          tag: 'image',
+                          child: LastFMImage(
+                              item: widget.item,
+                              sizing: compactViewAdjust < 0
+                                  ? ImageSizing.small
+                                  : ImageSizing.medium))),
+                ),
               ),
               Expanded(
                 child: InkWell(
@@ -182,15 +197,18 @@ class _ListViewCardState extends State<ListViewCard>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
+                        padding:
+                            EdgeInsets.only(left: 12.0 + compactViewAdjust / 2),
                         child: Text(
                           widget.item.title,
-
-                          style: Theme.of(context).textTheme.headline5,
-                          //maxLines: 2,
+                          style: compactViewAdjust < 0
+                              ? Theme.of(context).textTheme.headline6
+                              : Theme.of(context).textTheme.headline5,
+                          maxLines: compactViewAdjust < 0 ? 1 : 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      SizedBox(height: 10 + compactViewAdjust / 2),
                       if (widget.item.subTitle != '')
                         Padding(
                           padding: const EdgeInsets.only(left: 12.0),
@@ -312,33 +330,58 @@ class _ListViewCardState extends State<ListViewCard>
             ),
             SizedBox(height: 5),
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              ElevatedButton(
-                child: Icon(Icons.share),
-                onPressed: () async {
-                  //share_plus docs specify this as needed for IOS
-                  final box = context.findRenderObject() as RenderBox?;
+              Semantics(
+                button: true,
+                label: 'share',
+                child: ElevatedButton(
+                  child: Icon(Icons.share),
+                  onPressed: () async {
+                    //share_plus docs specify this as needed for IOS
+                    final box = context.findRenderObject() as RenderBox?;
 
-                  await Share.share(
-                    widget.item.url,
-                    subject: 'share',
-                    sharePositionOrigin:
-                        box!.localToGlobal(Offset.zero) & box.size,
-                  );
+                    await Share.share(
+                      widget.item.url,
+                      subject: 'share',
+                      sharePositionOrigin:
+                          box!.localToGlobal(Offset.zero) & box.size,
+                    );
 
-                  //await Share.share(widget.item.url);
-                },
+                    //await Share.share(widget.item.url);
+                  },
+                ),
               ),
-              ElevatedButton(
-                child: Icon(Icons.open_in_browser),
-                onPressed: () {
-                  _launchUrl(item.url);
-                },
+              Semantics(
+                button: true,
+                label: 'show in browser',
+                child: ElevatedButton(
+                  child: Icon(Icons.open_in_browser),
+                  onPressed: () {
+                    _launchUrl(item.url);
+                  },
+                ),
+              ),
+              Semantics(
+                button: true,
+                label: 'search youtube',
+                child: ElevatedButton(
+                  child: FaIcon(FontAwesomeIcons.youtube),
+                  onPressed: () async => _launchYoutube(item),
+                ),
               ),
             ])
           ],
         ),
       ),
     );
+  }
+
+  void _launchYoutube(MusicInfoViewModel item) {
+    String searchStr = '${item.title.trim()} ${item.subTitle.trim()}';
+    searchStr = searchStr.replaceAll(' ', '+');
+    searchStr = Uri.encodeComponent(searchStr);
+    String youtubeUrl =
+        'https://www.youtube.com/results?search_query=' + searchStr;
+    _launchUrl(youtubeUrl);
   }
 }
 
@@ -377,21 +420,24 @@ class LastFMImage extends StatelessWidget {
         break;
     }
 
-    return CachedNetworkImage(
-      width: maxLength.toDouble(),
-      maxHeightDiskCache: maxLength,
-      imageUrl: url,
-      placeholder: (_, __) => SizedBox(width: maxLength.toDouble()),
-      //lots of errors and blanks, so just swallow them
+    return Semantics(
+      label: 'pic',
+      child: CachedNetworkImage(
+        width: maxLength.toDouble(),
+        maxHeightDiskCache: maxLength,
+        imageUrl: url,
+        placeholder: (_, __) => SizedBox(width: maxLength.toDouble()),
+        //lots of errors and blanks, so just swallow them
 
-      errorWidget: (_, __, dynamic ___) => SizedBox(
-          width: maxLength.toDouble(),
-          child: Opacity(
-            opacity: 0.1,
-            child: Image.asset('assets/icon/icon_small.png',
-                cacheWidth: maxLength, filterQuality: FilterQuality.high),
-          )),
-      fadeInDuration: Duration(milliseconds: 150),
+        errorWidget: (_, __, dynamic ___) => SizedBox(
+            width: maxLength.toDouble(),
+            child: Opacity(
+              opacity: 0.1,
+              child: Image.asset('assets/icon/icon_small.png',
+                  cacheWidth: maxLength, filterQuality: FilterQuality.high),
+            )),
+        fadeInDuration: Duration(milliseconds: 150),
+      ),
     );
   }
 }
