@@ -6,6 +6,7 @@ import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/lastfm_api.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 import '../services/faves-api.dart';
+import 'list_view.dart';
 import 'models/item_model.dart';
 import 'models/items_viewmodel.dart';
 
@@ -36,6 +37,17 @@ class FavouritesViewNotifier extends StateNotifier<bool> {
 final isFavouritesViewProvider =
     StateNotifierProvider<FavouritesViewNotifier, bool>((ref) {
   return FavouritesViewNotifier(false);
+});
+
+class ViewDensityNotifier extends StateNotifier<ViewDensity> {
+  ViewDensity viewDensity = ViewDensity.large;
+
+  ViewDensityNotifier(super.state);
+}
+
+final viewDensityProvider =
+    StateNotifierProvider<ViewDensityNotifier, ViewDensity>((ref) {
+  return ViewDensityNotifier(ViewDensity.large);
 });
 
 final databaseProvider = Provider<LastfmApiService<MusicInfo>>((ref) {

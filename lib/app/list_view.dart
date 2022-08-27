@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobtest_lastfm/app/top_level_providers.dart';
 
 // Project imports:
 import 'package:jobtest_lastfm/services/repository.dart';
@@ -15,6 +17,18 @@ import 'models/items_viewmodel.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+enum ViewDensity {
+  compact(Icons.density_small_outlined, -16, 'compact view'),
+  medium(Icons.density_medium_outlined, -8, 'medium view'),
+  large(Icons.density_large_outlined, 0, 'larger view');
+
+  final IconData icon;
+  final String semanticLabel;
+  final int densityAdjust;
+
+  const ViewDensity(this.icon, this.densityAdjust, this.semanticLabel);
+}
 
 enum ImageSizing { small, medium, large }
 
@@ -122,7 +136,8 @@ class _ListViewCardState extends State<ListViewCard>
 
   //we need this for a faster bottomsheet transition
   late AnimationController animController;
-  int compactViewAdjust = 0;
+
+  //int viewDensity.densityAdjust = 0;
 
   @override
   initState() {
@@ -145,83 +160,89 @@ class _ListViewCardState extends State<ListViewCard>
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(17),
-        ),
-        key: widget.index == 0 ? cardKey : null,
-        margin: EdgeInsets.all(10 + compactViewAdjust / 4),
-        elevation: 15.0,
-        child: Padding(
-          padding: EdgeInsets.all(20.0 + compactViewAdjust),
-          child: Row(
-            children: [
-              SizedBox(
-                  width: 20,
-                  child: Text(
-                    '${widget.index + 1}  ',
-                    semanticsLabel: 'item ${widget.index + 1}',
-                    key: Key('item${widget.index}'),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  )),
-              Semantics(
-                button: true,
-                label: 'search Youtube for ${widget.item.title}',
-                //not a true button
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      side: BorderSide(width: 0, color: Colors.white)),
-                  onPressed: () async => _launchYoutube(widget.item)
-                  //_launchUrl(item.url, external: true);
-                  //await Share.share(widget.item.url);
-                  // Use Builder to get the widget context
-                  ,
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5.0),
-                      clipBehavior: Clip.antiAlias,
-                      child: Hero(
-                          tag: 'image',
-                          child: LastFMImage(
-                              item: widget.item,
-                              sizing: compactViewAdjust < 0
-                                  ? ImageSizing.small
-                                  : ImageSizing.medium))),
-                ),
-              ),
-              Expanded(
-                child: InkWell(
-                  onTap: () => showItemBottomSheet(
-                      context, widget.item), //_launchUrl(item.url),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding:
-                            EdgeInsets.only(left: 12.0 + compactViewAdjust / 2),
-                        child: Text(
-                          widget.item.title,
-                          style: compactViewAdjust < 0
-                              ? Theme.of(context).textTheme.headline6
-                              : Theme.of(context).textTheme.headline5,
-                          maxLines: compactViewAdjust < 0 ? 1 : 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      SizedBox(height: 10 + compactViewAdjust / 2),
-                      if (widget.item.subTitle != '')
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12.0),
-                          child: Text(widget.item.subTitle,
-                              style: Theme.of(context).textTheme.bodyLarge),
-                        )
-                    ],
+    return Consumer(
+      builder: (context, ref, _) {
+        final viewDensity = ref.watch(viewDensityProvider);
+        return Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(17),
+            ),
+            key: widget.index == 0 ? cardKey : null,
+            margin: EdgeInsets.all(10 + viewDensity.densityAdjust / 4),
+            elevation: 15.0,
+            child: Padding(
+              padding: EdgeInsets.all(20.0 + viewDensity.densityAdjust),
+              child: Row(
+                children: [
+                  SizedBox(
+                      width: 20,
+                      child: Text(
+                        '${widget.index + 1}  ',
+                        semanticsLabel: 'item ${widget.index + 1}',
+                        key: Key('item${widget.index}'),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )),
+                  Semantics(
+                    button: true,
+                    label: 'search Youtube for ${widget.item.title}',
+                    //not a true button
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          side: BorderSide(width: 0, color: Colors.white)),
+                      onPressed: () async => _launchYoutube(widget.item)
+                      //_launchUrl(item.url, external: true);
+                      //await Share.share(widget.item.url);
+                      // Use Builder to get the widget context
+                      ,
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5.0),
+                          clipBehavior: Clip.antiAlias,
+                          child: Hero(
+                              tag: 'image',
+                              child: LastFMImage(
+                                  item: widget.item,
+                                  sizing: viewDensity == ViewDensity.large
+                                      ? ImageSizing.medium
+                                      : ImageSizing.small))),
+                    ),
                   ),
-                ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => showItemBottomSheet(
+                          context, widget.item), //_launchUrl(item.url),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 12.0 + viewDensity.densityAdjust / 2),
+                            child: Text(
+                              widget.item.title,
+                              style: viewDensity == ViewDensity.compact
+                                  ? Theme.of(context).textTheme.headline6
+                                  : Theme.of(context).textTheme.headline5,
+                              maxLines:
+                                  viewDensity == ViewDensity.compact ? 1 : 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(height: 10 + viewDensity.densityAdjust / 2),
+                          if (widget.item.subTitle != '')
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: Text(widget.item.subTitle,
+                                  style: Theme.of(context).textTheme.bodyLarge),
+                            )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ));
+            ));
+      },
+    );
   }
 
   Future<void> _launchUrl(String url, {bool external = false}) async {

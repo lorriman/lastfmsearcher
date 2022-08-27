@@ -223,6 +223,7 @@ class _HomePageState extends State<HomePage> {
             Text('found ${viewModel.totalItems.toThousands()} ',
                 style: Theme.of(context).textTheme.headline6),
           Expanded(child: Container()),
+          _compactViewDropDown(),
           _dropDownSearchType(viewModel),
         ]),
       );
@@ -353,6 +354,57 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
+    );
+  }
+
+  //ViewDensity viewDensity=ViewDensity.large;
+
+  Widget _compactViewDropDown() {
+    return Consumer(
+      builder: (context, ref, _) {
+        final viewDensity = ref.watch(viewDensityProvider);
+        return Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              DropdownButton<ViewDensity>(
+                iconSize: 0,
+                style: Theme.of(context).textTheme.headline5,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                value: viewDensity,
+                //icon: const Icon(Icons.arrow_drop_down_outlined),
+                elevation: 16,
+                underline: Container(
+                  height: 0,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    ref.read(viewDensityProvider.notifier).state = value!;
+                  });
+                },
+
+                items: ViewDensity.values.reversed
+                    .map<DropdownMenuItem<ViewDensity>>((ViewDensity value) {
+                  return DropdownMenuItem<ViewDensity>(
+                    value: value,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(value.icon),
+                    ),
+                  );
+                }).toList(),
+              )
+            ],
+          ),
+        );
+      },
+    );
+
+    return ElevatedButton(
+      child: Text('sds'),
+      onPressed: () {},
     );
   }
 }
