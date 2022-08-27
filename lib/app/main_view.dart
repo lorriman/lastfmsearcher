@@ -1,6 +1,7 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 // Package imports:
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,7 +44,13 @@ class _HomePageState extends State<HomePage> {
     final screenSize = MediaQuery.of(context).size;
     final isWideScreen = screenSize.width >= global_screen_width_breakpoint;
     return Consumer(builder: (context, ref, _) {
-      final viewModel = ref.watch(viewModelProvider);
+      late MusicItemsViewModel viewModel;
+      final isFavouritesView = ref.watch(isFavouritesViewProvider);
+      if (isFavouritesView) {
+        viewModel = ref.watch(favouritesViewModelProvider);
+      } else {
+        viewModel = ref.watch(viewModelProvider);
+      }
       return GestureDetector(
         //legacy keyboard pop-down. We might have to resort to this
         //if the other one doesn't work out. See [MyApp.build]->Listener
@@ -54,6 +61,7 @@ class _HomePageState extends State<HomePage> {
         behavior: HitTestBehavior.translucent,
         child: Scaffold(
           appBar: AppBar(
+            toolbarHeight: 65,
             title: Column(
               children: [
                 GestureDetector(
@@ -75,11 +83,31 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             actions: [
-              IconButton(
-                color: Colors.red,
-                key: Key('faves_button'),
-                icon: Icon(Icons.favorite),
-                onPressed: showFavourites,
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: NeumorphicButton(
+                    padding: EdgeInsets.all(5),
+
+                    //color: Colors.red,
+                    //isSelected: true,
+                    key: Key('faves_button'),
+                    //icon: Icon(Icons.favorite),
+                    child: Icon(Icons.favorite, color: Colors.red),
+                    onPressed: () {
+                      ref.read(isFavouritesViewProvider.notifier).state =
+                          !ref.read(isFavouritesViewProvider);
+                    },
+                    style: isFavouritesView
+                        ? NeumorphicStyle(
+                            color: Colors.purple, depth: -4, intensity: 1)
+                        : NeumorphicStyle(
+                            color: Colors.purple, depth: 3, intensity: .4),
+                    //ButtonStyle(elevation: ButtonStyleButton.allOrNull(20)),
+                  ),
+                ),
               ),
               SizedBox(
                 width: 150,
@@ -98,12 +126,18 @@ class _HomePageState extends State<HomePage> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 4.0),
-                child: _header(viewModel, isWideScreen),
+                child: _header(ref, viewModel, isWideScreen),
               ),
               Consumer(
                 builder: (context, ref, _) {
-                  final modelsAsyncValue = ref.watch(musicInfoStreamProvider);
-
+                  late final AsyncValue modelsAsyncValue;
+                  final isFavouritesView = ref.watch(isFavouritesViewProvider);
+                  if (isFavouritesView) {
+                    modelsAsyncValue =
+                        ref.watch(favouritesMusicInfoStreamProvider);
+                  } else {
+                    modelsAsyncValue = ref.watch(musicInfoStreamProvider);
+                  }
                   //The first loading indicator is done here.
                   //To allow infinite scrolling subsequent loading indicators
                   //are done in the final element of the listview on scrolling
@@ -125,11 +159,12 @@ class _HomePageState extends State<HomePage> {
                     error: (e, st) => SelectableText(
                       'Error $e ${kDebugMode ? st.toString() : ''}',
                     ),
-                    data: (data) {
+                    data: (dynamic data) {
                       print('on data');
                       return Expanded(
                           child: ListViewMusicInfo(
-                        musicInfoItems: data?.items ?? <MusicInfo>[],
+                        musicInfoItems:
+                            data?.items as List<MusicInfo>? ?? <MusicInfo>[],
                         viewModel: viewModel,
                         results: data,
                       ));
@@ -145,8 +180,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void showFavourites() {}
-
   void _showAboutDialog(BuildContext context) async {
     final info = await PackageInfo.fromPlatform();
     showAboutDialog(
@@ -158,16 +191,37 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// search total and radio buttons for artist, song, album searches.
-  Widget _header(MusicItemsViewModel viewModel, bool isWideScreen) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0),
-      child: Row(children: [
-        if (viewModel.hasSearched && isWideScreen)
-          Text('found: ${viewModel.totalItems.toThousands()} '),
-        Expanded(child: Container()),
-        _radioButtons(viewModel),
-      ]),
-    );
+  Widget _header(
+      WidgetRef ref, MusicItemsViewModel viewModel, bool isWideScreen) {
+    final isFavouritesView = ref.read(isFavouritesViewProvider);
+
+    if (isFavouritesView) {
+      return Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Row(children: [
+          if (viewModel.hasSearched && isWideScreen)
+            Text('Favourites searched: ${viewModel.totalItems.toThousands()} ',
+                textScaleFactor: 1.5)
+          else
+            Text('Favourites', textScaleFactor: 1.5),
+          Expanded(
+              child: Align(
+                  child: Icon(Icons.favorite, color: Colors.red),
+                  alignment: Alignment.centerRight)),
+        ]),
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: Row(children: [
+          if (viewModel.hasSearched && isWideScreen)
+            Text('found ${viewModel.totalItems.toThousands()} ',
+                style: Theme.of(context).textTheme.headline6),
+          Expanded(child: Container()),
+          _dropDownSearchType(viewModel),
+        ]),
+      );
+    }
   }
 
   ///search total when screen is narrow
@@ -231,6 +285,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //retired
 //todo: turn this in to a loop
   Widget _radioButtons(MusicItemsViewModel viewModel) {
     return Padding(
@@ -242,20 +297,116 @@ class _HomePageState extends State<HomePage> {
           Radio<MusicInfoType>(
             value: MusicInfoType.albums,
             groupValue: viewModel.searchType,
-            onChanged: viewModel.onRadioChange,
+            onChanged: viewModel.onSearchTypeChange,
           ),
           Text('songs'),
           Radio<MusicInfoType>(
               value: MusicInfoType.tracks,
               groupValue: viewModel.searchType,
-              onChanged: viewModel.onRadioChange),
+              onChanged: viewModel.onSearchTypeChange),
           Text('artists'),
           Radio<MusicInfoType>(
               value: MusicInfoType.artists,
               groupValue: viewModel.searchType,
-              onChanged: viewModel.onRadioChange),
+              onChanged: viewModel.onSearchTypeChange),
+        ],
+      ),
+    );
+  }
+
+  Widget _dropDownSearchType(MusicItemsViewModel viewModel) {
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          DropdownButton<MusicInfoType>(
+            style: Theme.of(context).textTheme.headline5,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            value: viewModel.searchType,
+            icon: const Icon(Icons.arrow_drop_down_outlined),
+            elevation: 16,
+            underline: Container(
+              height: 0,
+              color: Colors.deepPurpleAccent,
+            ),
+            onChanged: viewModel.onSearchTypeChange,
+            items: MusicInfoType.values
+                .map<DropdownMenuItem<MusicInfoType>>((MusicInfoType value) {
+                  return DropdownMenuItem<MusicInfoType>(
+                    value: value,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(musicInfoTypeUIStrings[value]!,
+                          semanticsLabel: 'search type menu'),
+                    ),
+                  );
+                })
+                .toList()
+                .take(3)
+                .toList(), //todo: modify to avoid hard coding
+          )
         ],
       ),
     );
   }
 }
+
+/*
+class CustomisedCheckboxTile extends StatelessWidget {
+  final bool value;
+  final String text;
+  final ValueChanged<bool>? onChanged;
+  final bool small;
+
+  CustomisedCheckboxTile(
+      {this.value = true, this.text = '', this.onChanged, this.small = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    return SizedBox(
+      height: small ? 26 : null,
+      child: FittedBox(
+        fit: BoxFit.fitHeight,
+        child: Row(
+          children: [
+            NeumorphicCheckbox(
+              style: NeumorphicCheckboxStyle(
+                  selectedColor: primaryColor.withOpacity(.5)),
+              value: value,
+              isEnabled: onChanged != null,
+              onChanged: (val) {
+                if (onChanged != null) onChanged!(val);
+              },
+            ),
+            NeumorphicTextCustom(text, fontSize: 30),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class NeumorphicTextCustom extends StatelessWidget {
+
+  final String value;
+  final double fontSize;
+  final Color? color;
+  const NeumorphicTextCustom( this.value,{Key? key, this.fontSize=20, this.color=null}) : super(key: key);
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    Color? primaryColor=color;
+    if (primaryColor==null) primaryColor=Theme.of(context).colorScheme.primary;
+    return NeumorphicText(value,
+        style: NeumorphicStyle(color: primaryColor.withOpacity(0.9)),
+        textStyle: NeumorphicTextStyle(fontSize: fontSize));
+
+  }
+}
+
+
+ */

@@ -12,7 +12,7 @@ class FavouritesApiService<T> extends ApiService<T> {
   FavouritesApiService({
     required LastFmModelizer modelizer,
   }) {
-    this.modelizer = modelizer;
+     this.modelizer = modelizer;
   }
 
   @override

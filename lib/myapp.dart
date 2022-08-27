@@ -1,6 +1,7 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Project imports:
 import 'app/main_view.dart';
@@ -11,6 +12,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool favouritesView = false;
+
   @override
   Widget build(BuildContext context) {
     debugInvertOversizedImages = true;
@@ -29,13 +32,17 @@ class _MyAppState extends State<MyApp> {
           visualDensity: VisualDensity.standard,
           primarySwatch: Colors.purple,
           textSelectionTheme:
-          TextSelectionThemeData(selectionHandleColor: Colors.transparent),
+              TextSelectionThemeData(selectionHandleColor: Colors.transparent),
         ),
         darkTheme: ThemeData(
           primarySwatch: Colors.lightGreen,
           brightness: Brightness.dark,
         ),
-        home: HomePage(),
+        home: Consumer(
+          builder: (context, ref, _) {
+            return HomePage();
+          },
+        ),
       ),
     );
   }

@@ -183,7 +183,7 @@ class _ListViewCardState extends State<ListViewCard>
                         child: Text(
                           widget.item.title,
 
-                          textScaleFactor: 1.5,
+                          style: Theme.of(context).textTheme.headline5,
                           //maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -191,7 +191,8 @@ class _ListViewCardState extends State<ListViewCard>
                       if (widget.item.subTitle != '')
                         Padding(
                           padding: const EdgeInsets.only(left: 12.0),
-                          child: Text(widget.item.subTitle),
+                          child: Text(widget.item.subTitle,
+                              style: Theme.of(context).textTheme.bodyLarge),
                         )
                     ],
                   ),

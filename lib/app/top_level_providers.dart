@@ -27,6 +27,17 @@ import 'models/items_viewmodel.dart';
 
 //todo: writeup MvvM
 
+class FavouritesViewNotifier extends StateNotifier<bool> {
+  bool isFavouritesView = false;
+
+  FavouritesViewNotifier(super.state);
+}
+
+final isFavouritesViewProvider =
+    StateNotifierProvider<FavouritesViewNotifier, bool>((ref) {
+  return FavouritesViewNotifier(false);
+});
+
 final databaseProvider = Provider<LastfmApiService<MusicInfo>>((ref) {
   return LastfmApiService<MusicInfo>(
     apiKey: global_apiKey,
@@ -77,3 +88,4 @@ final favouritesMusicInfoStreamProvider =
   final repo = ref.watch(favouritesRepositoryProvider);
   return repo.stream;
 });
+

@@ -53,7 +53,7 @@ class MusicItemsViewModel extends ChangeNotifier {
 
   ///callback to support state for radio buttons
   ///Uses nullable type as legacy of pre-nullable Flutter
-  void onRadioChange(MusicInfoType? value) {
+  void onSearchTypeChange(MusicInfoType? value) {
     assert(value != null);
     if (value != null) searchType = value;
   }
