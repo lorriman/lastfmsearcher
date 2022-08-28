@@ -11,6 +11,7 @@ import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
 
+import '../services/shared_preferences_service.dart';
 import 'models/item_model.dart';
 import 'models/items_viewmodel.dart';
 import 'list_view.dart';
@@ -382,6 +383,9 @@ class _HomePageState extends State<HomePage> {
                 onChanged: (value) {
                   setState(() {
                     ref.read(viewDensityProvider.notifier).state = value!;
+                    ref
+                        .read(sharedPreferencesServiceProvider)
+                        .setViewDensity(value);
                   });
                 },
 

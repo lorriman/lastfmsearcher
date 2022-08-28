@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
         //gets in the way of the button
         debugShowCheckedModeBanner : false,
         theme: ThemeData(
-          visualDensity: VisualDensity.standard,
+          visualDensity: VisualDensity.compact,
           primarySwatch: Colors.purple,
           textSelectionTheme:
               TextSelectionThemeData(selectionHandleColor: Colors.transparent),

@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // Project imports:
 import 'package:jobtest_lastfm/services/globals.dart';
+import 'package:jobtest_lastfm/services/shared_preferences_service.dart';
 import 'package:jobtest_lastfm/services/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_size/window_size.dart';
 
 import 'myapp.dart';
@@ -26,6 +28,8 @@ Future<void> main({List<String>? args}) async {
     Rect.fromLTRB(1502.0, 133.0, 1886.0, 933.0);
   }
 
+  final sharedPreferences = await SharedPreferences.getInstance();
+
   //lastFM supplied developer key.
   final apikeys = await parseJsonFromAssets('assets/lastfm_api.json');
   global_apiKey = apikeys['api_key'] as String;
@@ -41,6 +45,10 @@ Future<void> main({List<String>? args}) async {
       DeviceOrientation.portraitDown,
     ],
   ).then((val) {
-    runApp(ProviderScope(child: MyApp()));
+    runApp(ProviderScope(overrides: [
+      sharedPreferencesServiceProvider.overrideWithValue(
+        SharedPreferencesService(sharedPreferences),
+      ),
+    ], child: MyApp()));
   });
 }

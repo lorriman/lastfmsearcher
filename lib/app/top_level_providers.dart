@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jobtest_lastfm/services/globals.dart';
 import 'package:jobtest_lastfm/services/lastfm_api.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/faves-api.dart';
+import '../services/shared_preferences_service.dart';
 import 'list_view.dart';
 import 'models/item_model.dart';
 import 'models/items_viewmodel.dart';
@@ -47,7 +49,8 @@ class ViewDensityNotifier extends StateNotifier<ViewDensity> {
 
 final viewDensityProvider =
     StateNotifierProvider<ViewDensityNotifier, ViewDensity>((ref) {
-  return ViewDensityNotifier(ViewDensity.large);
+  final vd = ref.read(sharedPreferencesServiceProvider).getViewDensity();
+  return ViewDensityNotifier(vd);
 });
 
 final databaseProvider = Provider<LastfmApiService<MusicInfo>>((ref) {
