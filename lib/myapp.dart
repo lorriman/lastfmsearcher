@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // Project imports:
 import 'app/main_view.dart';
@@ -31,6 +32,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           visualDensity: VisualDensity.compact,
           primarySwatch: Colors.purple,
+          textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme),
           textSelectionTheme:
               TextSelectionThemeData(selectionHandleColor: Colors.transparent),
         ),

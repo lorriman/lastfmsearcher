@@ -44,10 +44,10 @@ class PressSearchIcon extends StatelessWidget {
     return Center(
         heightFactor: 3,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text('Press search icon',
+          Text('Press search icon (',
               style: Theme.of(context).textTheme.headlineSmall),
           Icon(Icons.search, size: 50),
-          Text('to search', style: Theme.of(context).textTheme.headlineSmall),
+          Text(') to search', style: Theme.of(context).textTheme.headlineSmall),
         ]));
   }
 }
