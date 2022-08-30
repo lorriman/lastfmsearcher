@@ -32,6 +32,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           visualDensity: VisualDensity.compact,
           primarySwatch: Colors.purple,
+          // https://www.reddit.com/r/web_design/comments/skkr9k/whats_your_favorite_google_font_typeface/
           textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme),
           textSelectionTheme:
               TextSelectionThemeData(selectionHandleColor: Colors.transparent),

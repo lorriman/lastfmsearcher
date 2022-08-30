@@ -69,17 +69,20 @@ class ListViewMusicInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = musicInfoItems;
-    return ListView.builder(
-      itemCount: _computeElementCount(),
-      itemBuilder: (_, idx) {
-        if (results == null) return PressSearchIcon();
-        if (items.isEmpty) return _textNoItemsFound(context);
-        //if this element is > items then it's a fetch and circular indicator
-        if (idx == items.length) return _fetchAndIndicate();
-        return ListViewCard(
-            item: MusicInfoViewModel.fromMusicInfo(items[idx]), index: idx);
-      },
-    );
+    return Consumer(builder: (context, ref, _) {
+      final isFavouritesView = ref.watch(isFavouritesViewProvider);
+      return ListView.builder(
+        itemCount: _computeElementCount(),
+        itemBuilder: (_, idx) {
+          if (results == null) return PressSearchIcon();
+          if (items.isEmpty) return _textNoItemsFound(context);
+          //if this element is > items then it's a fetch and circular indicator
+          if (idx == items.length) return _fetchAndIndicate();
+          return ListViewCard(
+              item: MusicInfoViewModel.fromMusicInfo(items[idx]), index: idx);
+        },
+      );
+    });
   }
 
   //some inline convenience functions
@@ -163,6 +166,7 @@ class _ListViewCardState extends State<ListViewCard>
     return Consumer(
       builder: (context, ref, _) {
         final viewDensity = ref.watch(viewDensityProvider);
+        final isFavouritesView = ref.watch(isFavouritesViewProvider);
         return Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(17),
@@ -202,7 +206,10 @@ class _ListViewCardState extends State<ListViewCard>
                               tag: 'image',
                               child: LastFMImage(
                                   item: widget.item,
-                                  sizing: viewDensity == ViewDensity.large
+                                  sizing: [
+                                    ViewDensity.large,
+                                    ViewDensity.medium
+                                  ].contains(viewDensity)
                                       ? ImageSizing.medium
                                       : ImageSizing.small))),
                     ),

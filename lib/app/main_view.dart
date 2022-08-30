@@ -15,6 +15,7 @@ import '../services/shared_preferences_service.dart';
 import 'models/item_model.dart';
 import 'models/items_viewmodel.dart';
 import 'list_view.dart';
+import 'package:animations/animations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -103,6 +104,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         ref.read(isFavouritesViewProvider.notifier).state =
                             !ref.read(isFavouritesViewProvider);
+                        setState(() {});
                       },
                       style: isFavouritesView
                           ? NeumorphicStyle(
@@ -127,59 +129,82 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          body: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: _header(ref, viewModel, isWideScreen),
-              ),
-              Consumer(
-                builder: (context, ref, _) {
-                  late final AsyncValue modelsAsyncValue;
-                  final isFavouritesView = ref.watch(isFavouritesViewProvider);
-                  if (isFavouritesView) {
-                    modelsAsyncValue =
-                        ref.watch(favouritesMusicInfoStreamProvider);
-                  } else {
-                    modelsAsyncValue = ref.watch(musicInfoStreamProvider);
-                  }
-                  //The first loading indicator is done here.
-                  //To allow infinite scrolling subsequent loading indicators
-                  //are done in the final element of the listview on scrolling
-                  //to the end.
-                  //see fetchAndIndicate() in [ListViewMusicInfo.build]
-                  if (viewModel.isLoading && viewModel.isFirst) {
-                    return loadingIndicator(
-                        semantics: 'waiting for LastFM', size: 50);
-                  }
-                  if (modelsAsyncValue.asData == null) return PressSearchIcon();
+          body: Builder(builder: (context) {
+            final body = Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: _header(ref, viewModel, isWideScreen),
+                ),
+                Consumer(
+                  builder: (context, ref, _) {
+                    late final AsyncValue modelsAsyncValue;
+                    final isFavouritesView =
+                        ref.watch(isFavouritesViewProvider);
 
-                  return modelsAsyncValue.when(
-                    //data isn't livestreamed (unlike firestore) so
-                    //loading: is never called.
+                    if (isFavouritesView) {
+                      modelsAsyncValue =
+                          ref.watch(favouritesMusicInfoStreamProvider);
+                    } else {
+                      modelsAsyncValue = ref.watch(musicInfoStreamProvider);
+                    }
+                    //The first loading indicator is done here.
+                    //To allow infinite scrolling subsequent loading indicators
+                    //are done in the final element of the listview on scrolling
+                    //to the end.
                     //see fetchAndIndicate() in [ListViewMusicInfo.build]
-                    //This may change.
-                    loading: () =>
-                        Center(child: CircularProgressIndicator.adaptive()),
-                    error: (e, st) => SelectableText(
-                      'Error $e ${kDebugMode ? st.toString() : ''}',
-                    ),
-                    data: (dynamic data) {
-                      print('on data');
-                      return Expanded(
-                          child: ListViewMusicInfo(
-                        musicInfoItems:
-                            data?.items as List<MusicInfo>? ?? <MusicInfo>[],
-                        viewModel: viewModel,
-                        results: data,
-                      ));
-                    },
-                  );
-                },
-              ),
-              if (!isWideScreen && viewModel.hasSearched) _footer(viewModel),
-            ],
-          ),
+                    if (viewModel.isLoading && viewModel.isFirst) {
+                      return loadingIndicator(
+                          semantics: 'waiting for LastFM', size: 50);
+                    }
+                    if (modelsAsyncValue.asData == null)
+                      return PressSearchIcon();
+
+                    return modelsAsyncValue.when(
+                      //data isn't livestreamed (unlike firestore) so
+                      //loading: is never called.
+                      //see fetchAndIndicate() in [ListViewMusicInfo.build]
+                      //This may change.
+                      loading: () =>
+                          Center(child: CircularProgressIndicator.adaptive()),
+                      error: (e, st) => SelectableText(
+                        'Error $e ${kDebugMode ? st.toString() : ''}',
+                      ),
+                      data: (dynamic data) {
+                        print('on data');
+                        return Expanded(
+                            child: ListViewMusicInfo(
+                          musicInfoItems:
+                              data?.items as List<MusicInfo>? ?? <MusicInfo>[],
+                          viewModel: viewModel,
+                          results: data,
+                        ));
+                      },
+                    );
+                  },
+                ),
+                if (!isWideScreen && viewModel.hasSearched) _footer(viewModel),
+              ],
+            );
+
+            final body1 = Container(child: body);
+            final body2 = SizedBox(child: body);
+            return PageTransitionSwitcher(
+              transitionBuilder: (
+                Widget child,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+              ) {
+                return FadeThroughTransition(
+                  //fillColor: isFavouritesView ? Colors.red.shade200: Theme.of(context).canvasColor,
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  child: child,
+                );
+              },
+              child: isFavouritesView ? body1 : body2,
+            );
+          }),
         ),
       );
     });
