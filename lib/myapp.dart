@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:material_color_generator/material_color_generator.dart';
 
 // Project imports:
 import 'app/main_view.dart';
@@ -31,7 +32,10 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner : false,
         theme: ThemeData(
           visualDensity: VisualDensity.compact,
-          primarySwatch: Colors.purple,
+          primarySwatch: generateMaterialColor(
+              color: HSLColor.fromColor(Colors.purple)
+                  .withLightness(.6)
+                  .toColor()),
           // https://www.reddit.com/r/web_design/comments/skkr9k/whats_your_favorite_google_font_typeface/
           textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme),
           textSelectionTheme:

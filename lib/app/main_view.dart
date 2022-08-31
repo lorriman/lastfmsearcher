@@ -53,6 +53,17 @@ class _HomePageState extends State<HomePage> {
       } else {
         viewModel = ref.watch(viewModelProvider);
       }
+
+      //otherwise the button disappear in to the appbar
+      Color color = Theme.of(context).colorScheme.primary;
+      final adjust = 200;
+      color = Color.fromRGBO(
+          color.red + adjust, color.green + adjust, color.blue + adjust, 0.0);
+      final buttonColor = color;
+      final buttonStyle = TextButton.styleFrom(
+        foregroundColor: color,
+      );
+
       return GestureDetector(
         //legacy keyboard pop-down. We might have to resort to this
         //if the other one doesn't work out. See [MyApp.build]->Listener
@@ -63,6 +74,7 @@ class _HomePageState extends State<HomePage> {
         behavior: HitTestBehavior.translucent,
         child: Scaffold(
           appBar: AppBar(
+            elevation: 0,
             toolbarHeight: 65,
             title: Column(
               children: [
@@ -108,9 +120,9 @@ class _HomePageState extends State<HomePage> {
                       },
                       style: isFavouritesView
                           ? NeumorphicStyle(
-                              color: Colors.purple, depth: -4, intensity: 1)
+                              color: buttonColor, depth: -4, intensity: 1)
                           : NeumorphicStyle(
-                              color: Colors.purple, depth: 3, intensity: .4),
+                              color: buttonColor, depth: 3, intensity: .4),
                       //ButtonStyle(elevation: ButtonStyleButton.allOrNull(20)),
                     ),
                   ),
@@ -132,9 +144,14 @@ class _HomePageState extends State<HomePage> {
           body: Builder(builder: (context) {
             final body = Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: _header(ref, viewModel, isWideScreen),
+                Card(
+                  elevation: 5,
+                  margin: EdgeInsets.fromLTRB(1, 0, 1, 10),
+                  shadowColor: Colors.grey.shade50,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 0),
+                    child: _header(ref, viewModel, isWideScreen),
+                  ),
                 ),
                 Consumer(
                   builder: (context, ref, _) {
