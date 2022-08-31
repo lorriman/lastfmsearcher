@@ -145,13 +145,11 @@ class _HomePageState extends State<HomePage> {
             final body = Column(
               children: [
                 Card(
+                  //surfaceTintColor: Theme.of(context).primaryColor,
                   elevation: 5,
-                  margin: EdgeInsets.fromLTRB(1, 0, 1, 10),
+                  margin: EdgeInsets.fromLTRB(1, 0, 1, 5),
                   shadowColor: Colors.grey.shade50,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 0),
-                    child: _header(ref, viewModel, isWideScreen),
-                  ),
+                  child: _header(ref, viewModel, isWideScreen),
                 ),
                 Consumer(
                   builder: (context, ref, _) {
