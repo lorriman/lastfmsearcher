@@ -30,6 +30,7 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         //gets in the way of the button
         debugShowCheckedModeBanner : false,
+       // themeMode: ThemeMode.dark,
         theme: ThemeData(
           visualDensity: VisualDensity.compact,
           primarySwatch: generateMaterialColor(
@@ -42,7 +43,10 @@ class _MyAppState extends State<MyApp> {
               TextSelectionThemeData(selectionHandleColor: Colors.transparent),
         ),
         darkTheme: ThemeData(
-          primarySwatch: Colors.lightGreen,
+          primarySwatch: generateMaterialColor(
+              color: HSLColor.fromColor(Colors.purple)
+                  .withLightness(.6)
+                  .toColor()),
           brightness: Brightness.dark,
         ),
         home: Consumer(

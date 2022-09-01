@@ -178,25 +178,29 @@ class _ListViewCardState extends State<ListViewCard>
               padding: EdgeInsets.all(20.0 + viewDensity.densityAdjust),
               child: Row(
                 children: [
-                  SizedBox(
-                      width: 20,
-                      child: Text(
-                        '${widget.index + 1}  ',
-                        semanticsLabel: 'item ${widget.index + 1}',
-                        key: Key('item${widget.index}'),
-                        style: Theme.of(context).textTheme.bodySmall,
-                      )),
-                  Semantics(
-                    button: true,
-                    label: 'search Youtube for ${widget.item.title}',
-                    //not a true button
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: BorderSide(width: 0, color: Colors.white)),
-                      onPressed: () async => _launchYoutube(widget.item)
-                      //_launchUrl(item.url, external: true);
-                      //await Share.share(widget.item.url);
+                SizedBox(
+                  width: 21,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '${widget.index + 1}  ',
+                      semanticsLabel: 'item ${widget.index + 1}',
+                      key: Key('item${widget.index}'),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ),
+                Semantics(
+                  button: true,
+                  label: 'search Youtube for ${widget.item.title}',
+                  //not a true button
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: BorderSide(width: 0, color: Colors.white)),
+                    onPressed: () async => _launchYoutube(widget.item)
+                    //_launchUrl(item.url, external: true);
+                    //await Share.share(widget.item.url);
                       // Use Builder to get the widget context
                       ,
                       child: ClipRRect(
@@ -226,28 +230,44 @@ class _ListViewCardState extends State<ListViewCard>
                                 left: 12.0 + viewDensity.densityAdjust / 2),
                             child: Text(
                               widget.item.title,
-                              style: viewDensity == ViewDensity.compact
-                                  ? Theme.of(context).textTheme.headline6
-                                  : Theme.of(context).textTheme.headline5,
-                              maxLines:
-                                  viewDensity == ViewDensity.compact ? 1 : 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            style: viewDensity == ViewDensity.compact
+                                ? Theme.of(context).textTheme.headline6
+                                : Theme.of(context).textTheme.headline5,
+                            maxLines:
+                                viewDensity == ViewDensity.compact ? 1 : 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           ),
                           SizedBox(height: 10 + viewDensity.densityAdjust / 2),
-                          if (widget.item.subTitle != '')
-                            Padding(
-                              padding: const EdgeInsets.only(left: 12.0),
-                              child: Text(widget.item.subTitle,
-                                  style: Theme.of(context).textTheme.bodyLarge),
-                            )
-                        ],
-                      ),
+                        if (widget.item.subTitle != '')
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(widget.item.subTitle,
+                                style: Theme.of(context).textTheme.bodyLarge),
+                          )
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ));
+                ),
+                viewDensity == ViewDensity.large
+                    ? IconButton(
+                        alignment: Alignment.centerLeft,
+                        constraints: BoxConstraints(maxWidth: 25),
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.favorite_border,
+                          color: Colors.redAccent,
+                        ))
+                    : IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.favorite_border,
+                          color: Colors.redAccent,
+                        )),
+              ],
+            ),
+          ),
+        );
       },
     );
   }
