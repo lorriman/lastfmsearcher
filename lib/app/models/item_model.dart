@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'package:equatable/equatable.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 
+part 'item_model.g.dart';
+
+@CopyWith(constructor: 'named')
 class MusicInfo extends Equatable {
   MusicInfo(
       this.favourite,
@@ -12,6 +16,17 @@ class MusicInfo extends Equatable {
       this.imageLinkXLarge,
       this.url,
       this.otherData);
+
+  MusicInfo.named(
+      {required this.favourite,
+      required this.name,
+      required this.artist,
+      required this.imageLinkSmall,
+      required this.imageLinkMedium,
+      required this.imageLinkLarge,
+      required this.imageLinkXLarge,
+      required this.url,
+      required this.otherData});
 
   final bool favourite;
   final String name;

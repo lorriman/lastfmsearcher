@@ -198,17 +198,18 @@ class _ListViewCardState extends State<ListViewCard>
                     style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.white,
                         side: BorderSide(width: 0, color: Colors.white)),
+                    //todo: dark mode compatible?
                     onPressed: () async => _launchYoutube(widget.item)
                     //_launchUrl(item.url, external: true);
                     //await Share.share(widget.item.url);
-                      // Use Builder to get the widget context
-                      ,
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(5.0),
-                          clipBehavior: Clip.antiAlias,
-                          child: Hero(
-                              tag: 'image',
-                              child: LastFMImage(
+                    // Use Builder to get the widget context
+                    ,
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(5.0),
+                        clipBehavior: Clip.antiAlias,
+                        child: Hero(
+                            tag: 'image',
+                            child: LastFMImage(
                                   item: widget.item,
                                   sizing: [
                                     ViewDensity.large,

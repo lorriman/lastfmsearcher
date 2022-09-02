@@ -75,6 +75,33 @@ final viewModelProvider = ChangeNotifierProvider<MusicItemsViewModel>((ref) {
 final musicInfoStreamProvider =
     StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
   final repo = ref.watch(repositoryProvider);
+  final favesRepo = ref.watch(favouritesRepositoryProvider);
+
+  repo.stream.map((repositoryFetchResult) {
+    if (repositoryFetchResult == null) return null;
+    List<MusicInfo> newItems = [];
+    List<MusicInfo> items = repositoryFetchResult.items;
+    favesRepo.reset();
+    favesRepo.searchInit('', MusicInfoType.all);
+    favesRepo.next();
+    favesRepo.stream.map((faveRepositoryFetchResult) {
+      if (faveRepositoryFetchResult == null) return items;
+      if (faveRepositoryFetchResult.items.length == 0) return items;
+      final faveItemsMap = Map<MusicInfo, MusicInfo>.fromIterable(
+          faveRepositoryFetchResult.items);
+      //faveRepositoryFetchResult.items.forEach((e)=>faveItemsMap[e]=e);
+
+      for (final item in items) {
+        final faveItem = faveItemsMap[item];
+        if (faveItem != null) {
+          newItems.add(faveItem);
+        } else {
+          newItems.add(item);
+        }
+      }
+      return newItems;
+    });
+  });
 
   return repo.stream;
 });
