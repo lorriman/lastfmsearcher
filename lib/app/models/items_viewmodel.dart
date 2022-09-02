@@ -1,17 +1,22 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 
+import 'package:rxdart/rxdart.dart';
+
 // Project imports:
 import 'package:jobtest_lastfm/services/repository.dart';
+
+import 'item_model.dart';
 
 ///A number of properties are provided to reduce UI clutter as well as serve
 ///specific UI requirements.
 class MusicItemsViewModel extends ChangeNotifier {
-  MusicItemsViewModel(this._repository);
+  MusicItemsViewModel(this._repository, [this._favesRepository = null]);
 
   //private
 
   final Repository _repository;
+  final Repository? _favesRepository;
 
   String _searchString = '';
   bool? _isFirst;
@@ -20,7 +25,9 @@ class MusicItemsViewModel extends ChangeNotifier {
   //getters
 
   String get searchString => _searchString;
+
   int get totalItems => _repository.totalItems;
+
   bool get hasSearched => _repository.status == RepoStatus.loaded;
   MusicInfoType get searchType => _searchType;
   //useful to make UI more readable and less cluttered
@@ -33,7 +40,7 @@ class MusicItemsViewModel extends ChangeNotifier {
       (_searchString.trim().length > 2) &&
       (_repository.fetchPhase != FetchPhase.fetching);
   bool get notReady => !isReady;
-  
+
   //setters
 
   set searchString(String str) {
@@ -77,6 +84,51 @@ class MusicItemsViewModel extends ChangeNotifier {
       _isFirst = false;
     }
     await _repository.next(uiDelayMillisecs: 350);
-     notifyListeners();
+    notifyListeners();
   }
+
+  Stream<List<MusicInfo>> itemsStream() {
+    _repository.stream.map((repositoryFetchResult) {
+      if (repositoryFetchResult == null) return null;
+      final items = repositoryFetchResult.items;
+      if (items.isEmpty) return items;
+
+      if (_favesRepository != null) {
+        _favesRepository!.reset();
+        _favesRepository!.searchInit('', MusicInfoType.all);
+        _favesRepository!.next();
+        _favesRepository!.stream.map((faveRepositoryFetchResult) {
+          if (faveRepositoryFetchResult == null) return items;
+          if (faveRepositoryFetchResult.items.isEmpty) return items;
+
+          return CombineLatestStream.combine2<MusicInfo, MusicInfo,
+              List<MusicInfo>>(
+            Stream<Map<MusicInfo, MusicInfo>>.value({}),
+            _repository.stream,
+            _itemsCombiner,
+          );
+        });
+      }
+    });
+    return Stream.fromIterable(<MusicInfo>[emptyMusicInfo]);
+  }
+
+  static List<MusicInfo> _itemsCombiner(
+      List<MusicInfo> faveItems, List<MusicInfo> items) {
+    final List<MusicInfo> combo = [];
+    final faveItemsMap = Map<MusicInfo, MusicInfo>.fromIterable(faveItems);
+    for (final item in items) {
+      final faveItem = faveItemsMap[item];
+      if (faveItem != null) {
+        combo.add(faveItem);
+      } else {
+        combo.add(item);
+      }
+    }
+    return combo;
+  }
+
+  /// Output stream
+// Stream<List<ChecklistItemTileModel>> tileModelStream(DateTime day) =>
+//     _checklistitemsRatingitemsStream(day).map(_createModels);
 }
