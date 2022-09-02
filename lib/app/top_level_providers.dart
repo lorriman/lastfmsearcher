@@ -74,7 +74,9 @@ final viewModelProvider = ChangeNotifierProvider<MusicItemsViewModel>((ref) {
 
 final musicInfoStreamProvider =
     StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
-  final repo = ref.watch(repositoryProvider);
+  final vm = ref.watch(viewModelProvider);
+  return vm.itemsStream();
+
 /*  final favesRepo = ref.watch(favouritesRepositoryProvider);
 
   repo.stream.map((repositoryFetchResult) {
@@ -103,7 +105,7 @@ final musicInfoStreamProvider =
     });
   });
 */
-  return repo.stream;
+      //return repo.stream;
 });
 
 final favouritesProvider = Provider<FavouritesApiService<MusicInfo>>((ref) {

@@ -87,30 +87,36 @@ class MusicItemsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Stream<List<MusicInfo>> itemsStream() {
+  Stream<RepositoryFetchResult<MusicInfo>?> itemsStream() {
     _repository.stream.map((repositoryFetchResult) {
       if (repositoryFetchResult == null) return null;
       final items = repositoryFetchResult.items;
-      if (items.isEmpty) return items;
+      if (items.isEmpty) return repositoryFetchResult;
 
       if (_favesRepository != null) {
         _favesRepository!.reset();
         _favesRepository!.searchInit('', MusicInfoType.all);
         _favesRepository!.next();
         _favesRepository!.stream.map((faveRepositoryFetchResult) {
-          if (faveRepositoryFetchResult == null) return items;
-          if (faveRepositoryFetchResult.items.isEmpty) return items;
+          if (faveRepositoryFetchResult == null) return repositoryFetchResult;
+          if (faveRepositoryFetchResult.items.isEmpty)
+            return repositoryFetchResult;
 
-          return CombineLatestStream.combine2<MusicInfo, MusicInfo,
-              List<MusicInfo>>(
-            Stream<Map<MusicInfo, MusicInfo>>.value({}),
-            _repository.stream,
-            _itemsCombiner,
+          final newItems =
+              _itemsCombiner(faveRepositoryFetchResult.items, items);
+
+          return RepositoryFetchResult(
+            repositoryFetchResult.infoType,
+            newItems,
+            repositoryFetchResult.totalItems,
+            repositoryFetchResult.isFirst,
+            repositoryFetchResult.page,
           );
         });
       }
     });
-    return Stream.fromIterable(<MusicInfo>[emptyMusicInfo]);
+    return Stream.fromIterable(RepositoryFetchResult(
+        MusicInfoType.all, <MusicInfo>[emptyMusicInfo], 1, true, 1));
   }
 
   static List<MusicInfo> _itemsCombiner(
