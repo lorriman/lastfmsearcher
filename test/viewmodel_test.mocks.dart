@@ -29,58 +29,47 @@ class MockRepository<T> extends _i1.Mock implements _i2.Repository<T> {
   void Function(List<T>) get beforeFetch =>
       (super.noSuchMethod(Invocation.getter(#beforeFetch),
           returnValue: (List<T> data) {}) as void Function(List<T>));
-
   @override
   set beforeFetch(void Function(List<T>)? _beforeFetch) =>
       super.noSuchMethod(Invocation.setter(#beforeFetch, _beforeFetch),
           returnValueForMissingStub: null);
-
   @override
   void Function(List<T>) get afterFetch =>
       (super.noSuchMethod(Invocation.getter(#afterFetch),
           returnValue: (List<T> data) {}) as void Function(List<T>));
-
   @override
   set afterFetch(void Function(List<T>)? _afterFetch) =>
       super.noSuchMethod(Invocation.setter(#afterFetch, _afterFetch),
           returnValueForMissingStub: null);
-
   @override
   void Function(List<T>) get finalizedFetch =>
       (super.noSuchMethod(Invocation.getter(#finalizedFetch),
           returnValue: (List<T> data) {}) as void Function(List<T>));
-
   @override
   set finalizedFetch(void Function(List<T>)? _finalizedFetch) =>
       super.noSuchMethod(Invocation.setter(#finalizedFetch, _finalizedFetch),
           returnValueForMissingStub: null);
-
   @override
   _i2.RepoStatus get status => (super.noSuchMethod(Invocation.getter(#status),
       returnValue: _i2.RepoStatus.none) as _i2.RepoStatus);
-
   @override
   _i2.FetchPhase get fetchPhase =>
       (super.noSuchMethod(Invocation.getter(#fetchPhase),
           returnValue: _i2.FetchPhase.none) as _i2.FetchPhase);
-
   @override
   int get totalItems =>
       (super.noSuchMethod(Invocation.getter(#totalItems), returnValue: 0)
           as int);
-
   @override
   _i3.Stream<_i2.RepositoryFetchResult<T>?> get stream =>
       (super.noSuchMethod(Invocation.getter(#stream),
               returnValue: Stream<_i2.RepositoryFetchResult<T>?>.empty())
           as _i3.Stream<_i2.RepositoryFetchResult<T>?>);
-
   @override
   _i3.Stream<_i2.RepositoryFetchResult<T>?> get streamPage =>
       (super.noSuchMethod(Invocation.getter(#streamPage),
               returnValue: Stream<_i2.RepositoryFetchResult<T>?>.empty())
           as _i3.Stream<_i2.RepositoryFetchResult<T>?>);
-
   @override
   void reset() => super.noSuchMethod(Invocation.method(#reset, []),
       returnValueForMissingStub: null);
@@ -95,6 +84,18 @@ class MockRepository<T> extends _i1.Mock implements _i2.Repository<T> {
       Invocation.method(#next, [], {#uiDelayMillisecs: uiDelayMillisecs}),
       returnValue: Future<void>.value(),
       returnValueForMissingStub: Future<void>.value()) as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> addItem(T? item) =>
+      (super.noSuchMethod(Invocation.method(#addItem, [item]),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> removeItem(T? item) =>
+      (super.noSuchMethod(Invocation.method(#removeItem, [item]),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i3.Future<void>);
 
   @override
   void dispose() => super.noSuchMethod(Invocation.method(#dispose, []),

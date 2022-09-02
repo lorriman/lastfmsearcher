@@ -15,8 +15,8 @@ class MusicItemsViewModel extends ChangeNotifier {
 
   //private
 
-  final Repository _repository;
-  final Repository? _favesRepository;
+  final Repository<MusicInfo> _repository;
+  final Repository<MusicInfo>? _favesRepository;
 
   String _searchString = '';
   bool? _isFirst;
@@ -115,7 +115,8 @@ class MusicItemsViewModel extends ChangeNotifier {
         });
       }
     });
-    return Stream.fromIterable(RepositoryFetchResult(
+    return Stream.value(null);
+    return Stream.value(RepositoryFetchResult(
         MusicInfoType.all, <MusicInfo>[emptyMusicInfo], 1, true, 1));
   }
 
