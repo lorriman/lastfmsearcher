@@ -59,4 +59,4 @@ class MusicInfo extends Equatable {
 }
 
 final MusicInfo emptyMusicInfo =
-    MusicInfo(false, '', '', '', '', '', '', '', {});
+    MusicInfo(false, 'emptyMusicInfo', '', '', '', '', '', '', {});

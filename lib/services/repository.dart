@@ -65,7 +65,10 @@ class RepositoryFetchResult<T> {
 class Repository<T> {
   Repository({required ApiService lastFMapi}) : _lastFMapi = lastFMapi {
     _streamController = StreamController<RepositoryFetchResult<T>?>(
-        onListen: () => print('listening'));
+        onListen: () {
+          print('listening');
+        },
+        onResume: () => print('resuming'));
     _streamPageController = StreamController<RepositoryFetchResult<T>?>(
         onListen: () => print('pager listening'));
   }
@@ -99,7 +102,12 @@ class Repository<T> {
   ///Stream that is the main source of fetched data. (The next() call
   ///does not return data.) The data added is all items from all pages
   ///that have so far been fetched for the current search string.
-  Stream<RepositoryFetchResult<T>?> get stream => _streamController.stream;
+  Stream<RepositoryFetchResult<T>?> get stream {
+    print(' Repository get stream');
+    print(
+        ' Repository get stream: listener: ${_streamController.hasListener} closed: ${_streamController.isClosed}');
+    return _streamController.stream;
+  }
 
   ///Suitable for paged views with next button.
   ///stream that is the main source for fetched data. (The next() call
@@ -243,6 +251,7 @@ class Repository<T> {
   }
 
   void dispose() {
+    print('repository.dispose ${this.runtimeType}');
     _streamController.close();
     _streamPageController.close();
   }

@@ -88,23 +88,30 @@ class MusicItemsViewModel extends ChangeNotifier {
   }
 
   Stream<RepositoryFetchResult<MusicInfo>?> itemsStream() {
-    _repository.stream.map((repositoryFetchResult) {
+    print('itemsStream:entered');
+    //return _repository.stream;
+    return _repository.stream.map((repositoryFetchResult) {
+      print('itemsStream:_repository.stream.map');
       if (repositoryFetchResult == null) return null;
       final items = repositoryFetchResult.items;
       if (items.isEmpty) return repositoryFetchResult;
+      print('itemsStream:pre _faveRepository');
+      if (_favesRepository == null) return repositoryFetchResult;
 
       if (_favesRepository != null) {
         _favesRepository!.reset();
         _favesRepository!.searchInit('', MusicInfoType.all);
         _favesRepository!.next();
+        print('itemsStream:pre next()');
         _favesRepository!.stream.map((faveRepositoryFetchResult) {
+          print('itemsStream:_favesRepository!.stream.map');
           if (faveRepositoryFetchResult == null) return repositoryFetchResult;
           if (faveRepositoryFetchResult.items.isEmpty)
             return repositoryFetchResult;
 
           final newItems =
               _itemsCombiner(faveRepositoryFetchResult.items, items);
-
+          print('itemsStream:pre next() type: ${newItems.runtimeType}');
           return RepositoryFetchResult(
             repositoryFetchResult.infoType,
             newItems,
@@ -115,6 +122,7 @@ class MusicItemsViewModel extends ChangeNotifier {
         });
       }
     });
+    print('itemsStream:Stream.value(null)');
     return Stream.value(null);
     return Stream.value(RepositoryFetchResult(
         MusicInfoType.all, <MusicInfo>[emptyMusicInfo], 1, true, 1));

@@ -61,20 +61,26 @@ final databaseProvider = Provider<LastfmApiService<MusicInfo>>((ref) {
   );
 });
 
-final repositoryProvider = StateProvider<Repository<MusicInfo>>((ref) {
+final repositoryProvider =
+    StateProvider.autoDispose<Repository<MusicInfo>>((ref) {
   final database = ref.watch(databaseProvider);
 
   ref.onDispose(() {});
   return Repository<MusicInfo>(lastFMapi: database);
 });
 
-final viewModelProvider = ChangeNotifierProvider<MusicItemsViewModel>((ref) {
+final viewModelProvider =
+    ChangeNotifierProvider.autoDispose<MusicItemsViewModel>((ref) {
   return MusicItemsViewModel(ref.watch(repositoryProvider));
 });
 
 final musicInfoStreamProvider =
-    StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
-  final vm = ref.watch(viewModelProvider);
+    StreamProvider.autoDispose<RepositoryFetchResult<MusicInfo>?>((ref) {
+  print('calling musicInfoStreamProvider');
+  ref.onDispose(() {
+    print('disposing musicInfoStreamProvider ');
+  });
+  final vm = ref.read(viewModelProvider);
   return vm.itemsStream();
 
 /*  final favesRepo = ref.watch(favouritesRepositoryProvider);
