@@ -72,7 +72,9 @@ final repositoryProvider =
 final viewModelProvider =
     ChangeNotifierProvider.autoDispose<MusicItemsViewModel>((ref) {
   return MusicItemsViewModel(
-      ref.read(repositoryProvider), ref.read(favouritesRepositoryProvider));
+    ref.read(repositoryProvider),
+    Repository<MusicInfo>(lastFMapi: ref.read(favouritesDatabaseProvider)),
+  );
 });
 
 final musicInfoStreamProvider =
@@ -115,7 +117,8 @@ final musicInfoStreamProvider =
       //return repo.stream;
 });
 
-final favouritesProvider = Provider<FavouritesApiService<MusicInfo>>((ref) {
+final favouritesDatabaseProvider =
+    Provider<FavouritesApiService<MusicInfo>>((ref) {
   return FavouritesApiService<MusicInfo>(
     modelizer: Repository.modelize,
   );
@@ -123,7 +126,7 @@ final favouritesProvider = Provider<FavouritesApiService<MusicInfo>>((ref) {
 
 final favouritesRepositoryProvider =
     StateProvider<Repository<MusicInfo>>((ref) {
-  final database = ref.watch(favouritesProvider);
+      final database = ref.watch(favouritesDatabaseProvider);
 
   ref.onDispose(() {});
   return Repository<MusicInfo>(lastFMapi: database);

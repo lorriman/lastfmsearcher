@@ -90,9 +90,15 @@ class MusicItemsViewModel extends ChangeNotifier {
   Stream<RepositoryFetchResult<MusicInfo>?> itemsStream() {
     print('itemsStream:entered');
     //return _repository.stream;
+    if (_favesRepository == null) return _repository.stream;
+    final favsRepo = _favesRepository;
+    favsRepo!.reset();
+    favsRepo!.searchInit('', MusicInfoType.all);
+    favsRepo!.next();
 
     return CombineLatestStream.combine2(
-      Stream.value(RepositoryFetchResult<MusicInfo>.empty()),
+      //Stream.value(RepositoryFetchResult<MusicInfo>.empty()),
+      _favesRepository!.stream,
       _repository.stream,
       _itemsCombiner,
     );
@@ -138,19 +144,32 @@ class MusicItemsViewModel extends ChangeNotifier {
   }
 
   static RepositoryFetchResult<MusicInfo>? _itemsCombiner(
-      RepositoryFetchResult<MusicInfo>? faveItems,
-      RepositoryFetchResult<MusicInfo>? items) {
-    final List<MusicInfo> combo = [];
-    final faveItemsMap = Map<MusicInfo, MusicInfo>.fromIterable(faveItems);
+      RepositoryFetchResult<MusicInfo>? faveRepFetchResult,
+      RepositoryFetchResult<MusicInfo>? repFetchResult) {
+    print('items combiner');
+    if (repFetchResult == null) return null;
+    if (faveRepFetchResult == null) return repFetchResult;
+
+    final List<MusicInfo> newItems = [];
+    final items = repFetchResult.items;
+    final faveItemsMap =
+        Map<MusicInfo, MusicInfo>.fromIterable(faveRepFetchResult.items);
     for (final item in items) {
       final faveItem = faveItemsMap[item];
       if (faveItem != null) {
-        combo.add(faveItem);
+        newItems.add(faveItem);
       } else {
-        combo.add(item);
+        newItems.add(item);
       }
     }
-    return combo;
+
+    return RepositoryFetchResult<MusicInfo>(
+      repFetchResult.infoType,
+      newItems,
+      repFetchResult.totalItems,
+      repFetchResult.isFirst,
+      repFetchResult.page,
+    );
   }
 
 /*
