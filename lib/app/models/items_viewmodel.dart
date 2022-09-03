@@ -29,16 +29,22 @@ class MusicItemsViewModel extends ChangeNotifier {
   int get totalItems => _repository.totalItems;
 
   bool get hasSearched => _repository.status == RepoStatus.loaded;
+
   MusicInfoType get searchType => _searchType;
+
   //useful to make UI more readable and less cluttered
   bool get isLoading => _repository.fetchPhase == FetchPhase.fetching;
+
   bool get notLoading => !isLoading;
+
   //replicated by [RepoFetchResult.isFirst] but needed in the loading phase
   //prior to a RepoFetchResult coming through in the streams.
   bool get isFirst => _isFirst ?? false;
+
   bool get isReady =>
       (_searchString.trim().length > 2) &&
       (_repository.fetchPhase != FetchPhase.fetching);
+
   bool get notReady => !isReady;
 
   //setters
@@ -87,9 +93,12 @@ class MusicItemsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  //stream for the UI to hook into with an AsyncValue
+  //If _favesRepository is configured reconciled with main stream
+  //to supply favourited items.
   Stream<RepositoryFetchResult<MusicInfo>?> itemsStream() {
     print('itemsStream:entered');
-    //return _repository.stream;
+
     if (_favesRepository == null) return _repository.stream;
     final favsRepo = _favesRepository;
     favsRepo!.reset();
@@ -97,50 +106,11 @@ class MusicItemsViewModel extends ChangeNotifier {
     favsRepo!.next();
 
     return CombineLatestStream.combine2(
-      //Stream.value(RepositoryFetchResult<MusicInfo>.empty()),
+      //Stream.value(RepositoryFetchResult<MusicInfo>.empty()),//fallback for testing
       _favesRepository!.stream,
       _repository.stream,
       _itemsCombiner,
     );
-    /*
-    return _repository.stream.map((repositoryFetchResult) {
-      print('itemsStream:_repository.stream.map');
-      if (repositoryFetchResult == null) return null;
-      final items = repositoryFetchResult.items;
-      if (items.isEmpty) return repositoryFetchResult;
-      print('itemsStream:pre _faveRepository');
-      if (_favesRepository == null) return repositoryFetchResult;
-
-      if (_favesRepository != null) {
-        _favesRepository!.reset();
-        _favesRepository!.searchInit('', MusicInfoType.all);
-        _favesRepository!.next();
-        print('itemsStream:pre next()');
-          _favesRepository!.stream.map((faveRepositoryFetchResult) {
-          print('itemsStream:_favesRepository!.stream.map');
-          if (faveRepositoryFetchResult == null) return repositoryFetchResult;
-          if (faveRepositoryFetchResult.items.isEmpty)
-            return repositoryFetchResult;
-
-          final newItems =
-              _itemsCombiner(faveRepositoryFetchResult.items, items);
-          print('itemsStream:pre next() type: ${newItems.runtimeType}');
-          return RepositoryFetchResult<MusicInfo>(
-            repositoryFetchResult.infoType,
-            newItems,
-            repositoryFetchResult.totalItems,
-            repositoryFetchResult.isFirst,
-            repositoryFetchResult.page,
-          );
-        });
-      }
-    });
-
-     */
-    print('itemsStream:Stream.value(null)');
-    return Stream.value(null);
-    return Stream.value(RepositoryFetchResult(
-        MusicInfoType.all, <MusicInfo>[emptyMusicInfo], 1, true, 1));
   }
 
   static RepositoryFetchResult<MusicInfo>? _itemsCombiner(
@@ -172,29 +142,4 @@ class MusicItemsViewModel extends ChangeNotifier {
     );
   }
 
-/*
-  Stream<List<RatingChecklistItem>> _checklistitemsTrashItemsStream() {
-    //reusing some of the infrastructure of the main Checklist tab, so we need
-    //an empty stream since we're not reading any ratings for the trash tab.
-
-    return CombineLatestStream.combine2(
-      Stream<Map<String, Rating>>.value({}),
-      repository.checklistItemsTrashStream(),
-      _ratingsChecklistItemsCombiner,
-    );
-  }
-
-  static List<RatingChecklistItem> _ratingsChecklistItemsCombiner(
-      Map<String, Rating>? ratings, List<ChecklistItem> checklistItems) {
-    final List<RatingChecklistItem> combo = [];
-    for (final checklistItem in checklistItems) {
-      final Rating? rating = ratings?[checklistItem.id];
-      combo.add(RatingChecklistItem(rating, checklistItem));
-    }
-    return combo;
-  }
-  */
-  /// Output stream
-// Stream<List<ChecklistItemTileModel>> tileModelStream(DateTime day) =>
-//     _checklistitemsRatingitemsStream(day).map(_createModels);
 }
