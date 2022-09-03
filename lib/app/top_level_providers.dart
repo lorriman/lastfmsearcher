@@ -71,7 +71,8 @@ final repositoryProvider =
 
 final viewModelProvider =
     ChangeNotifierProvider.autoDispose<MusicItemsViewModel>((ref) {
-  return MusicItemsViewModel(ref.watch(repositoryProvider));
+  return MusicItemsViewModel(
+      ref.read(repositoryProvider), ref.read(favouritesRepositoryProvider));
 });
 
 final musicInfoStreamProvider =
@@ -135,7 +136,7 @@ final favouritesViewModelProvider =
 
 final favouritesMusicInfoStreamProvider =
     StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
-  final repo = ref.watch(favouritesRepositoryProvider);
+      final repo = ref.read(favouritesRepositoryProvider);
   return repo.stream;
 });
 

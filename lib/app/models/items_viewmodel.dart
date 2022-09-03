@@ -90,6 +90,13 @@ class MusicItemsViewModel extends ChangeNotifier {
   Stream<RepositoryFetchResult<MusicInfo>?> itemsStream() {
     print('itemsStream:entered');
     //return _repository.stream;
+
+    return CombineLatestStream.combine2(
+      Stream.value(RepositoryFetchResult<MusicInfo>.empty()),
+      _repository.stream,
+      _itemsCombiner,
+    );
+    /*
     return _repository.stream.map((repositoryFetchResult) {
       print('itemsStream:_repository.stream.map');
       if (repositoryFetchResult == null) return null;
@@ -103,7 +110,7 @@ class MusicItemsViewModel extends ChangeNotifier {
         _favesRepository!.searchInit('', MusicInfoType.all);
         _favesRepository!.next();
         print('itemsStream:pre next()');
-        _favesRepository!.stream.map((faveRepositoryFetchResult) {
+          _favesRepository!.stream.map((faveRepositoryFetchResult) {
           print('itemsStream:_favesRepository!.stream.map');
           if (faveRepositoryFetchResult == null) return repositoryFetchResult;
           if (faveRepositoryFetchResult.items.isEmpty)
@@ -112,7 +119,7 @@ class MusicItemsViewModel extends ChangeNotifier {
           final newItems =
               _itemsCombiner(faveRepositoryFetchResult.items, items);
           print('itemsStream:pre next() type: ${newItems.runtimeType}');
-          return RepositoryFetchResult(
+          return RepositoryFetchResult<MusicInfo>(
             repositoryFetchResult.infoType,
             newItems,
             repositoryFetchResult.totalItems,
@@ -122,14 +129,17 @@ class MusicItemsViewModel extends ChangeNotifier {
         });
       }
     });
+
+     */
     print('itemsStream:Stream.value(null)');
     return Stream.value(null);
     return Stream.value(RepositoryFetchResult(
         MusicInfoType.all, <MusicInfo>[emptyMusicInfo], 1, true, 1));
   }
 
-  static List<MusicInfo> _itemsCombiner(
-      List<MusicInfo> faveItems, List<MusicInfo> items) {
+  static RepositoryFetchResult<MusicInfo>? _itemsCombiner(
+      RepositoryFetchResult<MusicInfo>? faveItems,
+      RepositoryFetchResult<MusicInfo>? items) {
     final List<MusicInfo> combo = [];
     final faveItemsMap = Map<MusicInfo, MusicInfo>.fromIterable(faveItems);
     for (final item in items) {
@@ -143,6 +153,28 @@ class MusicItemsViewModel extends ChangeNotifier {
     return combo;
   }
 
+/*
+  Stream<List<RatingChecklistItem>> _checklistitemsTrashItemsStream() {
+    //reusing some of the infrastructure of the main Checklist tab, so we need
+    //an empty stream since we're not reading any ratings for the trash tab.
+
+    return CombineLatestStream.combine2(
+      Stream<Map<String, Rating>>.value({}),
+      repository.checklistItemsTrashStream(),
+      _ratingsChecklistItemsCombiner,
+    );
+  }
+
+  static List<RatingChecklistItem> _ratingsChecklistItemsCombiner(
+      Map<String, Rating>? ratings, List<ChecklistItem> checklistItems) {
+    final List<RatingChecklistItem> combo = [];
+    for (final checklistItem in checklistItems) {
+      final Rating? rating = ratings?[checklistItem.id];
+      combo.add(RatingChecklistItem(rating, checklistItem));
+    }
+    return combo;
+  }
+  */
   /// Output stream
 // Stream<List<ChecklistItemTileModel>> tileModelStream(DateTime day) =>
 //     _checklistitemsRatingitemsStream(day).map(_createModels);

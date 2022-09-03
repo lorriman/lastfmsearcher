@@ -15,7 +15,7 @@ enum RepoStatus { none, init, loaded }
 
 ///all is used for favourites
 // todo: convert to modern enums
-enum MusicInfoType { albums, tracks, artists, all }
+enum MusicInfoType { all, albums, tracks, artists }
 
 const Map<MusicInfoType, String> searchTypeApiStrings = <MusicInfoType, String>{
   MusicInfoType.albums: 'album',
@@ -34,6 +34,7 @@ const Map<MusicInfoType, String> musicInfoTypeUIStrings = {
 ///A single object of this type is the result from a Repository.fetch(), and
 ///is sent in the streams. They are not returned by any methods.
 ///Implementation is to use StreamBuilders or streamProviders.
+//todo: generalise by converting MusicInfoType to a thingy
 class RepositoryFetchResult<T> {
   RepositoryFetchResult(
     this.infoType,
@@ -44,11 +45,16 @@ class RepositoryFetchResult<T> {
     this.page,
   );
 
-  final MusicInfoType infoType;
+  factory RepositoryFetchResult.empty() {
+    return RepositoryFetchResult(MusicInfoType.all, <T>[], 0, true, 1);
+  }
+
+  final MusicInfoType infoType; //this should be an enum
   final List<T> items;
   final int totalItems;
   final int page;
   final bool isFirst;
+
   bool get isLast {
     return items.length == totalItems;
   }
@@ -191,7 +197,8 @@ class Repository<T> {
     final str = searchStr.trim();
     if (str.isEmpty) reset();
     if (str != _searchString) reset();
-    if (str.length > 2) _status = RepoStatus.init;
+    if (searchType == MusicInfoType.all || str.length > 2)
+      _status = RepoStatus.init;
     _searchString = str;
     _musicInfoType = searchType;
     _page = 0;
@@ -203,7 +210,9 @@ class Repository<T> {
   /// seen in case fetching is near instantaneous.
   Future<void> next({int uiDelayMillisecs = 0}) async {
     assert(_page > -1);
-    assert(_searchString.length > 2);
+    assert(_lastFMapi.runtimeType == LastfmApiService
+        ? _searchString.length > 2
+        : true);
     assert(_status != RepoStatus.none);
     final stopWatch = Stopwatch()..start();
     try {
