@@ -142,4 +142,12 @@ class MusicItemsViewModel extends ChangeNotifier {
     );
   }
 
+  Future<void> toggleFavourite(MusicInfo item) async {
+    if (item.favourite) {
+      await _favesRepository?.removeItem(item);
+    } else {
+      await _favesRepository?.addItem(item);
+    }
+    notifyListeners();
+  }
 }

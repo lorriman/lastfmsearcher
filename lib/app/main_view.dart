@@ -235,7 +235,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// search total and radio buttons for artist, song, album searches.
+  /// search total and dropdown for artist, song, album searches.
   Widget _header(
       WidgetRef ref, MusicItemsViewModel viewModel, bool isWideScreen) {
     final isFavouritesView = ref.read(isFavouritesViewProvider);
@@ -332,34 +332,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //retired
-//todo: turn this in to a loop
-  Widget _radioButtons(MusicItemsViewModel viewModel) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text('albums'),
-          Radio<MusicInfoType>(
-            value: MusicInfoType.albums,
-            groupValue: viewModel.searchType,
-            onChanged: viewModel.onSearchTypeChange,
-          ),
-          Text('songs'),
-          Radio<MusicInfoType>(
-              value: MusicInfoType.tracks,
-              groupValue: viewModel.searchType,
-              onChanged: viewModel.onSearchTypeChange),
-          Text('artists'),
-          Radio<MusicInfoType>(
-              value: MusicInfoType.artists,
-              groupValue: viewModel.searchType,
-              onChanged: viewModel.onSearchTypeChange),
-        ],
-      ),
-    );
-  }
 
   Widget _dropDownSearchType(MusicItemsViewModel viewModel) {
     return Padding(
@@ -398,7 +370,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //ViewDensity viewDensity=ViewDensity.large;
 
   Widget _compactViewDropDown() {
     return Consumer(
@@ -446,68 +417,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    return ElevatedButton(
-      child: Text('sds'),
-      onPressed: () {},
-    );
   }
 }
 
-/*
-class CustomisedCheckboxTile extends StatelessWidget {
-  final bool value;
-  final String text;
-  final ValueChanged<bool>? onChanged;
-  final bool small;
-
-  CustomisedCheckboxTile(
-      {this.value = true, this.text = '', this.onChanged, this.small = false});
-
-  @override
-  Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).colorScheme.primary;
-    return SizedBox(
-      height: small ? 26 : null,
-      child: FittedBox(
-        fit: BoxFit.fitHeight,
-        child: Row(
-          children: [
-            NeumorphicCheckbox(
-              style: NeumorphicCheckboxStyle(
-                  selectedColor: primaryColor.withOpacity(.5)),
-              value: value,
-              isEnabled: onChanged != null,
-              onChanged: (val) {
-                if (onChanged != null) onChanged!(val);
-              },
-            ),
-            NeumorphicTextCustom(text, fontSize: 30),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class NeumorphicTextCustom extends StatelessWidget {
-
-  final String value;
-  final double fontSize;
-  final Color? color;
-  const NeumorphicTextCustom( this.value,{Key? key, this.fontSize=20, this.color=null}) : super(key: key);
-
-
-
-  @override
-  Widget build(BuildContext context) {
-    Color? primaryColor=color;
-    if (primaryColor==null) primaryColor=Theme.of(context).colorScheme.primary;
-    return NeumorphicText(value,
-        style: NeumorphicStyle(color: primaryColor.withOpacity(0.9)),
-        textStyle: NeumorphicTextStyle(fontSize: fontSize));
-
-  }
-}
-
-
- */
