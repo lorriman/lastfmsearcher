@@ -9,6 +9,14 @@ import 'globals.dart';
 
 import 'utils.dart';
 
+abstract class IJson {
+  factory IJson.fromJson(String rawJson) {
+    throw Exception('not implemented for $rawJson');
+  }
+
+  String toJson();
+}
+
 //shorthand as there's a lot of this
 typedef MapSD = Map<String, dynamic>;
 
@@ -75,7 +83,7 @@ abstract class ApiService<T> {
 
 
 ///Call the search method.
-class LastfmApiService<T> extends ApiService<T> {
+class LastfmApiService<T extends IJson> extends ApiService<T> {
 // The service avoids data state, which should be managed by objects using it.
   final _client = http.Client();
   final String _apiKey;

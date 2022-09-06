@@ -18,32 +18,39 @@ class FavouritesApiService<T> extends ApiService<T> {
   @override
   Future<LastFMSearchResult> search(String searchString,
       {String searchType = '', int page = 1, int itemCount = 50}) async {
-    print('Api search');
+    print('Faves search');
     int totalItems = 0;
     final prefs = await SharedPreferences.getInstance();
 
-    final response = prefs.getString(_favouritesKey);
+    //final test=prefs.getString(_favouritesKey);
+    final response = prefs.getStringList(_favouritesKey);
+
     final items = <T>[];
 
     if (response != null) {
-      final data = json.decode(response) as MapSD;
-
-      totalItems = _jsonToObjects(data, items, searchType);
+      for (var rawJson in response) {
+        if (rawJson.trim() != '') {
+          final item = _jsonToObject(rawJson);
+          items.add(item);
+        }
+      }
+      totalItems = items.length; // _jsonToObjects(data, items, searchType);
     }
     return LastFMSearchResult(items, totalItems, page);
   }
 
+/*
   ///extracts meta data, like the total available number of
   ///items if all pages were fetched (totalItems) and
   ///then calls toItemJsonToModel to make objects for
   ///each item.
-  int _jsonToObjects(MapSD data, List<T> items, String searchType) {
+  int _jsonToObjects(String data, Map<T, T> items, String searchType) {
     late final int totalItems;
     try {
-      for (int idx = 0; idx < data.length; idx++) {
-        final T item = _itemJsonToObject(data[idx]);
-        items.add(item);
-      }
+      data.forEach((key, MapSD value) {
+        final T item = _itemJsonToObject(value);
+        items[item]=item;
+      });
     } catch (e, st) {
       logger.e(e, '', st);
       throw LastFmApiException(
@@ -51,39 +58,60 @@ class FavouritesApiService<T> extends ApiService<T> {
     }
     return data.length;
   }
+*/
 
   ///produces a model object (with a callback, modelizer, provided by the
   ///client object)
-  T _itemJsonToObject(MapSD itemData) {
+  /// todo: Is this pointless? Refactor? Tried defining an IJson as a more
+  /// elegant solution but doesn't work with dart generics
+  T _jsonToObject(String rawJson) {
+    final itemData = json.decode(rawJson) as MapSD;
+
     final favourite = (itemData['favourite'] ?? false) as bool;
     final String name = (itemData['name'] ?? '') as String;
-    final String imageSmall = (itemData['nameimageLinkSmall'] ?? '') as String;
+    final String imageSmall = (itemData['imageLinkSmall'] ?? '') as String;
     final String imageMedium = (itemData['imageLinkMedium'] ?? '') as String;
     final String imageLarge = (itemData['imageLinkLarge'] ?? '') as String;
     final String imageXLarge = (itemData['imageLinkXLarge'] ?? '') as String;
     final String url = (itemData['url'] ?? '') as String;
-    final other = (itemData['other'] ?? {}) as Map<String, dynamic>;
+    final other =
+        (itemData['otherData'] ?? <String, dynamic>{}) as Map<String, dynamic>;
 
     //callback, note the cast at the end
-    final item = modelizer(favourite, name, imageSmall, imageMedium, imageLarge,
+    return modelizer(favourite, name, imageSmall, imageMedium, imageLarge,
         imageXLarge, url, other, itemData) as T;
-    return item;
   }
 
   Future<void> add(T item) async {
     final searchResults = await search('');
+    assert(!searchResults.items.contains(item));
     searchResults.items.insert(0, item);
+    final newStrings = <String>[];
+    for (dynamic itm in searchResults.items) {
+      newStrings.add(itm.toJson());
+    }
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-        _favouritesKey, searchResults.items as List<String>);
+    await prefs.setStringList(_favouritesKey, newStrings);
   }
 
   Future<void> delete(T item) async {
     final searchResults = await search('');
+    assert(searchResults.items.contains(item));
+    searchResults.items.remove(item);
+    final newStrings = <String>[];
+    for (dynamic itm in searchResults.items) {
+      newStrings.add(itm.toJson());
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_favouritesKey, newStrings);
+    /*
+    final searchResults = await search('');
+    assert(searchResults.items.contains(item));
     searchResults.items.remove(item);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-        _favouritesKey, searchResults.items as List<String>);
+    await prefs.setString(
+        _favouritesKey, item.toJson());
+  */
   }
 
   @override

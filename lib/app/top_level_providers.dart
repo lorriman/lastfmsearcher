@@ -70,7 +70,7 @@ final repositoryProvider =
 });
 
 final viewModelProvider =
-    ChangeNotifierProvider.autoDispose<MusicItemsViewModel>((ref) {
+    ChangeNotifierProvider<MusicItemsViewModel>((ref) {
   return MusicItemsViewModel(
     ref.read(repositoryProvider),
     Repository<MusicInfo>(lastFMapi: ref.read(favouritesDatabaseProvider)),
@@ -78,14 +78,13 @@ final viewModelProvider =
 });
 
 final musicInfoStreamProvider =
-    StreamProvider.autoDispose<RepositoryFetchResult<MusicInfo>?>((ref) {
+StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
   print('calling musicInfoStreamProvider');
   ref.onDispose(() {
     print('disposing musicInfoStreamProvider ');
   });
   final vm = ref.read(viewModelProvider);
   return vm.itemsStream();
-
 });
 
 final favouritesDatabaseProvider =

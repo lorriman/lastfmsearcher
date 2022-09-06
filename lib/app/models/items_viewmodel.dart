@@ -11,7 +11,14 @@ import 'item_model.dart';
 ///A number of properties are provided to reduce UI clutter as well as serve
 ///specific UI requirements.
 class MusicItemsViewModel extends ChangeNotifier {
-  MusicItemsViewModel(this._repository, [this._favesRepository = null]);
+  MusicItemsViewModel(this._repository, [this._favesRepository = null]) {
+    if (_favesRepository == null) {
+      //then this is the faves repo
+      searchType = MusicInfoType.all;
+      searchString = '';
+      fetch();
+    }
+  }
 
   //private
 
@@ -89,6 +96,13 @@ class MusicItemsViewModel extends ChangeNotifier {
     } else {
       _isFirst = false;
     }
+    if (_favesRepository != null) {
+      final favsRepo = _favesRepository;
+      favsRepo!.reset();
+      favsRepo!.searchInit('', MusicInfoType.all);
+      await favsRepo!.next();
+    }
+
     await _repository.next(uiDelayMillisecs: 350);
     notifyListeners();
   }
@@ -100,10 +114,6 @@ class MusicItemsViewModel extends ChangeNotifier {
     print('itemsStream:entered');
 
     if (_favesRepository == null) return _repository.stream;
-    final favsRepo = _favesRepository;
-    favsRepo!.reset();
-    favsRepo!.searchInit('', MusicInfoType.all);
-    favsRepo!.next();
 
     return CombineLatestStream.combine2(
       //Stream.value(RepositoryFetchResult<MusicInfo>.empty()),//fallback for testing
@@ -143,11 +153,24 @@ class MusicItemsViewModel extends ChangeNotifier {
   }
 
   Future<void> toggleFavourite(MusicInfo item) async {
-    if (item.favourite) {
-      await _favesRepository?.removeItem(item);
+    late Repository<MusicInfo> repo;
+    //if this IS the favesRepository then _favesRepository is null
+    //Either way, this operation always adds or removes from the favesRepository
+    if (_favesRepository == null) {
+      repo = _repository;
     } else {
-      await _favesRepository?.addItem(item);
+      repo = _favesRepository!;
     }
+    if (item.favourite) {
+      await repo.removeItem(item);
+    } else {
+      await repo.addItem(item.copyWith(favourite: true));
+    }
+
+    repo.reset();
+    repo.searchInit('', MusicInfoType.all);
+    await repo.next();
+
     notifyListeners();
   }
 }
