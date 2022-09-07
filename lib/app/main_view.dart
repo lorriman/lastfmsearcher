@@ -114,9 +114,17 @@ class _HomePageState extends State<HomePage> {
                       //icon: Icon(Icons.favorite),
                       child: Icon(Icons.favorite, color: Colors.red),
                       onPressed: () {
+                        final isFavesView = ref.read(isFavouritesViewProvider);
+                        //if not then prep/refresh the faves view
+                        //todo: refactor in to a refresh method
+                        if (!isFavesView) {
+                          final fvm = ref.read(favouritesViewModelProvider);
+                          fvm.searchString = '';
+                          fvm.fetch();
+                        }
                         ref.read(isFavouritesViewProvider.notifier).state =
                             !ref.read(isFavouritesViewProvider);
-                        setState(() {});
+                        //setState(() {});
                       },
                       style: isFavouritesView
                           ? NeumorphicStyle(

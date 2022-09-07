@@ -60,13 +60,13 @@ class MusicItemsViewModel extends ChangeNotifier {
     if (str != _searchString) _isFirst = null;
     _searchString = str;
     _repository.searchInit(searchString, _searchType);
-    notifyListeners();
+    //@notifyListeners();
   }
 
   set searchType(MusicInfoType searchType) {
     _searchType = searchType;
     _repository.reset();
-    notifyListeners();
+    //@notifyListeners();
   }
 
   //events/callbacks
@@ -104,7 +104,7 @@ class MusicItemsViewModel extends ChangeNotifier {
     }
 
     await _repository.next(uiDelayMillisecs: 350);
-    notifyListeners();
+    //@notifyListeners();
   }
 
   //stream for the UI to hook into with an AsyncValue
@@ -171,6 +171,6 @@ class MusicItemsViewModel extends ChangeNotifier {
     repo.searchInit('', MusicInfoType.all);
     await repo.next();
 
-    notifyListeners();
+    //@notifyListeners();
   }
 }
