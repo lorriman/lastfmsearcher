@@ -99,8 +99,8 @@ class MusicItemsViewModel extends ChangeNotifier {
     if (_favesRepository != null) {
       final favsRepo = _favesRepository;
       favsRepo!.reset();
-      favsRepo!.searchInit('', MusicInfoType.all);
-      await favsRepo!.next();
+      favsRepo.searchInit('', MusicInfoType.all);
+      await favsRepo.next();
     }
 
     await _repository.next(uiDelayMillisecs: 350);
@@ -167,10 +167,10 @@ class MusicItemsViewModel extends ChangeNotifier {
       await repo.addItem(item.copyWith(favourite: true));
     }
 
-    repo.reset();
+    //repo.reset();
     repo.searchInit('', MusicInfoType.all);
     await repo.next();
 
-    //@notifyListeners();
+    notifyListeners();
   }
 }

@@ -254,10 +254,11 @@ class _ListViewCardState extends State<ListViewCard>
                     ? IconButton(
                         alignment: Alignment.centerLeft,
                         constraints: BoxConstraints(maxWidth: 25),
-                        onPressed: () {
-                          ref
+                        onPressed: () async {
+                          await ref
                               .read(viewModelProvider)
                               .toggleFavourite(widget.item.musicInfo);
+                          setState(() {});
                         },
                         icon: Icon(
                           widget.item.favourite
@@ -266,10 +267,11 @@ class _ListViewCardState extends State<ListViewCard>
                           color: Colors.redAccent,
                         ))
                     : IconButton(
-                    onPressed: () {
-                          ref
+                        onPressed: () async {
+                          await ref
                               .read(viewModelProvider)
                               .toggleFavourite(widget.item.musicInfo);
+                          setState(() {});
                         },
                         icon: Icon(
                           widget.item.favourite

@@ -1,7 +1,7 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart' hide Builder;
 import 'package:package_info_plus/package_info_plus.dart';
 // Package imports:
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -99,42 +99,7 @@ class _HomePageState extends State<HomePage> {
             actions: [
               Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: Semantics(
-                    button: true,
-                    label: 'toggle favourites list',
-                    child: NeumorphicButton(
-                      padding: EdgeInsets.all(5),
-
-                      //color: Colors.red,
-                      //isSelected: true,
-                      key: Key('faves_button'),
-                      //icon: Icon(Icons.favorite),
-                      child: Icon(Icons.favorite, color: Colors.red),
-                      onPressed: () {
-                        final isFavesView = ref.read(isFavouritesViewProvider);
-                        //if not then prep/refresh the faves view
-                        //todo: refactor in to a refresh method
-                        if (!isFavesView) {
-                          final fvm = ref.read(favouritesViewModelProvider);
-                          fvm.searchString = '';
-                          fvm.fetch();
-                        }
-                        ref.read(isFavouritesViewProvider.notifier).state =
-                            !ref.read(isFavouritesViewProvider);
-                        //setState(() {});
-                      },
-                      style: isFavouritesView
-                          ? NeumorphicStyle(
-                              color: buttonColor, depth: -4, intensity: 1)
-                          : NeumorphicStyle(
-                              color: buttonColor, depth: 3, intensity: .4),
-                      //ButtonStyle(elevation: ButtonStyleButton.allOrNull(20)),
-                    ),
-                  ),
-                ),
+                child: FavouritesButton(ref, isFavouritesView, buttonColor),
               ),
               SizedBox(
                 width: 150,
@@ -152,13 +117,7 @@ class _HomePageState extends State<HomePage> {
           body: Builder(builder: (context) {
             final body = Column(
               children: [
-                Card(
-                  //surfaceTintColor: Theme.of(context).primaryColor,
-                  elevation: 5,
-                  margin: EdgeInsets.fromLTRB(1, 0, 1, 5),
-                  shadowColor: Colors.grey.shade50,
-                  child: _header(ref, viewModel, isWideScreen),
-                ),
+                Header(ref, viewModel, isWideScreen),
                 Consumer(
                   builder: (context, ref, _) {
                     late final AsyncValue modelsAsyncValue;
@@ -188,13 +147,19 @@ class _HomePageState extends State<HomePage> {
                       //loading: is never called.
                       //see fetchAndIndicate() in [ListViewMusicInfo.build]
                       //This may change.
-                      loading: () =>
-                          Center(child: CircularProgressIndicator.adaptive()),
-                      error: (e, st) => SelectableText(
-                        'Error $e ${kDebugMode ? st.toString() : ''}',
-                      ),
+                      loading: () {
+                        print(
+                            'AsyncValue.loading!! This shouldn\'t be happening');
+                        return Center(
+                            child: CircularProgressIndicator.adaptive());
+                      },
+                      error: (e, st) {
+                        print('AsyncValue.error');
+                        return SelectableText(
+                            'Error $e ${kDebugMode ? st.toString() : ''}');
+                      },
                       data: (dynamic data) {
-                        print('on data');
+                        print('AsyncValue.data');
                         return Expanded(
                             child: ListViewMusicInfo(
                           musicInfoItems:
@@ -332,14 +297,13 @@ class _HomePageState extends State<HomePage> {
         style: TextStyle(color: Colors.white),
         showCursor: true,
         onChanged: (value) {
-          //setState(() {
-          viewModel.searchString = value;
-          //});
+          setState(() {
+            viewModel.searchString = value;
+          });
         },
       ),
     );
   }
-
 
   Widget _dropDownSearchType(MusicItemsViewModel viewModel) {
     return Padding(
@@ -377,7 +341,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 
   Widget _compactViewDropDown() {
     return Consumer(
@@ -424,7 +387,187 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
-
   }
 }
 
+class Header extends StatelessWidget {
+  const Header(this.ref, this.viewModel, this.isWideScreen, {Key? key})
+      : super(key: key);
+
+  final WidgetRef ref;
+  final MusicItemsViewModel viewModel;
+  final bool isWideScreen;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+        //surfaceTintColor: Theme.of(context).primaryColor,
+        elevation: 5,
+        margin: EdgeInsets.fromLTRB(1, 0, 1, 5),
+        shadowColor: Colors.grey.shade50,
+        child: Builder(builder: (context) {
+          final isFavouritesView = ref.read(isFavouritesViewProvider);
+
+          if (isFavouritesView) {
+            return Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(children: [
+                if (viewModel.hasSearched && isWideScreen)
+                  Text(
+                      'Favourites searched: ${viewModel.totalItems.toThousands()} ',
+                      style: Theme.of(context).textTheme.headlineSmall)
+                else
+                  Text('Favourites',
+                      style: Theme.of(context).textTheme.headlineMedium),
+                Expanded(
+                    child: Align(
+                        child: Icon(Icons.favorite, color: Colors.red),
+                        alignment: Alignment.centerRight)),
+              ]),
+            );
+          } else {
+            return Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Row(children: [
+                if (viewModel.hasSearched && isWideScreen)
+                  Text('found ${viewModel.totalItems.toThousands()} ',
+                      style: Theme.of(context).textTheme.headline6),
+                Expanded(child: Container()),
+                _compactViewDropDown(),
+                _dropDownSearchType(context, viewModel),
+              ]),
+            );
+          }
+        }));
+  }
+
+  Widget _dropDownSearchType(
+      BuildContext context, MusicItemsViewModel viewModel) {
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          DropdownButton<MusicInfoType>(
+            style: Theme.of(context).textTheme.headline5,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            value: viewModel.searchType,
+            icon: const Icon(Icons.arrow_drop_down_outlined),
+            elevation: 16,
+            underline: Container(
+              height: 0,
+              color: Colors.deepPurpleAccent,
+            ),
+            onChanged: viewModel.onSearchTypeChange,
+            items: MusicInfoType.values
+                //.all is not supported by LastFM, used for favourites list :
+                .skipWhile((value) => value == MusicInfoType.all)
+                .map<DropdownMenuItem<MusicInfoType>>((MusicInfoType value) {
+              return DropdownMenuItem<MusicInfoType>(
+                value: value,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(musicInfoTypeUIStrings[value]!,
+                      semanticsLabel: 'search type menu'),
+                ),
+              );
+            }).toList(),
+            //.takeWhile((value) => value.value!=MusicInfoType.all)
+            //.toList(), //todo: modify to avoid hard coding
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _compactViewDropDown() {
+    return Consumer(
+      builder: (context, ref, _) {
+        final viewDensity = ref.watch(viewDensityProvider);
+        return Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              DropdownButton<ViewDensity>(
+                iconSize: 0,
+                style: Theme.of(context).textTheme.headline5,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                value: viewDensity,
+                //icon: const Icon(Icons.arrow_drop_down_outlined),
+                elevation: 16,
+                underline: Container(
+                  height: 0,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (value) {
+                  // demoted setState(() {
+                  ref.read(viewDensityProvider.notifier).state = value!;
+                  ref
+                      .read(sharedPreferencesServiceProvider)
+                      .setViewDensity(value);
+                  //});
+                },
+
+                items: ViewDensity.values.reversed
+                    .map<DropdownMenuItem<ViewDensity>>((ViewDensity value) {
+                  return DropdownMenuItem<ViewDensity>(
+                    value: value,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(value.icon),
+                    ),
+                  );
+                }).toList(),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class FavouritesButton extends StatelessWidget {
+  const FavouritesButton(this.ref, this.isFavouritesView, this.buttonColor,
+      {Key? key})
+      : super(key: key);
+
+  final bool isFavouritesView;
+  final Color buttonColor;
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: Semantics(
+        button: true,
+        label: 'toggle favourites list',
+        child: NeumorphicButton(
+          padding: EdgeInsets.all(5),
+          key: Key('faves_button'),
+          //icon: Icon(Icons.favorite),
+          child: Icon(Icons.favorite, color: Colors.red),
+          onPressed: () async {
+            final isFavesView = ref.read(isFavouritesViewProvider);
+            //if not then prep/refresh the faves view
+            //todo: refactor in to a refresh method
+            if (!isFavesView) {
+              final fvm = ref.read(favouritesViewModelProvider);
+              //fvm.searchString = '';
+              //await fvm.fetch();
+            }
+            ref.read(isFavouritesViewProvider.notifier).state =
+                !ref.read(isFavouritesViewProvider);
+          },
+          style: isFavouritesView
+              ? NeumorphicStyle(color: buttonColor, depth: -4, intensity: 1)
+              : NeumorphicStyle(color: buttonColor, depth: 3, intensity: .4),
+          //ButtonStyle(elevation: ButtonStyleButton.allOrNull(20)),
+        ),
+      ),
+    );
+  }
+}
