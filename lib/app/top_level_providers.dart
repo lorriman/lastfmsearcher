@@ -8,6 +8,7 @@ import 'package:jobtest_lastfm/services/repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/faves-api.dart';
 import '../services/shared_preferences_service.dart';
+import '../services/utils.dart';
 import 'list_view.dart';
 import 'models/item_model.dart';
 import 'models/items_viewmodel.dart';
@@ -38,6 +39,7 @@ class FavouritesViewNotifier extends StateNotifier<bool> {
 
 final isFavouritesViewProvider =
     StateNotifierProvider<FavouritesViewNotifier, bool>((ref) {
+      debugLog('','create FavouritesViewNotifier in isFavouritesViewProvider');
   return FavouritesViewNotifier(false);
 });
 
@@ -54,6 +56,7 @@ final viewDensityProvider =
 });
 
 final databaseProvider = Provider<LastfmApiService<MusicInfo>>((ref) {
+  debugLog('','create LastfmApiService in databaseProvider');
   return LastfmApiService<MusicInfo>(
     apiKey: global_apiKey,
     modelizer: Repository.modelize,
@@ -62,7 +65,8 @@ final databaseProvider = Provider<LastfmApiService<MusicInfo>>((ref) {
 });
 
 final repositoryProvider =
-    StateProvider.autoDispose<Repository<MusicInfo>>((ref) {
+    StateProvider<Repository<MusicInfo>>((ref) {
+      debugLog('','create Repository in repositoryProvider');
   final database = ref.watch(databaseProvider);
 
   ref.onDispose(() {});
@@ -70,8 +74,15 @@ final repositoryProvider =
 });
 
 final viewModelProvider =
-    ChangeNotifierProvider<MusicItemsViewModel>((ref) {
-  return MusicItemsViewModel(
+    ChangeNotifierProvider.autoDispose<MusicItemsViewModel>((ref) {
+      debugLog('','create MusicItemsViewModel in viewModelProvider');
+      ref.onDispose(() {
+        debugLog('viewModelProvider','dispose');
+      });
+
+
+
+      return MusicItemsViewModel(
     ref.read(repositoryProvider),
     Repository<MusicInfo>(lastFMapi: ref.read(favouritesDatabaseProvider)),
   );
@@ -79,9 +90,9 @@ final viewModelProvider =
 
 final musicInfoStreamProvider =
 StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
-  print('calling musicInfoStreamProvider');
+  debugLog('','init viewModelProvider.itemsStream() in musicInfoStreamProvider');
   ref.onDispose(() {
-    print('disposing musicInfoStreamProvider ');
+    debugLog('musicInfoStreamProvider','dispose');
   });
   final vm = ref.read(viewModelProvider);
   return vm.itemsStream();
@@ -96,6 +107,8 @@ final favouritesDatabaseProvider =
 
 final favouritesRepositoryProvider =
     StateProvider<Repository<MusicInfo>>((ref) {
+      debugLog('','create Repository in favouritesRepositoryProvider');
+
       final database = ref.watch(favouritesDatabaseProvider);
 
   ref.onDispose(() {});
@@ -103,13 +116,21 @@ final favouritesRepositoryProvider =
 });
 
 final favouritesViewModelProvider =
-    ChangeNotifierProvider<MusicItemsViewModel>((ref) {
-  return MusicItemsViewModel(ref.watch(favouritesRepositoryProvider));
+    ChangeNotifierProvider.autoDispose<MusicItemsViewModel>((ref) {
+      debugLog('','create MusicItemsViewModel in favouritesViewModelProvider');
+      ref.onDispose(() {
+        debugLog('favouritesViewModelProvider','dispose');
+      });
+
+      return MusicItemsViewModel(ref.watch(favouritesRepositoryProvider));
 });
 
 final favouritesMusicInfoStreamProvider =
     StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
-      final repo = ref.read(favouritesRepositoryProvider);
-  return repo.stream;
+      //final repo = ref.read(favouritesRepositoryProvider);
+  //return repo.stream;
+      debugLog('','init favouritesViewModelProvider.itemsStream() in favouritesMusicInfoStreamProvider');
+      final vm = ref.read(favouritesViewModelProvider);
+      return vm.itemsStream();
 });
 

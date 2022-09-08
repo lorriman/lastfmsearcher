@@ -3,6 +3,7 @@ import 'dart:async';
 
 // Project imports:
 import 'package:jobtest_lastfm/app/models/item_model.dart';
+import 'package:jobtest_lastfm/services/utils.dart';
 import 'lastfm_api.dart';
 
 // here ignore_for_file directive is because we use empty anonymous callbacks
@@ -69,10 +70,10 @@ class RepositoryFetchResult<T> {
 ///The T parameter is the ViewModel's choice for model object and is passed
 ///through to the API class, and implemented via a call back.
 class Repository<T> {
-  Repository({required ApiService lastFMapi}) : _lastFMapi = lastFMapi {
+  Repository({required ApiService lastFMapi} ) : _lastFMapi = lastFMapi {
     _streamController = StreamController<RepositoryFetchResult<T>?>(
         onListen: () {
-          print('listening');
+          debugLog(debugLabel,'listening');
         },
         onResume: () => print('resuming'));
     _streamPageController = StreamController<RepositoryFetchResult<T>?>(
@@ -97,6 +98,8 @@ class Repository<T> {
 
   //getters
 
+  String get debugLabel =>"repository(${_lastFMapi.runtimeType}) ";
+
   RepoStatus get status => _status;
 
   FetchPhase get fetchPhase => _fetchPhase;
@@ -109,9 +112,7 @@ class Repository<T> {
   ///does not return data.) The data added is all items from all pages
   ///that have so far been fetched for the current search string.
   Stream<RepositoryFetchResult<T>?> get stream {
-    print(' Repository get stream');
-    print(
-        ' Repository get stream: listener: ${_streamController.hasListener} closed: ${_streamController.isClosed}');
+    debugLog(debugLabel,'get stream');
     return _streamController.stream;
   }
 
@@ -181,6 +182,7 @@ class Repository<T> {
   ///calling this function will send nulls to both streams.
   void reset() {
     assert(_fetchPhase == FetchPhase.none);
+    debugLog(debugLabel,'reset');
     if (_status == RepoStatus.none) return;
     _page = -1;
     _totalItems = -1;
@@ -194,6 +196,7 @@ class Repository<T> {
   ///Initialise a search, ready for calling next()
   void searchInit(String searchStr, MusicInfoType searchType) {
     assert(_fetchPhase == FetchPhase.none);
+    debugLog(debugLabel,'searchInit: $searchStr');
     final str = searchStr.trim();
     if (str.isEmpty) reset();
     if (str != _searchString) reset();
@@ -209,13 +212,18 @@ class Repository<T> {
   ///The uiDelayMillisecs is to guarantee that a progress indicator gets to be
   /// seen in case fetching is near instantaneous.
   Future<void> next({int uiDelayMillisecs = 0}) async {
-    assert(_page > -1);
-    assert(_lastFMapi.runtimeType == LastfmApiService
-        ? _searchString.length > 2
-        : true);
-    assert(_status != RepoStatus.none);
-    final stopWatch = Stopwatch()..start();
     try {
+      assert(_page > -1);
+      assert(_lastFMapi.runtimeType == LastfmApiService
+          ? _searchString.length > 2
+          : true);
+      assert(_status != RepoStatus.none);
+      assert(_streamController.hasListener ||
+          _streamPageController.hasListener, 'no stream subscribers');
+      debugLog(debugLabel, 'next');
+      final stopWatch = Stopwatch()
+        ..start();
+
       beforeFetch(_items);
       _fetchPhase = FetchPhase.fetching;
       final results = await _lastFMapi.search(_searchString,
@@ -228,7 +236,9 @@ class Repository<T> {
       final fetchResultPage = RepositoryFetchResult<T>(_musicInfoType,
           results.items as List<T>, results.totalItems, _items.isEmpty, _page);
 
-      _streamPageController.add(fetchResultPage);
+      if (_streamPageController.hasListener) _streamPageController.add(
+          fetchResultPage);
+
       _items.addAll(results.items as List<T>);
       //all results, for infinite scrolling
       final fetchResultAll = RepositoryFetchResult<T>(
@@ -239,13 +249,17 @@ class Repository<T> {
         _page,
       );
       _fetchPhase = FetchPhase.none;
-      _streamController.add(fetchResultAll);
-      print('call finalized fetch');
-      finalizedFetch(_items);
-      print('after finalized fetch');
+      if (_streamController.hasListener) _streamController.add(fetchResultAll);
+      debugLog(debugLabel,
+          'next _streamController.add ${fetchResultAll.items.length} items');
+      //print('after finalized fetch');
       final delay = uiDelayMillisecs - stopWatch.elapsed.inMilliseconds;
       await Future.delayed(Duration(milliseconds: delay));
-    } finally {
+    }on AssertionError catch(e){
+      debugLog(debugLabel,e.toString());
+    }  on Exception catch( e){
+      debugLog(debugLabel,e.toString());
+  }finally {
       _fetchPhase = FetchPhase.none;
     }
   }
@@ -260,7 +274,7 @@ class Repository<T> {
   }
 
   void dispose() {
-    print('repository.dispose ${this.runtimeType}');
+    debugLog(debugLabel,'dispose');
     _streamController.close();
     _streamPageController.close();
   }

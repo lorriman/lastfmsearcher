@@ -1,6 +1,6 @@
 // Flutter imports:
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' hide debugPrint;
+import 'package:flutter/material.dart' hide debugPrint;
 import 'package:flutter_neumorphic/flutter_neumorphic.dart' hide Builder;
 import 'package:package_info_plus/package_info_plus.dart';
 // Package imports:
@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
       final buttonStyle = TextButton.styleFrom(
         foregroundColor: color,
       );
-
+/*
       return GestureDetector(
         //legacy keyboard pop-down. We might have to resort to this
         //if the other one doesn't work out. See [MyApp.build]->Listener
@@ -72,7 +72,9 @@ class _HomePageState extends State<HomePage> {
         //FocusScope.of(context).requestFocus(new FocusNode()),
 */
         behavior: HitTestBehavior.translucent,
-        child: Scaffold(
+        child:
+        */
+          return Scaffold(
           appBar: AppBar(
             elevation: 0,
             toolbarHeight: 65,
@@ -118,12 +120,12 @@ class _HomePageState extends State<HomePage> {
             final body = Column(
               children: [
                 Header(ref, viewModel, isWideScreen),
-                Consumer(
-                  builder: (context, ref, _) {
+                Builder(
+                  builder: (context) {
                     late final AsyncValue modelsAsyncValue;
-                    final isFavouritesView =
+  /*                  final isFavouritesView =
                         ref.watch(isFavouritesViewProvider);
-
+*/
                     if (isFavouritesView) {
                       modelsAsyncValue =
                           ref.watch(favouritesMusicInfoStreamProvider);
@@ -159,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                             'Error $e ${kDebugMode ? st.toString() : ''}');
                       },
                       data: (dynamic data) {
-                        print('AsyncValue.data');
+                        debugLog( viewModel.debugLabel, 'AsyncValue.data');
                         return Expanded(
                             child: ListViewMusicInfo(
                           musicInfoItems:
@@ -193,8 +195,8 @@ class _HomePageState extends State<HomePage> {
               child: isFavouritesView ? body1 : body2,
             );
           }),
-        ),
-      );
+        );
+      //);Gesture detector
     });
   }
 
@@ -209,40 +211,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// search total and dropdown for artist, song, album searches.
-  Widget _header(
-      WidgetRef ref, MusicItemsViewModel viewModel, bool isWideScreen) {
-    final isFavouritesView = ref.read(isFavouritesViewProvider);
-
-    if (isFavouritesView) {
-      return Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Row(children: [
-          if (viewModel.hasSearched && isWideScreen)
-            Text('Favourites searched: ${viewModel.totalItems.toThousands()} ',
-                style: Theme.of(context).textTheme.headlineSmall)
-          else
-            Text('Favourites',
-                style: Theme.of(context).textTheme.headlineMedium),
-          Expanded(
-              child: Align(
-                  child: Icon(Icons.favorite, color: Colors.red),
-                  alignment: Alignment.centerRight)),
-        ]),
-      );
-    } else {
-      return Padding(
-        padding: const EdgeInsets.only(left: 8.0),
-        child: Row(children: [
-          if (viewModel.hasSearched && isWideScreen)
-            Text('found ${viewModel.totalItems.toThousands()} ',
-                style: Theme.of(context).textTheme.headline6),
-          Expanded(child: Container()),
-          _compactViewDropDown(),
-          _dropDownSearchType(viewModel),
-        ]),
-      );
-    }
-  }
 
   ///search total when screen is narrow
   SizedBox _footer(MusicItemsViewModel viewModel) {
@@ -305,89 +273,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _dropDownSearchType(MusicItemsViewModel viewModel) {
-    return Padding(
-      padding: const EdgeInsets.all(5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          DropdownButton<MusicInfoType>(
-            style: Theme.of(context).textTheme.headline5,
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-            value: viewModel.searchType,
-            icon: const Icon(Icons.arrow_drop_down_outlined),
-            elevation: 16,
-            underline: Container(
-              height: 0,
-              color: Colors.deepPurpleAccent,
-            ),
-            onChanged: viewModel.onSearchTypeChange,
-            items: MusicInfoType.values
-                .map<DropdownMenuItem<MusicInfoType>>((MusicInfoType value) {
-                  return DropdownMenuItem<MusicInfoType>(
-                    value: value,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(musicInfoTypeUIStrings[value]!,
-                          semanticsLabel: 'search type menu'),
-                    ),
-                  );
-                })
-                .toList()
-                .take(3)
-                .toList(), //todo: modify to avoid hard coding
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _compactViewDropDown() {
-    return Consumer(
-      builder: (context, ref, _) {
-        final viewDensity = ref.watch(viewDensityProvider);
-        return Padding(
-          padding: const EdgeInsets.all(5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              DropdownButton<ViewDensity>(
-                iconSize: 0,
-                style: Theme.of(context).textTheme.headline5,
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                value: viewDensity,
-                //icon: const Icon(Icons.arrow_drop_down_outlined),
-                elevation: 16,
-                underline: Container(
-                  height: 0,
-                  color: Colors.deepPurpleAccent,
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    ref.read(viewDensityProvider.notifier).state = value!;
-                    ref
-                        .read(sharedPreferencesServiceProvider)
-                        .setViewDensity(value);
-                  });
-                },
-
-                items: ViewDensity.values.reversed
-                    .map<DropdownMenuItem<ViewDensity>>((ViewDensity value) {
-                  return DropdownMenuItem<ViewDensity>(
-                    value: value,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(value.icon),
-                    ),
-                  );
-                }).toList(),
-              )
-            ],
-          ),
-        );
-      },
-    );
-  }
 }
 
 class Header extends StatelessWidget {
@@ -461,7 +346,7 @@ class Header extends StatelessWidget {
             onChanged: viewModel.onSearchTypeChange,
             items: MusicInfoType.values
                 //.all is not supported by LastFM, used for favourites list :
-                .skipWhile((value) => value == MusicInfoType.all)
+                .where((element) => element != MusicInfoType.all)
                 .map<DropdownMenuItem<MusicInfoType>>((MusicInfoType value) {
               return DropdownMenuItem<MusicInfoType>(
                 value: value,
@@ -501,12 +386,10 @@ class Header extends StatelessWidget {
                   color: Colors.deepPurpleAccent,
                 ),
                 onChanged: (value) {
-                  // demoted setState(() {
                   ref.read(viewDensityProvider.notifier).state = value!;
                   ref
                       .read(sharedPreferencesServiceProvider)
                       .setViewDensity(value);
-                  //});
                 },
 
                 items: ViewDensity.values.reversed

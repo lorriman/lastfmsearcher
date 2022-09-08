@@ -8,6 +8,12 @@ import 'package:flutter/services.dart' show rootBundle;
 // Package imports:
 import 'package:intl/intl.dart';
 
+void debugLog(String label, String str){
+
+  print(DateTime.now().toString().substring(11,21)+' '+str.padRight(20)+ ' '+label );
+
+}
+
 const uInt32maxValue = 0xFFFFFFFF;
 const uInt32minValue = 0;
 const int32maxValue = 0x7FFFFFFF;

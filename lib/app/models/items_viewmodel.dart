@@ -1,5 +1,5 @@
 // Flutter imports:
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide debugPrint;
 
 import 'package:rxdart/rxdart.dart';
 
@@ -7,6 +7,8 @@ import 'package:rxdart/rxdart.dart';
 import 'package:jobtest_lastfm/services/repository.dart';
 
 import 'item_model.dart';
+
+import 'package:jobtest_lastfm/services/utils.dart';
 
 ///A number of properties are provided to reduce UI clutter as well as serve
 ///specific UI requirements.
@@ -30,6 +32,8 @@ class MusicItemsViewModel extends ChangeNotifier {
   MusicInfoType _searchType = MusicInfoType.albums;
 
   //getters
+
+  String get debugLabel =>"MusicItemsViewModel(${searchType.name==MusicInfoType.all? 'faves':'main'})";
 
   String get searchString => _searchString;
 
@@ -91,6 +95,7 @@ class MusicItemsViewModel extends ChangeNotifier {
   ///loading indicator for the first fetch. This is because the API
   ///is not live streamed and when.loading: is not triggered.
   Future<void> fetch() async {
+    debugLog(debugLabel,'fetch');
     if (_isFirst == null) {
       _isFirst = true;
     } else {
@@ -111,7 +116,7 @@ class MusicItemsViewModel extends ChangeNotifier {
   //If _favesRepository is configured reconciled with main stream
   //to supply favourited items.
   Stream<RepositoryFetchResult<MusicInfo>?> itemsStream() {
-    print('itemsStream:entered');
+    debugLog(debugLabel,'itemsStream');
 
     if (_favesRepository == null) return _repository.stream;
 
@@ -123,10 +128,10 @@ class MusicItemsViewModel extends ChangeNotifier {
     );
   }
 
-  static RepositoryFetchResult<MusicInfo>? _itemsCombiner(
+   RepositoryFetchResult<MusicInfo>? _itemsCombiner(
       RepositoryFetchResult<MusicInfo>? faveRepFetchResult,
       RepositoryFetchResult<MusicInfo>? repFetchResult) {
-    print('items combiner');
+    debugLog(debugLabel,'_itemsCombiner');
     if (repFetchResult == null) return null;
     if (faveRepFetchResult == null) return repFetchResult;
 
@@ -167,7 +172,7 @@ class MusicItemsViewModel extends ChangeNotifier {
       await repo.addItem(item.copyWith(favourite: true));
     }
 
-    //repo.reset();
+    repo.reset();
     repo.searchInit('', MusicInfoType.all);
     await repo.next();
 
