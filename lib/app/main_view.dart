@@ -119,20 +119,20 @@ class _HomePageState extends State<HomePage> {
           body: Builder(builder: (context) {
             final body = Column(
               children: [
-                Header(ref, viewModel, isWideScreen),
-                Builder(
-                  builder: (context) {
-                    late final AsyncValue modelsAsyncValue;
-  /*                  final isFavouritesView =
+              Header(ref, viewModel, isWideScreen),
+              Consumer(
+                builder: (context, ref, _) {
+                  late final AsyncValue modelsAsyncValue;
+                  /*                  final isFavouritesView =
                         ref.watch(isFavouritesViewProvider);
 */
-                    if (isFavouritesView) {
-                      modelsAsyncValue =
-                          ref.watch(favouritesMusicInfoStreamProvider);
-                    } else {
-                      modelsAsyncValue = ref.watch(musicInfoStreamProvider);
-                    }
-                    //The first loading indicator is done here.
+                  if (isFavouritesView) {
+                    modelsAsyncValue =
+                        ref.watch(favouritesMusicInfoStreamProvider);
+                  } else {
+                    modelsAsyncValue = ref.watch(musicInfoStreamProvider);
+                  }
+                  //The first loading indicator is done here.
                     //To allow infinite scrolling subsequent loading indicators
                     //are done in the final element of the listview on scrolling
                     //to the end.

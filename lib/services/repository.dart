@@ -44,7 +44,10 @@ class RepositoryFetchResult<T> {
     // ignore: avoid_positional_boolean_parameters
     this.isFirst,
     this.page,
-  );
+  ) {
+    debugLog('hashCode: ${this.hashCode} items: ${items.length}',
+        'RepositoryFetchResult()');
+  }
 
   factory RepositoryFetchResult.empty() {
     return RepositoryFetchResult(MusicInfoType.all, <T>[], 0, true, 1);
@@ -182,7 +185,7 @@ class Repository<T> {
   ///calling this function will send nulls to both streams.
   void reset() {
     assert(_fetchPhase == FetchPhase.none);
-    debugLog(debugLabel,'reset');
+    debugLog(debugLabel, 'reset');
     if (_status == RepoStatus.none) return;
     _page = -1;
     _totalItems = -1;
@@ -218,11 +221,10 @@ class Repository<T> {
           ? _searchString.length > 2
           : true);
       assert(_status != RepoStatus.none);
-      assert(_streamController.hasListener ||
-          _streamPageController.hasListener, 'no stream subscribers');
+      // assert(_streamController.hasListener ||
+      //     _streamPageController.hasListener, 'no stream subscribers');
       debugLog(debugLabel, 'next');
-      final stopWatch = Stopwatch()
-        ..start();
+      final stopWatch = Stopwatch()..start();
 
       beforeFetch(_items);
       _fetchPhase = FetchPhase.fetching;
