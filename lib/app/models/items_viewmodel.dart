@@ -33,7 +33,7 @@ class MusicItemsViewModel extends ChangeNotifier {
 
   //getters
 
-  String get debugLabel =>"MusicItemsViewModel(${searchType.name==MusicInfoType.all? 'faves':'main'})";
+  String get debugLabel =>"MusicItemsViewModel(${searchType.name==MusicInfoType.all? 'faves':'main'}) ${this.hashCode}";
 
   String get searchString => _searchString;
 

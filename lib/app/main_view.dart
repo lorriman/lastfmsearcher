@@ -132,6 +132,8 @@ class _HomePageState extends State<HomePage> {
                   } else {
                     modelsAsyncValue = ref.watch(musicInfoStreamProvider);
                   }
+                  debugLog('viewModel','watching ${viewModel.hashCode}');
+                  //debugLog('modelsAsyncValue stream','watching ${modelsAsyncValue.s}')
                   //The first loading indicator is done here.
                     //To allow infinite scrolling subsequent loading indicators
                     //are done in the final element of the listview on scrolling

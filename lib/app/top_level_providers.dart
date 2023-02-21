@@ -13,7 +13,6 @@ import 'list_view.dart';
 import 'models/item_model.dart';
 import 'models/items_viewmodel.dart';
 
-
 /// ## call order of classes (to explain the providers)
 ///
 /// UI->MusicViewModel.search() and ..next()->Repository.search()->LastFMAPI.search()->http calls
@@ -39,7 +38,7 @@ class FavouritesViewNotifier extends StateNotifier<bool> {
 
 final isFavouritesViewProvider =
     StateNotifierProvider<FavouritesViewNotifier, bool>((ref) {
-      debugLog('','create FavouritesViewNotifier in isFavouritesViewProvider');
+  debugLog('', 'create FavouritesViewNotifier in isFavouritesViewProvider');
   return FavouritesViewNotifier(false);
 });
 
@@ -56,7 +55,7 @@ final viewDensityProvider =
 });
 
 final databaseProvider = Provider<LastfmApiService<MusicInfo>>((ref) {
-  debugLog('','create LastfmApiService in databaseProvider');
+  debugLog('', 'create LastfmApiService in databaseProvider');
   return LastfmApiService<MusicInfo>(
     apiKey: global_apiKey,
     modelizer: Repository.modelize,
@@ -64,9 +63,8 @@ final databaseProvider = Provider<LastfmApiService<MusicInfo>>((ref) {
   );
 });
 
-final repositoryProvider =
-    StateProvider<Repository<MusicInfo>>((ref) {
-      debugLog('','create Repository in repositoryProvider');
+final repositoryProvider = StateProvider<Repository<MusicInfo>>((ref) {
+  debugLog('', 'create Repository in repositoryProvider');
   final database = ref.watch(databaseProvider);
 
   ref.onDispose(() {});
@@ -75,24 +73,25 @@ final repositoryProvider =
 
 final viewModelProvider =
     ChangeNotifierProvider.autoDispose<MusicItemsViewModel>((ref) {
-      debugLog('','create MusicItemsViewModel in viewModelProvider');
-      ref.onDispose(() {
-        debugLog('viewModelProvider','dispose');
-      });
-
-
-
-      return MusicItemsViewModel(
+  final mivm = MusicItemsViewModel(
     ref.read(repositoryProvider),
     Repository<MusicInfo>(lastFMapi: ref.read(favouritesDatabaseProvider)),
   );
+
+  final hashCode = mivm.hashCode;
+  ref.onDispose(() {
+    debugLog('viewModelProvider', 'dispose $hashCode');
+  });
+  debugLog('viewModelProvider', 'create $hashCode');
+  return mivm;
 });
 
 final musicInfoStreamProvider =
-StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
-  debugLog('','init viewModelProvider.itemsStream() in musicInfoStreamProvider');
+    StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
+  debugLog(
+      '', 'init viewModelProvider.itemsStream() in musicInfoStreamProvider');
   ref.onDispose(() {
-    debugLog('musicInfoStreamProvider','dispose');
+    debugLog('musicInfoStreamProvider', 'dispose');
   });
   final vm = ref.read(viewModelProvider);
   return vm.itemsStream();
@@ -107,9 +106,9 @@ final favouritesDatabaseProvider =
 
 final favouritesRepositoryProvider =
     StateProvider<Repository<MusicInfo>>((ref) {
-      debugLog('','create Repository in favouritesRepositoryProvider');
+  debugLog('', 'create Repository in favouritesRepositoryProvider');
 
-      final database = ref.watch(favouritesDatabaseProvider);
+  final database = ref.watch(favouritesDatabaseProvider);
 
   ref.onDispose(() {});
   return Repository<MusicInfo>(lastFMapi: database);
@@ -117,20 +116,21 @@ final favouritesRepositoryProvider =
 
 final favouritesViewModelProvider =
     ChangeNotifierProvider.autoDispose<MusicItemsViewModel>((ref) {
-      debugLog('','create MusicItemsViewModel in favouritesViewModelProvider');
-      ref.onDispose(() {
-        debugLog('favouritesViewModelProvider','dispose');
-      });
-
-      return MusicItemsViewModel(ref.watch(favouritesRepositoryProvider));
+  final mivm = MusicItemsViewModel(ref.watch(favouritesRepositoryProvider));
+  final hashCode = mivm.hashCode;
+  ref.onDispose(() {
+    debugLog('favouritesViewModelProvider', 'dispose $hashCode');
+  });
+  debugLog('favouritesViewModelProvider', 'create $hashCode');
+  return mivm;
 });
 
 final favouritesMusicInfoStreamProvider =
     StreamProvider<RepositoryFetchResult<MusicInfo>?>((ref) {
-      //final repo = ref.read(favouritesRepositoryProvider);
+  //final repo = ref.read(favouritesRepositoryProvider);
   //return repo.stream;
-      debugLog('','init favouritesViewModelProvider.itemsStream() in favouritesMusicInfoStreamProvider');
-      final vm = ref.read(favouritesViewModelProvider);
-      return vm.itemsStream();
+  debugLog('',
+      'init favouritesViewModelProvider.itemsStream() in favouritesMusicInfoStreamProvider');
+  final vm = ref.read(favouritesViewModelProvider);
+  return vm.itemsStream();
 });
-
